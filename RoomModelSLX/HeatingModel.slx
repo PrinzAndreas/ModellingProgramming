@@ -1,0 +1,270 @@
+#define SLX2 ON
+import <ContinuousSmall>
+import <PlotTrace>
+import <ValueTable>
+import <TimeBaseSeconds>
+
+import <HeatingConstants>
+
+module RoomHeating {
+  //========== Experiment parameters
+  constant double TEMP_NIGHT_NOMINAL= 15;      // °C 
+  constant double TEMP_DAY_NOMINAL=   22;      // °C 
+  constant double BOILER_WATER_TEMP=  40;      // °C 
+  constant double EXPERIMENT_DURATION = Day;
+  //========== End Experiment parameters
+
+  pointer (Environment) env;
+  pointer (Boiler)      boiler;
+  pointer (Radiator)    radiator;
+  pointer (Room)        room;
+  pointer (Resident)    resident;
+
+  passive class Environment implements (Behavior) {
+    ContinuousVariable temp;
+    ValueTable temp_out(Hour);
+    pointer(Point) p;
+    
+    initial {
+      fill temp_out with 
+        ( 0,  4), // start with previous day
+      //April 22, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-22
+        ( 1,  3), ( 2,  3), ( 3,  3), ( 4,  2), ( 5,  2), ( 6,  2), 
+        ( 7,  4), ( 8,  7), ( 9, 10), (10, 14), (11, 15), (12, 15), 
+        (13, 15), (14, 15), (15, 15), (16, 16), (17, 15), (18, 14), 
+        (19, 13), (20, 12), (21, 11), (22, 11), (23, 10), (24, 10),
+      //April 23, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-23
+        (24+ 1,  9), (24+ 2,  9), (24+ 3,  9), (24+ 4,  9), (24+ 5,  9), (24+ 6,  9), 
+        (24+ 7,  9), (24+ 8,  9), (24+ 9,  9), (24+10, 10), (24+11, 11), (24+12, 12), 
+        (24+13, 13), (24+14, 13), (24+15, 12), (24+16, 13), (24+17, 12), (24+18, 12), 
+        (24+19, 11), (24+20,  9), (24+21,  8), (24+22,  8), (24+23,  8), (24+24,  8), 
+      //April 24, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-24
+        (48+ 1,  8), (48+ 2,  8), (48+ 3,  9), (48+ 4,  9), (48+ 5,  9), (48+ 6,  9), 
+        (48+ 7,  9), (48+ 8,  9), (48+ 9,  9), (48+10,  9), (48+11,  9), (48+12,  9), 
+        (48+13,  8), (48+14,  8), (48+15,  9), (48+16,  9), (48+17, 10), (48+18,  9), 
+        (48+19,  8), (48+20,  7), (48+21,  6), (48+22,  6), (48+23,  5), (48+24,  5), 
+      //April 25, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-25
+        (72+ 1,  5), (72+ 2,  5), (72+ 3,  5), (72+ 4,  5), (72+ 5,  5), (72+ 6,  5), 
+        (72+ 7,  5), (72+ 8,  6), (72+ 9,  8), (72+10,  9), (72+11,  9), (72+12,  9), 
+        (72+13,  8), (72+14,  7), (72+15,  8), (72+16,  8), (72+17,  8), (72+18,  7), 
+        (72+19,  7), (72+20,  8), (72+21,  7), (72+22,  6), (72+23,  5), (72+24,  5), 
+      //April 26, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-26
+        (96+ 1,  4), (96+ 2,  4), (96+ 3,  3), (96+ 4,  3), (96+ 5,  3), (96+ 6,  3), 
+        (96+ 7,  4), (96+ 8,  5), (96+ 9,  6), (96+10,  7), (96+11,  9), (96+12,  9), 
+        (96+13,  9), (96+14, 10), (96+15, 11), (96+16, 10), (96+17, 11), (96+18,  8), 
+        (96+19,  8), (96+20,  7), (96+21,  6), (96+22,  5), (96+23,  4), (96+24,  3), 
+      //April 27, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-27
+        (120+ 1,  3), (120+ 2,  3), (120+ 3,  3), (120+ 4,  3), (120+ 5,  3), (120+ 6,  3), 
+        (120+ 7,  4), (120+ 8,  6), (120+ 9,  8), (120+10,  9), (120+11, 10), (120+12, 10), 
+        (120+13, 11), (120+14, 11), (120+15, 12), (120+16, 12), (120+17, 11), (120+18, 11), 
+        (120+19, 10), (120+20,  8), (120+21,  6), (120+22,  5), (120+23,  5), (120+24,  4), 
+      //April 28, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-28
+        (144+ 1,  3), (144+ 2,  2), (144+ 3,  1), (144+ 4,  0), (144+ 5, -1), (144+ 6, -2), 
+        (144+ 7,  2), (144+ 8,  4), (144+ 9,  7), (144+10,  8), (144+11,  8), (144+12,  8), 
+        (144+13,  9), (144+14, 10), (144+15,  9), (144+16,  8), (144+17,  8), (144+18,  9), 
+        (144+19,  8), (144+20,  7), (144+21,  7), (144+22,  6), (144+23,  5), (144+24,  4);
+      temp.state = temp_out.linear(0);
+
+      theIntegrator->attachODE(ME, 1);  
+    }
+  
+    concrete method derivatives(double t) {
+      temp.state = temp_out.linear(time);
+    }
+  }
+
+  passive class Boiler (double boilerTemp) implements (Behavior) {
+    ContinuousVariable temp;
+    double initTemp = boilerTemp; // °C
+  
+    initial {
+      temp.state= initTemp;
+//      theIntegrator->attachVar(&temp);
+      theIntegrator->attachODE(ME, 0);
+    } 
+  
+    concrete method derivatives(double t) {
+//      temp.rate= 0.0;
+      temp.state= initTemp;
+    } 
+  } 
+
+  abstract passive class Radiator(double initTemp) implements(Behavior) {
+    double tempNominal=initTemp;
+    double onOff=0; // call it lever? or control?
+
+    ContinuousVariable temp;
+    
+    initial {
+      temp.state = tempNominal;
+      theIntegrator->attachVar(&temp);
+      theIntegrator->attachODE(ME, 1);  
+    } 
+  }
+  
+  passive class WaterRadiator(double initTemp, double initHyst) subclass(Radiator(initTemp)) implements (Behavior) {
+    double hysteresis=initHyst;   //°C       ~ hysteresis of temperature control
+    
+    concrete method derivatives(double t)  {
+      double tempIN = boiler->temp.state;
+      double tempDiff = tempNominal - room->temp.state;
+      double T1, T2;
+
+      if (tempDiff <=0) onOff=0.0;
+      else if (tempDiff >= hysteresis) onOff=1.0;
+      else onOff= tempDiff / hysteresis;
+    
+      T1 = onOff * F_WATER / V_RADIATOR_WATER  * (tempIN - temp.state) ;
+      T2 = K_RADIATOR * A_RADIATOR * (room->temp.state - temp.state ) / (V_RADIATOR_WATER * D_WATER * C_WATER);  
+      temp.rate = T1 + T2;
+    } 
+  } 
+
+  passive class ElectricalRadiator(double initTemp, double initHyst) subclass(Radiator(initTemp)) implements (Behavior) {
+    double hysteresis=initHyst;   //°C       ~ hysteresis of temperature control
+    
+    concrete method derivatives(double t)  {
+      double tempDiff = tempNominal - room->temp.state;
+      double inpPower, outpPower;
+
+      if (onOff>0 && tempDiff <= -hysteresis) onOff=0.0;
+      if (onOff<1 && tempDiff >= hysteresis) onOff=1.0;
+      
+      // calculate average opening of onoff for amount of time
+    
+      inpPower= (onOff * P_RADIATOR) / (C_WATER * V_RADIATOR_WATER * D_WATER);		
+      // below should be the same as for the room, see also water case
+      outpPower = K_RADIATOR * A_RADIATOR * (room->temp.state - temp.state ) / (V_RADIATOR_WATER * D_WATER * C_WATER);  
+      temp.rate = inpPower + outpPower;
+      } 
+  } 
+
+  passive class Room() implements (Behavior) {  
+    double k_Window = K_CLOSED_WINDOW;
+    ContinuousVariable temp; 
+  
+    initial {
+      temp.state = radiator->tempNominal;
+      theIntegrator->attachVar(&temp);
+      theIntegrator->attachODE(ME, 1);
+    }
+        
+    concrete method derivatives(double t) {
+      double radiatorPower = K_RADIATOR * A_RADIATOR * (radiator->temp.state - temp.state);
+      double wallLossRate = (temp.state - env->temp.state) * A_WALL * K_WALL;
+      double windowLossRate = (temp.state - env->temp.state) * A_WINDOW * k_Window;
+      temp.rate = (radiatorPower - windowLossRate - wallLossRate) / (C_AIR * V_ROOM *D_AIR);
+    }
+  } 
+
+	type ResidentState enum { Sleeping, Active, Working, Airing, finalAiring };
+	type ResidentEvent enum { wakeup, workStart, workEnd, needAir, enoughAir, timeToSleep };
+  class Event(double t, ResidentEvent s) { double when=t; ResidentEvent what=s; }
+  class Resident() {  
+  
+	  ResidentState myState = Sleeping;
+    set(Event) ranked (ascending when) calendar;
+    pointer(Event) currentEvent;
+    
+    rn_stream windowClose, windowOpen; // use better names
+    
+    actions {
+      theIntegrator->attachPuck(ACTIVE);
+      
+      place new Event(6*Hour, wakeup) into calendar; // sleep until 6
+      place new Event(10*Hour, workStart) into calendar; // go to work at 10
+      place new Event(22*Hour, timeToSleep) into calendar; // prepare to bed at 22
+
+      print "Starting simulation";
+      forever {
+        currentEvent = first Event in calendar;
+        remove currentEvent from calendar;
+        print (myState) ", state is now _. ";
+        print (currentEvent->when/Hour, currentEvent->what) "At __.__, we want to _\n";
+        advance currentEvent->when - time; // wait until the time of the event
+        print ((time%Day)/Hour, (time%Hour)/Minute, floor(time/Hour)%24, floor(time/Minute)%60, myState, currentEvent->what) "__:__ (or __:__): _ -> _";
+
+        switch (currentEvent->what) {
+          case wakeup: // regulate temperature and plan next airing
+            radiator->tempNominal = TEMP_DAY_NOMINAL;
+          case workEnd: // this part applies to wakeup and workEnd
+            place new Event(time+Hour+rv_expo(windowOpen, 1 *Hour), needAir) into calendar;
+            myState = Active;
+            break;
+          case workStart: // close the window if it was still open
+            room->k_Window = K_CLOSED_WINDOW;
+            place new Event(time+4*Hour, workEnd) into calendar; // leave for 4 hours
+            place new Event(time+24*Hour, workStart) into calendar; // do the same tomorrow
+            myState = Working;
+            break;
+          case needAir: // open window and schedule closing
+            if (myState != Active) break; // do not air unless active
+            room->k_Window = K_OPEN_WINDOW;
+            place new Event(time+rv_uniform(windowClose, 15*Minute, 25*Minute), enoughAir) into calendar;
+            myState = Airing;
+            break;
+          case enoughAir: // close window and plan next airing
+            room->k_Window = K_CLOSED_WINDOW;
+            if (myState == Airing) { // plan next airing
+              place new Event(time+Hour+rv_expo(windowOpen, 1*Hour), needAir) into calendar;
+              myState = Active;
+            }
+            if (myState == finalAiring) { // go to sleep for 8 hours
+              place new Event(time+8*Hour, wakeup) into calendar;
+              myState = Sleeping;
+            }
+            break;
+          case timeToSleep:
+            radiator->tempNominal = TEMP_NIGHT_NOMINAL;
+            room->k_Window = K_OPEN_WINDOW;
+            place new Event(time+24*Hour, timeToSleep) into calendar; // do the same tomorrow
+            place new Event(time+rv_normal(windowClose, 20*Minute, 5*Minute), enoughAir) into calendar;
+            myState = finalAiring;
+            break;
+        }
+      }
+    } 
+  } 
+
+  procedure main {  
+    // integrator configuration (maybe do it silently?)
+    double min_h  = 0.0001 * Minute;
+    double max_h  = 10.0* Minute;
+    double err_limit   = 0.1;
+    theIntegrator= new RKM_Integrator (max_h, min_h, RELATIVE, err_limit);  
+    
+    env= new Environment;
+    boiler =new Boiler (BOILER_WATER_TEMP);
+    radiator= new WaterRadiator (TEMP_NIGHT_NOMINAL, 1.0);
+//    radiator= new ElectricalRadiator (TEMP_NIGHT_NOMINAL, 0.2);
+    room= new Room;
+    resident= new Resident ();
+    
+    Tracer diagram ("RoomChart");
+    Tracer observed ("RoomObserved");
+
+    activate resident;
+
+    theIntegrator->attachPuck(ACTIVE);
+    activate theIntegrator;     
+
+    trace diagram 
+          ( env->temp.state named TemperatureOutside, boiler->temp.state named TemperatureBoiler, radiator->temp.state named TemperatureHeating, 
+            room->temp.state named TemperatureRoom, room->k_Window *1.0 named WindowHeatLoss, radiator->tempNominal named wantedTemperature,  
+            radiator->onOff *10.0 named ValveHeating ) 
+      every 10*Second watch theIntegrator;
+
+    trace observed 
+          ( env->temp.state named TemperatureOutside, room->temp.state named TemperatureRoom, room->k_Window *1.0 named WindowOpen, radiator->onOff *10.0 named HeatingOnOff ) 
+      every 10*Second watch theIntegrator;
+
+    advance EXPERIMENT_DURATION;
+    
+    plot diagram as "pdf";
+    plot observed as "pdf";
+		print (F_WATER, D_WATER)
+			"\tFLOW WATER: _.__ kg/min\n\tWater density: _.__ kg/l\n";
+
+    exit(0);
+  }
+} 

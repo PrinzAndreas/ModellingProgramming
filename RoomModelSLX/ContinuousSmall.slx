@@ -1,0 +1,481 @@
+//*****************************************************************************
+// 	Module Continuous
+//                           Runge-Kutta-Merson method with step length control
+//                           virtual function derivatives without time dependency
+//*****************************************************************************
+
+#define SLX2 ON
+
+public module Continuous
+{
+	// Global Declarations
+	//------------------------------------------------------------------------------------------------
+	constant double EPSILON1= 1E-150;
+	constant double EPSILON2= 1E-150;
+	
+	pointer (Integrator) theIntegrator;
+	
+	//*****************************************************************************
+	// class Puck ---Extension
+	//*****************************************************************************
+	augment puck
+	{
+		boolean stateEventDetected, stateEventFinalized;
+	}
+	
+	//*****************************************************************************
+	// class Point
+	//*****************************************************************************
+	passive class Point (double x_, y_) {
+		double x= x_;
+		double y= y_;
+		procedure show () {
+			print options= italic (x, y) "[ __.__, __.__ ]\n";
+		}
+} //class Point
+
+	//*****************************************************************************
+	// class Continous Variable
+	//*****************************************************************************
+	passive class ContinuousVariable {
+		string(22) myName;
+		boolean isActive;
+		pointer(Integrator) myIntegrator;
+		
+		control double currentState;
+		double state;
+		double rate;
+		double initialState;
+		double errorValue;
+		double k1;
+		double k2;
+		double k3;
+		
+		method initialize(double v)
+		{
+			currentState = v;
+			state = v;
+		}
+		
+		initial
+		{
+			get_slx_name(ME, myName);
+		}
+	} // ContinuousVariable
+	
+	//*****************************************************************************
+	// class Behavior (as Ordinary Differential Equation)
+	//*****************************************************************************
+	public interface Behavior {
+		
+				abstract method derivatives(double t);
+	}
+	
+	type ErrorType enum {RELATIVE, ABSOLUTE};
+	
+	passive class IntegratorRecord(pointer(Behavior) ode_, int prio_)
+	{
+		int prio = prio_;
+		double t; // internal time
+		pointer(Behavior) ode = ode_; // differential equation
+	}
+	
+	//*****************************************************************************
+	//class  Integrator
+	//*****************************************************************************
+	abstract class Integrator(double minStepLength_, double maxStepLength_,
+	                          ErrorType errorType_, double errorLimit_)
+	{
+		double minStepLength = minStepLength_;
+		double maxStepLength = maxStepLength_;
+		ErrorType errorType = errorType_;
+		double errorLimit = errorLimit_;
+		
+		string(15) myName;
+		pointer(puck) myPuck;
+		double stepLength;
+		double errorValue;		// represents the Euclid or maximum norm
+		double savedStepLength;	// in the case that the stepLenght has to be reduced for synchronisation
+		double largeStepLength;	// largest stepLength without any synchronisation problem
+		
+		boolean stateEventHandling;		// TRUE for RKM, FALSE for Euler-Heun
+		
+		set (ContinuousVariable) vList;	// all active ContinuousVariables
+
+		set (IntegratorRecord) ranked (descending prio) rList; // all active DifferentialEquations
+		set (puck) pList; // all active time-discrete PeerPucks  for synchronisation
+		pointer(puck) waitUntilList;
+		// all time-discrete pucks which have detected a state event (by wait until);
+		// they will be reactivated as soon the last integration step was repeated
+		// with a reduced step length
+		
+		method attachVar(pointer(ContinuousVariable) v)
+		{
+			v->myIntegrator = ME;
+			v->isActive = TRUE;
+			place v into vList;
+		}
+		
+		method attachPuck(pointer(puck) p)
+		{
+			place p into pList;
+		}
+		
+		method detachPuck(pointer(puck) p)
+		{
+			remove p from pList;
+		}
+		
+		method attachODE(pointer(Behavior) ode, int prio)
+		{
+			place new IntegratorRecord(ode, prio) into rList;
+		}
+		
+		method stateEventDetected() returning boolean
+		{
+			pointer(puck) p;
+			
+			for (p = waitUntilList; p != NULL; p = p->frozen_successor)
+				if (p->stateEventDetected)
+					return TRUE;
+			
+			return FALSE;
+		} // stateEventDetected
+		
+		method stateEventFinalization()
+		{
+			pointer(puck) p;
+			
+			for (p = waitUntilList; p != NULL; p = p->frozen_successor)
+			{
+				if (p->stateEventDetected)
+					p->stateEventFinalized = TRUE;
+			}
+		} // stateEventFinalization
+		
+		abstract method takeAStep(double stepLength);
+
+		overridable method errorNorm() returning double
+		{
+			//..................................................................
+			// evaluates the maximum Norm
+			double keepValue = 0.0;
+			pointer(ContinuousVariable) vPtr;
+			
+			for (vPtr = each ContinuousVariable in vList)
+			{
+				if (vPtr->errorValue > keepValue)
+					keepValue = vPtr->errorValue;
+			}
+			
+			return keepValue;
+		} // errorNorm
+		
+		abstract method reduce() returning boolean;
+		
+		abstract method enlarge();
+		
+		initial
+		{
+			get_slx_name (ME, myName);
+			
+			if (minStepLength <= 0 || maxStepLength <= 0 || minStepLength >= maxStepLength)
+			{
+				if (minStepLength < 0)
+					minStepLength = -minStepLength;
+				if (maxStepLength < 0)
+					maxStepLength = -maxStepLength;
+				if (minStepLength == 0)
+					minStepLength = 0.01;
+				if (maxStepLength == 0)
+					maxStepLength = 0.1;
+				if (minStepLength >= maxStepLength)
+					maxStepLength *= 10.0;
+			}
+			
+			myPuck = activate ME;
+			myPuck->priority = -200;
+		}
+		
+		actions
+		{
+			pointer(IntegratorRecord) rPtr; 
+			pointer(ContinuousVariable) vPtr;
+			pointer(puck) wPtr;
+			pointer(puck) pPtr;
+			
+			forever
+			{
+				// wait for something to do
+				wait until rList.size != 0 && vList.size != 0;
+				
+				// estimate the time distance to the next peer process
+				largeStepLength = stepLength;
+				for (pPtr = each puck in pList with pPtr->state == SCHEDULED)
+				{
+					if ((pPtr->move_time - time) <= largeStepLength)
+						largeStepLength = pPtr->move_time - time;
+				}
+				
+				// adaptation of the next integration step
+				if (stepLength > largeStepLength)
+				{
+					savedStepLength = stepLength;
+					stepLength = largeStepLength;
+				}
+				
+				// save the current state for all active variables at: (t)
+				for (vPtr = each ContinuousVariable in vList)
+					vPtr->initialState = vPtr->state;			
+								
+				takeAStep(stepLength);
+				
+				while (reduce())   // because too large integration error
+				{
+					stepLength *= 0.5;      // reducing step size for reply
+					
+					for (vPtr = each ContinuousVariable in vList)
+						vPtr->state = vPtr->initialState;
+					
+					takeAStep(stepLength);
+				};
+				
+				// update of real_state for pending wait untils
+				for (vPtr = each ContinuousVariable in vList)
+					vPtr->currentState = vPtr->state;
+				
+				// control has jump to all slaves for computing the current state conditions
+				reactivate list = waitUntilList;
+				yield;
+				
+				if (stateEventHandling && stateEventDetected())
+				{
+					// handle stateEvent
+					savedStepLength = stepLength;
+					
+					// perform binary search to find the earliest state event
+					while (stepLength >= 2*minStepLength)
+					{
+						while (stateEventDetected() && stepLength > 2.0*minStepLength)
+						{
+							
+							for (vPtr = each ContinuousVariable in vList)
+								vPtr->state = vPtr->initialState;
+							
+							stepLength *= 0.5;
+							takeAStep(stepLength);
+							
+							for (vPtr = each ContinuousVariable in vList)
+								vPtr->currentState = vPtr->state;
+							
+							reactivate list = waitUntilList;
+							yield;
+						}
+						
+						if (!stateEventDetected() && stepLength > 2.0*minStepLength)
+						{
+							forever
+							{
+								advance stepLength;
+								
+								for (rPtr = each IntegratorRecord in rList)
+									rPtr->t += stepLength;
+
+								
+								if (stateEventDetected() || stepLength <= 2.0*minStepLength)
+									break;
+								
+								for (vPtr = each ContinuousVariable in vList)
+									vPtr->initialState = vPtr->state;
+								
+								stepLength *= 0.5;
+								takeAStep(stepLength);
+								
+								for (vPtr = each ContinuousVariable in vList)
+									vPtr->currentState = vPtr->state;
+								
+								reactivate list = waitUntilList;
+								yield;
+							}
+						}
+					}
+					
+					reactivate list = waitUntilList;
+					yield;
+					
+					// minStepLength is already in use
+					// but the case could happen, that we are shortly before the event
+					if (!stateEventDetected())
+					{
+						stepLength= 2*stepLength;
+						takeAStep(stepLength);  // minStepLength
+						
+						for (vPtr = each ContinuousVariable in vList)
+							vPtr->currentState= vPtr->state;
+						
+						advance stepLength;
+						
+						for (rPtr = each IntegratorRecord in rList)
+							rPtr->t += stepLength;
+					}
+					
+					stateEventFinalization();
+					
+					reactivate list = waitUntilList;
+					yield;
+					
+					if (savedStepLength >0.0) 
+						stepLength = savedStepLength;
+					savedStepLength = -1.0;
+				}
+				else
+				{
+					advance stepLength;
+					
+					for (rPtr = each IntegratorRecord in rList)
+						rPtr->t += stepLength;
+						
+					// taking back the reduction of integration step width stepLength for the next step
+					if (savedStepLength > 0.0)
+					{
+						stepLength = savedStepLength;
+						savedStepLength = -1.0;
+					}
+					
+					enlarge();
+				}
+			} //forever
+		} //Actions
+	} // class integrator
+	
+	class RKM_Integrator (double min, max, ErrorType eT, double eL)
+		subclass(Integrator (min, max, eT, eL))
+	{
+		initial
+		{
+			stateEventHandling = TRUE;
+			stepLength = maxStepLength;
+			}
+		
+		concrete method reduce() returning boolean
+		{
+			//..................................................................
+			errorValue = errorNorm();
+			
+			if (errorValue <= errorLimit)
+				return FALSE;
+			
+			if (stepLength < 2.0 * minStepLength)
+			{
+				return FALSE;
+			}
+			
+			return TRUE;
+		} // reduce;
+		
+		concrete method enlarge()
+		{
+			if ((errorValue < 0.03125 * errorLimit) && (4.0*stepLength <= maxStepLength))
+			{
+				stepLength *= 2.0;
+			}
+		}
+		
+		concrete method takeAStep(double stepLength)
+		{
+			//..................................................................
+			double h_div2 = stepLength/2.0;
+			double h_div3 = stepLength/3.0;
+			double h_div6 = stepLength/6.0;
+			double h_div8 = stepLength/8.0;
+
+			pointer (ContinuousVariable) vPtr;
+			pointer (IntegratorRecord) bPtr;
+			
+			// compute the rate for all active ContinuousVariable at: ( t )
+			for (bPtr = each IntegratorRecord in rList)
+				bPtr->ode->derivatives(bPtr->t);
+			
+			// save the rate in k1 for all active variables
+			// and compute the state (prediction) at: ( t+h_div3 )
+			for (vPtr = each ContinuousVariable in vList)
+			{
+				vPtr->k1 = vPtr->rate;
+				vPtr->state = vPtr->initialState + h_div3*vPtr->k1;
+			}
+			
+			// compute the rate for all active ContinuousVariable at: ( t + h_div3 )
+			for (bPtr = each IntegratorRecord in rList)   // compute the current rate at t
+				bPtr->ode->derivatives(bPtr->t + h_div3);
+			
+			// save the rate in k1 for all active variables
+			// and compute the state (correction) at:  (t+h_div3)
+			for (vPtr = each ContinuousVariable in vList)
+			{
+				vPtr->k2 = vPtr->rate;
+				vPtr->state = vPtr->initialState + h_div6*(vPtr->k1 + vPtr->k2);
+			}
+			
+			// compute the rate for all active ContinuousVariable at: ( t + h_div3 )
+			for (bPtr = each IntegratorRecord in rList)    // compute the current rate at t
+				bPtr->ode->derivatives(bPtr->t + h_div3);
+			
+			// save the rate in k2 for all active variables
+			// and compute the state (prediction) at:  ( t+h_div2 )
+			for (vPtr = each ContinuousVariable in vList)
+			{
+				vPtr->k2 = vPtr->rate;
+				vPtr->state = vPtr->initialState + h_div8*(vPtr->k1 + 3.0*vPtr->k2);
+			}
+			
+			//  compute the rate for all active ContinuousVariable at: ( t + h_div2 )
+			for (bPtr = each IntegratorRecord in rList)   // compute the current rate at t
+				bPtr->ode->derivatives(bPtr->t + h_div2);
+			
+			// save the rate in k3 for all active variables
+			// and compute the state (prediction) at:  ( t + stepLength )
+			for (vPtr = each ContinuousVariable in vList)
+			{
+				vPtr->k3 = vPtr->rate;
+				vPtr->state = vPtr->initialState + h_div2*(vPtr->k1 - 3.0*vPtr->k2 + 4.0*vPtr->k3);
+				vPtr->errorValue= vPtr->state;
+			}
+			
+			//  compute the rate for all active ContinuousVariable at: ( t + stepLength )
+			for (bPtr = each IntegratorRecord in rList)   // compute the current rate at t
+				bPtr->ode->derivatives(bPtr->t + stepLength);
+			
+			// save the rate in k2 for all active variables
+			// and compute the state (correction) at:  ( t + stepLength )
+			// and use the state für error_computation
+			for (vPtr = each ContinuousVariable in vList)
+			{
+				vPtr->k2 = vPtr->rate;
+				vPtr->state = vPtr->initialState + h_div6*(vPtr->k1 + 4.0*vPtr->k3 + vPtr->k2);
+				
+				if (errorType == ABSOLUTE)
+					vPtr->errorValue = abs(0.2*(vPtr->errorValue - vPtr->state));
+				else if (vPtr->errorValue > 0.0)
+					vPtr->errorValue = abs(0.2*(1.0 - vPtr->state/vPtr->errorValue));
+			}
+		} // take_a_step
+	} // class Runge-Kutta-Merson
+	
+	procedure attachVar (pointer(ContinuousVariable) v)
+		{
+			v->myIntegrator = theIntegrator;
+			v->isActive = TRUE;
+			place v into theIntegrator->vList;
+		}
+
+	procedure attachODE(pointer(Behavior) ode)
+		{
+			place new IntegratorRecord(ode, 0) into theIntegrator->rList;
+		}
+
+	procedure attachPuck ( pointer(puck) p)
+		{
+			place p into theIntegrator->pList;
+		}
+
+} //end of module Continuous
