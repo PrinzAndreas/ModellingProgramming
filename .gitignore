@@ -1,0 +1,5 @@
+# generated diagrams
+RoomModelSLX/*.pdf
+
+# generated data
+RoomModelSLX/*.csv
