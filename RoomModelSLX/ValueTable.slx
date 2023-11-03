@@ -30,8 +30,8 @@ public module ValueTables
 			remove p from data;
 		}
 		
-		method refresh() {
-			if (time >= nextTime) {
+		method refresh(double t) {
+			if (t >= nextTime) {
 				pointer(Point) p;
 				
 				currentTime = nextTime;
@@ -49,8 +49,8 @@ public module ValueTables
 		}
 		
 		method linear(double t) returning double {
-			refresh();
-			return currentTemp + (time-currentTime)/(nextTime-currentTime) * (nextTemp-currentTemp);
+			refresh(t);
+			return currentTemp + (t-currentTime)/(nextTime-currentTime) * (nextTemp-currentTemp);
 		}
 	}
 	
