@@ -1,0 +1,2801 @@
+//*****************************************************************************
+//	Copyright 2014, Wolverine Software Corporation
+//*****************************************************************************
+
+public module SLX_statistics
+	{
+#safesymbol	FAST_STATS
+
+	entity_class	random_variable;    // set=All_random_variables;
+	entity_class	interval	title = "Statistics Collection Intervals";  // set=All_intervals;
+
+
+	typedef enum { unweighted, weighted, time_weighted }		wtype;
+
+	private int	slx_active_intervals;	// keep a count
+	private boolean prior_histogram;	// manage title printing
+
+	OEM constant string(*)	asterisks =
+
+		"**************************************************";
+
+//*****************************************************************************
+//	statistics Object
+//*****************************************************************************
+
+	read_only class statistics(	pointer(random_variable) stat_root_rv,
+											pointer(interval)	 stat_interval)
+		{
+		int			count;
+
+		double	sum,
+					sum_of_weights,
+					sum_of_squares,
+					min_value,
+					max_value;
+
+		// SOB variables
+		
+		double	SOB_low_sum,					// lower half-batch sum of values
+					SOB_high_sum,					// upper half-batch sum of values
+					SOB_mean,						// current (recursively calculated) mean
+					SOB_svar_sum;					// current (recursively calculated) variance sum
+					
+		int			SOB_batch_count,
+					SOB_sample_no;
+																				
+		pointer(histogram)			histo;
+		pointer(random_variable)	root_rv;
+		pointer(interval)				my_interval;
+
+		initial
+			{
+			root_rv = stat_root_rv;
+			my_interval = stat_interval;
+
+			if (my_interval != NULL)
+				place ME into my_interval -> interval_statistics;
+
+			if (root_rv -> histo != NULL)
+				{
+				histo = new histogram(
+					root_rv -> histo -> lower_bound,
+					root_rv -> histo -> class_width,
+					root_rv -> histo -> class_count);
+
+				histo -> root_stats = ME;
+				}
+
+			min_value = INFINITY;
+			max_value = -INFINITY;
+			}
+
+		final
+			{
+			root_rv = NULL;
+			}
+		
+		report
+			{
+			report_statistics(*ME);
+			}
+
+		clear
+			{
+			count = 0;
+			sum = 0.0;
+			sum_of_squares = 0.0;
+			sum_of_weights = 0.0;
+			min_value = INFINITY;
+			max_value = -INFINITY;
+
+			if (histo != NULL)
+				clear *histo;
+
+			SOB_low_sum		= 0.0;
+			SOB_high_sum		= 0.0;
+			SOB_mean      		= 0.0;	
+			SOB_svar_sum		= 0.0;
+			SOB_batch_count	= 0;
+			SOB_sample_no		= 0;
+			}
+
+		procedure report_statistics(statistics s)
+			{
+			OEM constant string(*)	rv_format =
+"|__________________  ___________|  ________.___|  ________.___|  ____________|  ________.__|  ________.__|\n";
+
+			string(30)	SOB_batch_info, digits, smean_string, stderr_string;
+			double		smean, stderr;
+			
+			if (rvs_count(s) <= 0)
+				return;
+
+			if (!report_title_written || report_title_level == 0 || prior_histogram)
+				{
+				report_title_written = TRUE;
+
+				print "\n\n";
+				print options=bold ("", "", "Mean", "Std Dev", "", "", "")		rv_format;
+				print options=bold, underline
+
+("Random Variable", "#Observed", "or ~Value", "or ~Error", "Sig. Digits", "Minimum", "Maximum")		rv_format;
+				}
+
+			if (s.SOB_batch_count == 0)
+				print ( s.root_rv -> title,
+					rvs_count(s),
+					rvs_mean(s),
+//NO!				sqrt(rvs_variance(s) / rvs_count(s)),
+					sqrt(rvs_variance(s)),
+					"",
+					rvs_min(s),
+					rvs_max(s)	)	rv_format;
+			else
+				{
+				write string=SOB_batch_info (s.SOB_batch_count, s.root_rv -> SOB_batch_size)	"_X_";
+				
+				calculate_SOB(s, smean, stderr, digits);
+				
+				write string=smean_string (smean)	"~_.___";
+				write string=stderr_string (stderr)	"~_.___";
+				
+				print options=rtf_escapes	(s.root_rv -> title, SOB_batch_info, smean_string, stderr_string, digits, rvs_min(s), rvs_max(s))	rv_format;
+				}
+
+			if (s.histo != NULL)
+				{
+				report *(s.histo);
+				prior_histogram = TRUE; // force new titles
+				}
+			else
+				prior_histogram = FALSE;
+			return;
+			}
+		};
+
+//*****************************************************************************
+//	random_variable Object
+//*****************************************************************************
+
+	public read_only class random_variable(
+
+		wtype						rv_weight_type,
+		pointer(histogram)		rv_histo,
+		string(*)					report_title,
+		int							estimated_sample_count)
+		
+		{
+		wtype						weight_type;
+		pointer(histogram)		histo;
+		string(16)				title;
+		int							SOB_batch_size, SOB_half_batch_size;
+		private OEM int		nhb;
+		control double			current_value;
+
+		double					tlast,				// time of last update
+									smallest_max,	// of derived stats
+									largest_min;		// of derived stats
+
+		set(statistics)			by_interval;
+		statistics					master(ME, NULL);		// statistics over time
+
+		initial
+			{
+			if (report_title != "")
+				title = report_title;
+			else
+				get_slx_name(ME, title);
+
+			weight_type = rv_weight_type;
+			histo = rv_histo;
+			master.histo = histo;
+			if (histo != NULL)
+				histo -> root_stats = &master;
+
+			smallest_max	= -INFINITY;		// will increase
+			largest_min	= INFINITY;		// will decrease
+
+			if (estimated_sample_count != 0)
+				{
+				nhb = pow(estimated_sample_count, 1.0/3.0);		// cube root;
+				if (nhb < 31)
+					nhb = 31;
+				else				
+					nhb |= 1;								// always odd
+				
+				SOB_half_batch_size = estimated_sample_count / nhb;
+				SOB_batch_size = 2 * SOB_half_batch_size;
+				}
+					
+			place ME into random_variable_set;
+			}
+
+		report
+			{
+			report_statistics(master);
+			}
+
+		clear
+			{
+			if (slx_active_intervals > 0)
+				clear(interval_set);
+
+			current_value = 0.0;
+			tlast = 0.0;
+
+			clear	master;
+			clear	by_interval;
+
+			if (histo != NULL)
+				clear *histo;
+
+			smallest_max	= -INFINITY;	// will increase
+			largest_min		= INFINITY;		// will decrease
+			}
+
+#ifdef SLX2
+		method cleanup_rv()
+			{
+			pointer(statistics)	s;
+	
+			for (s = each statistics in by_interval)
+				{
+				s -> root_rv		= NULL;		// root random variable
+				s -> histo			= NULL;		// histogram
+				
+				if (s -> my_interval != NULL)
+					{
+					remove s from s -> my_interval -> interval_statistics;
+					s -> my_interval	= NULL;		// observation interval
+					}
+				
+				if (s is_in by_interval)
+					remove s from by_interval;
+				}
+	
+			master.root_rv = NULL;
+			master.histo = NULL;
+			master.my_interval = NULL;
+			histo = NULL;
+	
+			if (ME is_in random_variable_set)
+				remove ME from random_variable_set;
+				
+			return;
+			}
+#endif
+		};
+
+#ifndef SLX2
+	procedure cleanup_rv(pointer(random_variable) rv)
+		{
+		pointer(statistics)	s;
+
+		for (s = each statistics in rv -> by_interval)
+			{
+			s -> root_rv		= NULL;		// root random variable
+			s -> histo			= NULL;		// histogram
+			
+			if (s -> my_interval != NULL)
+				{
+				remove s from s -> my_interval -> interval_statistics;
+				s -> my_interval	= NULL;		// observation interval
+				}
+			
+			if (s is_in rv -> by_interval)
+				remove s from rv -> by_interval;
+			}
+
+		rv -> master.root_rv			= NULL;
+		rv -> master.histo			= NULL;
+		rv -> master.my_interval	= NULL;
+		rv -> histo					= NULL;
+
+		if (rv is_in random_variable_set)
+			remove rv from random_variable_set;
+			
+		return;
+		}
+#endif
+//*****************************************************************************
+//	Histograms
+//*****************************************************************************
+
+	public read_only class histogram(double h_lower_bound, double h_class_width, int h_class_count)
+		{
+		pointer(statistics)	root_stats;
+
+		read_write double	frequency[0...h_class_count-1];
+
+		double	lower_bound,
+			upper_bound,
+			class_width,
+			sum_of_weights,
+			underflow_sum,
+			underflow_sum_of_weights,
+			overflow_sum,
+			overflow_sum_of_weights;
+
+		int	class_count,	// number of buckets
+			count;		// observation count
+
+		initial
+			{
+			if (h_class_width <= 0.0)
+				diagnose h_class_width run_time error
+					"frequency class width is <= 0";
+
+			if (h_class_count <= 0)
+				diagnose h_class_count run_time error
+					"number of frequency classes is <= 0";
+
+			class_width = h_class_width;
+			class_count = h_class_count;
+			lower_bound = h_lower_bound;
+			upper_bound = lower_bound + class_count * class_width;
+			}
+
+		report
+			{
+			int								i;
+			double						lower, max_freq;
+			OEM constant string(*)	histo_header =
+
+"_______._|  _______._|  __________|  ____.___|\n";
+
+			OEM constant string(*)	histo_format =
+
+"_______._|  _______._|  __________|  ____.___| | |_\n";
+
+			if (root_stats -> my_interval != NULL
+				&& root_stats -> my_interval -> active)
+					update_histogram(ME, time - root_stats -> root_rv -> tlast);
+
+			if (sum_of_weights > 0)
+				{
+				print "\n";
+				print options=bold,underline	("Lower", "Upper", "Frequency", "Percent")
+					histo_header;
+
+				lower = lower_bound;
+				max_freq = 0.0;
+				for (i = 0; i < class_count; i++)
+					if (frequency[i] > max_freq)
+						max_freq = frequency[i];
+
+				for (i = 0; i < class_count; i++)
+					{
+					if (frequency[i] > 0.0)
+						print (lower,
+						      lower + class_width,
+						      frequency[i],
+							frequency[i] * 100.0 / sum_of_weights,
+						      substring(asterisks, 1, frequency[i] * 50 / max_freq))		histo_format;
+
+					lower += class_width;
+					}
+
+				if (underflow_sum_of_weights + overflow_sum_of_weights > 0.0)
+					print "\n";
+					
+				if (underflow_sum_of_weights > 0.0)
+					{
+					print options=bold	("Underflow:")			"___________";
+
+					print (underflow_sum_of_weights)			"______|  ";
+
+					print options=bold	("Average Underflow:")	"___________________";
+
+					print (underflow_sum / underflow_sum_of_weights)	"_______.__\n";
+					}
+
+				if (overflow_sum_of_weights > 0.0)
+					{
+					print options=bold	("Overflow:")			"___________";
+
+					print (overflow_sum_of_weights)				"______|  ";
+
+					print options=bold	("Average Overflow:")	"___________________";
+
+					print (overflow_sum / overflow_sum_of_weights)		"_______.__\n";
+					}
+				}
+
+			// back out the update performed above
+
+			if (root_stats -> my_interval != NULL
+				&& root_stats -> my_interval -> active)
+					update_histogram(ME, root_stats -> root_rv -> tlast - time);
+
+			clear
+				{
+				sum_of_weights					= 0.0;
+				underflow_sum					= 0.0;
+				underflow_sum_of_weights	= 0.0;
+				overflow_sum						= 0.0;
+				overflow_sum_of_weights		= 0.0;
+
+				for (i = 0; i < class_count; i++)
+					frequency[i] = 0.0;
+				}
+			}
+
+		procedure slx_tabulate_histogram(nonNULL pointer(histogram) h, double value, double weight, int increment)
+			{
+			h -> sum_of_weights += weight;
+			h -> count += increment;
+
+			if (value < h -> lower_bound)
+				{
+				h -> underflow_sum += value * weight;
+				h -> underflow_sum_of_weights += weight;
+				return;
+				}
+
+			if (value >= h -> upper_bound)
+				{
+				h -> overflow_sum += value * weight;
+				h -> overflow_sum_of_weights += weight;
+				return;
+				}
+
+			h -> frequency[(value - h -> lower_bound) / h -> class_width] += weight;
+			return;
+			}
+		};
+
+	private procedure update_histogram(nonNULL pointer(histogram) h, double deltat)
+		{
+		nonNULL pointer(statistics)				s = h  -> root_stats;
+		nonNULL pointer(random_variable)	rv = s  -> root_rv;
+		nonNULL pointer(histogram)			rvh = rv -> histo;
+
+		int		i;
+		double	value, deltav;
+
+		if (h != rvh)			// not master stats
+			{
+			h -> sum_of_weights			= rvh -> sum_of_weights				- h -> sum_of_weights;
+			h -> underflow_sum				= rvh -> underflow_sum				- h -> underflow_sum;
+			h -> underflow_sum_of_weights	= rvh -> underflow_sum_of_weights	- h -> underflow_sum_of_weights;
+			h -> overflow_sum				= rvh -> overflow_sum				- h -> overflow_sum;
+			h -> overflow_sum_of_weights	= rvh -> overflow_sum_of_weights	- h -> overflow_sum_of_weights;
+			h -> count						= rvh -> count						- h -> count;
+
+			for (i = 0; i < rvh -> class_count; i++)
+				h -> frequency[i] = rvh -> frequency[i] - h -> frequency[i];
+			}
+
+		if (rv -> weight_type != time_weighted)
+			return;
+
+		value = rv -> current_value;
+		deltav = deltat * value;
+
+		h -> sum_of_weights += deltat;
+		if (value < rvh -> lower_bound)
+			{
+			h -> underflow_sum	      += deltav;
+			h -> underflow_sum_of_weights += deltat;
+			}
+		else
+			if (value >= rvh -> upper_bound)
+				{
+				h -> overflow_sum	     += deltav;
+				h -> overflow_sum_of_weights += deltat;
+				}
+			else
+				h -> frequency[(value - h -> lower_bound) / h -> class_width]
+					+= deltat;
+		return;
+
+		}	// end of update_histogram(h, deltat)
+
+//*****************************************************************************
+//	Tabulation of Random Variables
+//*****************************************************************************
+
+	procedure slx_tabulate_observation(inout random_variable rv, double value, int increment)
+		{
+		pointer(statistics)	s;
+		double			old_value, weighted_obs;
+
+		if (rv.weight_type == unweighted)
+			{
+			rv.master.sum += value;
+			rv.master.sum_of_squares += value * value;
+
+			if (rv.histo != NULL)
+				slx_tabulate_histogram(rv.histo, value, 1.0, increment);
+
+			if (rv.SOB_batch_size > 0)
+				{
+				slx_tabulate_SOB(rv.master, value);
+				
+				for (s = each statistics in rv.by_interval)
+					if (s -> my_interval -> active)
+						slx_tabulate_SOB(*s, value);
+				}
+			}
+		else
+			{
+			if (rv.weight_type == weighted)
+				diagnose rv run_time error "^ is weighted; \"weight = value\" must be used";
+
+			if (rv.histo != NULL)
+				{
+				old_value = rv.current_value;	// non-control arg req'd
+
+				slx_tabulate_histogram(rv.histo, old_value, time - rv.tlast, increment);
+				}
+
+			if (rv.current_value != 0.0)
+				{
+				weighted_obs = (time - rv.tlast) * rv.current_value;
+				rv.master.sum += weighted_obs;
+				rv.master.sum_of_squares += weighted_obs * rv.current_value;
+				}
+			
+			rv.tlast = time;
+			}
+
+		rv.current_value = value;
+		rv.master.count += increment;
+
+		if (value > rv.master.max_value)
+			rv.master.max_value = value;
+		
+		if (value < rv.master.min_value)
+			rv.master.min_value = value;
+
+		if (value > rv.smallest_max)
+			{
+			rv.smallest_max = INFINITY;
+			for (s = each statistics in rv.by_interval)
+				if (s -> my_interval -> active)
+					{
+					if (value > s -> max_value)
+						s -> max_value = value;
+
+					if (s -> max_value < rv.smallest_max)
+						rv.smallest_max = s -> max_value;
+					}
+			}
+
+		if (value < rv.largest_min)
+			{
+			rv.largest_min = -INFINITY;
+			for (s = each statistics in rv.by_interval)
+				if (s -> my_interval -> active)
+					{
+					if (value < s -> min_value)
+						s -> min_value = value;
+
+					if (s -> min_value > rv.largest_min)
+						rv.largest_min = s -> min_value;
+					}
+			}
+
+		return;
+		}
+
+	procedure slx_tabulate_weighted_observation(inout random_variable rv, double value, double weight, int increment)
+		{
+		pointer(statistics)	s;
+
+		if (rv.weight_type == unweighted)
+			diagnose rv, weight run_time error "^ is an unweighted random variable";
+
+		if (rv.weight_type == time_weighted)
+			diagnose rv, weight run_time error "^ is a time-weighted random variable";
+
+		if (weight <= 0.0)
+			if (weight < 0.0)
+				diagnose weight run_time error "weight is negative";
+			else
+				diagnose weight run_time warning "zero weight used";
+
+		rv.master.sum += value * weight;
+		rv.master.sum_of_squares += value * value * weight;
+		rv.master.sum_of_weights += weight;
+		rv.master.count += increment;
+		rv.current_value = value;
+
+		if (rv.histo != NULL)
+			slx_tabulate_histogram(rv.histo, value, weight, increment);
+
+		if (value > rv.master.max_value)
+			rv.master.max_value = value;
+
+		if (value < rv.master.min_value)
+			rv.master.min_value = value;
+
+		if (value > rv.smallest_max)
+			{
+			rv.smallest_max = INFINITY;
+			for (s = each statistics in rv.by_interval)
+				if (s -> my_interval -> active)
+					{
+					if (value > s -> max_value)
+						s -> max_value = value;
+
+					if (s -> max_value < rv.smallest_max)
+						rv.smallest_max = s -> max_value;
+					}
+			}
+
+		if (value < rv.largest_min)
+			{
+			rv.largest_min = -INFINITY;
+			for (s = each statistics in rv.by_interval)
+				if (s -> my_interval -> active)
+					{
+					if (value < s -> min_value)
+						s -> min_value = value;
+
+					if (s -> min_value > rv.largest_min)
+						rv.largest_min = s -> min_value;
+					}
+			}
+
+		return;
+		}
+
+//*****************************************************************************
+//	Tabulation of SOB Info
+//*****************************************************************************
+
+procedure slx_tabulate_SOB(inout statistics so, double value)
+	{
+	pointer(random_variable)	root_rv = so.root_rv;
+	double							ix, batch_mean;
+		
+	if (++so.SOB_sample_no <= root_rv -> SOB_half_batch_size)
+		so.SOB_low_sum += value;
+	else	
+		so.SOB_high_sum += value;
+			
+	if (so.SOB_sample_no == root_rv -> SOB_batch_size)
+		{
+		batch_mean = (so.SOB_low_sum + so.SOB_high_sum) / root_rv -> SOB_batch_size;
+		
+		ix = ++so.SOB_batch_count;
+
+		// apply recurrences to update the mean and the variance sum
+		
+		so.SOB_svar_sum += (ix - 1.0) / ix * pow(batch_mean - so.SOB_mean, 2);
+		so.SOB_mean += 1.0 / ix * (batch_mean - so.SOB_mean);
+		
+		so.SOB_low_sum				= so.SOB_high_sum;
+		so.SOB_high_sum				= 0.0;
+		so.SOB_sample_no				= root_rv -> SOB_half_batch_size;
+		}
+
+	return;
+	}
+
+procedure calculate_SOB(statistics so, out double smean, out double stderr, out string(*) digits)
+	{
+	pointer(random_variable)	root_rv = so.root_rv;
+		
+	if (so.SOB_batch_count < 2)
+		{
+		smean = 0.0;
+		stderr = 0.0;
+		digits = "";
+		return;
+		}
+	
+	smean = so.SOB_mean;
+	stderr = so.SOB_svar_sum / (so.SOB_batch_count - 1) / so.SOB_batch_count;
+
+	digits = SignificantDigits(smean, stderr, stdout.file_flags & RTF_FORMAT != 0);
+	
+	return;
+	}
+
+//*****************************************************************************
+//	random_input, random_variable, tabulate, observe statement definitions
+//*****************************************************************************
+
+	statement random_input
+		{ #random_variable_name = #distribution
+			{
+			  [ accept ( #bound1 [ , #bound2 ] ) ]
+			  [ @histogram start = #start width = #width count = #count ]
+			  [title = #title]
+			}*
+		},... ;
+
+	    definition
+		{
+		int		i;
+
+		for (i = 1; #random_variable_name[i] != ""; i++)
+			{
+			expand (#random_variable_name[i])		"random_variable #";
+
+			if (#start[i] != "")
+				expand (#start[i], #width[i], #count[i])		" histogram start = # width = # count = #";
+
+			if (#title[i] != "")
+				expand (#title[i])		" title = #";
+
+			expand					";\n";
+
+			expand (#random_variable_name[i])		"procedure sample_#() returning double"
+									"\t{"
+									"\tdouble	sample;\n\n";
+
+			if (#bound1[i] =="")
+				expand (#distribution[i])		"\tsample = #;\n";
+			else
+				{
+				expand (#distribution[i])		"\tdo"
+											"\t\tsample = #;"
+											"\twhile (sample ";
+
+				if (#bound2[i]== "")
+					expand (#bound1[i])				"#);\n\n";
+				else
+					expand (#bound1[i], #bound2[i])		"< # || sample > #);\n\n";
+				}
+
+			expand(#random_variable_name[i])			"\ttabulate # = sample;\n"
+										"\treturn sample;"
+										"\t}\n\n";
+			}
+		}
+
+	statement random_variable
+		[ ( <#weight @time> | <#weight weight> ) ]
+		{ #variable_name
+		  [ @histogram start = #start width = #width count = #count ]
+		  [title = #title]
+		  [ SOBcount = #SOBcount ]
+		},... ;
+
+	    definition
+		{
+		int		i;
+		string(20)	weight_type;
+		string(100)	histo, sample_count;
+
+		sample_count = "0";			// default
+		if (#SOBcount[i] != "")
+			if (#weight != "")
+				diagnose #weight, #SOBcount[i]		"SOBcount can be used only with unweighted random variables";
+			else
+				sample_count = #SOBcount[i];
+
+		switch (#weight)
+			{
+default:		weight_type = "unweighted";
+			break;
+
+case "weight":		weight_type = "weighted";
+			break;
+
+case "time":		weight_type = "time_weighted";
+			break;
+			}
+
+		for (i = 1; #variable_name[i] != ""; i++)
+			{
+			if (#start[i] != "")
+				{
+				histo = "new histogram(";
+				histo cat= #start[i];
+				histo cat= ", ";
+				histo cat= #width[i];
+				histo cat= ", ";
+				histo cat= #count[i];
+				histo cat= ")";
+				}
+			else
+				histo = "NULL";
+
+			if (#title[i] != "")
+				expand(#variable_name[i], weight_type, histo, #title[i], sample_count)
+					"@random_variable #(#, #, #, #);\n";
+			else
+				expand(#variable_name[i], weight_type, histo, sample_count)
+					"@random_variable #(#, #, \"\", #);\n";
+			}
+		}
+
+	statement tabulate #observation = #expression [ weight = #weight ] [ count = #count ] ;
+	    definition
+		{
+#ifdef FAST_STATSxxx
+		if (argtypename(#observation) != "random_variable")
+			diagnose #observation compile_time error "a random_variable object is required here";
+#endif
+		if (#weight != "")
+			if (#count != "")
+				diagnose #count compile_time error
+					"a count cannot be specified for a weighted tabulate";
+			else
+				expand(#observation, #expression, #weight)
+					"slx_tabulate_weighted_observation(#, #, #, 1);\n";
+
+		else
+			if (#count != "")
+				expand(#observation, #expression, #count)
+#safeifdef FAST_STATS
+					"SLX_Tabulate(&(#), #, #);\n";
+#else
+					"slx_tabulate_observation(#, #, #);\n";
+#endif
+			else
+				expand(#observation, #expression)
+#safeifdef FAST_STATS
+					"SLX_Tabulate(&(#), #, 1);\n";
+#else
+					"slx_tabulate_observation(#, #, 1);\n";
+#endif
+		}
+
+	statement observe #random_variable,... over #interval,... ;
+	    definition
+		{
+		int		i, j;
+
+		expand	"{\n";
+		for (i = 1; #random_variable[i] != ""; i++)
+			for (j = 1; #interval[j] != ""; j++)
+				expand(#random_variable[i], #interval[j])
+
+					"slx_observe_rv(#, #);\n";
+
+		expand	"}\n";
+		}
+
+//*****************************************************************************
+//	Interval Definitions
+//*****************************************************************************
+
+	typedef enum { CLEAR, RESET } ClearOrReset;
+	
+	statement interval { #interval_name [title = #title] },... ;
+	    definition
+		{
+		int		i;
+
+		for (i = 1; #interval_name[i] != ""; i++)
+			if (#title[i] != "")
+				expand(#interval_name[i], #title[i])
+					"@interval #(#);\n";
+			else
+				expand(#interval_name[i])
+					"@interval #(\"\");\n";
+		}
+
+	class interval(string(*) report_title)
+		{
+		string(16)			title;
+		double				base_time;
+		boolean 			active;
+		set(statistics) 		interval_statistics;
+
+		constant string(*)		interval_format = "|________________   __________.____|\n";
+
+		initial
+			{
+			if (report_title != "")
+				title = report_title;
+			else
+				get_slx_name(ME, title);
+
+			place ME into interval_set;
+			}
+
+		report
+			{
+			if (interval_statistics.size > 0)
+				{
+				print	"\n";
+				print options=bold, underline ("Interval", "Elapsed Time")		interval_format;
+				print(title, elapsed(*ME))     									interval_format;
+
+				report(interval_statistics);
+				}
+			}
+
+		clear
+			{
+			slx_reset_interval(*ME, CLEAR);
+			}
+
+		procedure elapsed(in interval t) returning double
+			{
+			if (!t.active)
+				return t.base_time;
+			else
+				return time - t.base_time;
+			}
+
+		procedure slx_start_interval(inout interval t)
+			{
+			pointer(statistics)	s;
+
+			if (t.active)
+				return;
+
+			for (s = each statistics in t.interval_statistics)
+				slx_start_stop_statistics(s);
+
+			t.active = TRUE;
+			t.base_time = time - t.base_time;
+
+			++slx_active_intervals; 	// clear needs this count
+			return;
+			}
+
+		procedure slx_stop_interval(inout interval t)
+			{
+			pointer(statistics)	s;
+
+			if (!t.active)
+				return;
+
+			for (s = each statistics in t.interval_statistics)
+				slx_start_stop_statistics(s);
+
+			t.active = FALSE;
+			t.base_time = time - t.base_time;
+
+			--slx_active_intervals; 	// clear needs this count
+			return;
+			}
+
+		procedure slx_start_stop_statistics(nonNULL pointer(statistics) s)
+			{
+			nonNULL pointer(random_variable) rv = s -> root_rv;
+
+			if (rv -> histo != NULL)
+				update_histogram(s -> histo, time - rv -> tlast);
+
+			s -> count				= rv -> master.count - s -> count;
+			s -> sum_of_weights	= rv -> master.sum_of_weights - s -> sum_of_weights;
+
+			if (rv -> weight_type == time_weighted)
+				{
+				s -> sum = rv -> master.sum
+					 + (time - rv -> tlast)
+					 * rv -> current_value
+					 - s -> sum;
+
+				s -> sum_of_squares = rv -> master.sum_of_squares
+						    + (time - rv -> tlast)
+						    * pow(rv -> current_value, 2)
+						    - s -> sum_of_squares;
+
+//??				if (s -> my_interval -> active)	// turning off
+//??					s -> count++;					// counts as an observation
+				}
+			else
+				{
+				s -> sum					= rv -> master.sum		  - s -> sum;
+				s -> sum_of_squares	= rv -> master.sum_of_squares - s -> sum_of_squares;
+				}
+
+			if (s -> min_value > rv -> largest_min)
+				rv -> largest_min = s -> min_value;
+
+			if (s -> max_value < rv -> smallest_max)
+				rv -> smallest_max = s -> max_value;
+
+			return;
+			}
+
+		procedure slx_reset_interval(inout interval t, ClearOrReset type_of_reset)
+			{
+			pointer(statistics)			s;
+			pointer(random_variable)	rv;
+			pointer(histogram)			h, rvh;
+			double						value, deltat, deltav;
+			int							i;
+
+			if (t.active)
+				{
+				if (type_of_reset == CLEAR)
+					t.base_time = 0.0;
+				else
+					t.base_time = time;
+
+				for (s = each statistics in t.interval_statistics)
+					{
+					rv = s -> root_rv;
+					value = rv -> current_value;
+					s -> count = rv -> master.count;
+
+					if (rv -> weight_type == time_weighted)
+						{
+						s -> sum = rv -> master.sum
+							 + (time - rv -> tlast)
+							 * rv -> current_value;
+
+						s -> sum_of_squares = rv -> master.sum_of_squares
+								    + (time - rv -> tlast)
+								    * pow(rv -> current_value, 2);
+						}
+					else
+						{
+						s -> sum				= rv -> master.sum;
+						s -> sum_of_squares	= rv -> master.sum_of_squares;
+						}
+
+					s -> sum_of_weights		= rv -> master.sum_of_weights;
+
+					if (type_of_reset == CLEAR)
+						{
+						s -> min_value			= INFINITY;
+						s -> max_value			= -INFINITY;
+						}
+					else
+						{
+						s -> min_value			= rv -> current_value;
+						s -> max_value			= rv -> current_value;
+						}
+					
+					h = s -> histo;
+					if (h != NULL)
+						{
+						rvh = rv -> histo;
+						h -> sum_of_weights			= rvh -> sum_of_weights;
+						h -> underflow_sum				= rvh -> underflow_sum;
+						h -> underflow_sum_of_weights	= rvh -> underflow_sum_of_weights;
+						h -> overflow_sum				= rvh -> overflow_sum;
+						h -> overflow_sum_of_weights	= rvh -> overflow_sum_of_weights;
+						h -> count						= rvh -> count;
+
+						for (i = 0; i < h -> class_count; i++)
+							h -> frequency[i] = rvh -> frequency[i];
+
+						if (rv -> weight_type == time_weighted)
+							{
+							deltat = time - rv -> tlast;
+							deltav = deltat * value;
+
+							h -> sum_of_weights += deltat;
+							if (value < rvh -> lower_bound)
+								{
+								h -> underflow_sum				+= deltav;
+								h -> underflow_sum_of_weights	+= deltat;
+								}
+							else
+								if (value >= rvh -> upper_bound)
+									{
+									h -> overflow_sum				+= deltav;
+									h -> overflow_sum_of_weights	+= deltat;
+									}
+								else
+									h -> frequency[(value - h -> lower_bound) / h -> class_width]
+										+= deltat;
+							}
+						}
+					}
+				}
+			else		// inactive interval
+				{
+				t.base_time = 0.0;
+
+				for (s = each statistics in t.interval_statistics)
+					{
+					rv = s -> root_rv;
+					value = rv -> current_value;
+					rvh = rv -> histo;
+
+					s -> count				= 0;
+					s -> sum				= 0.0;
+					s -> sum_of_squares	= 0.0;
+					s -> sum_of_weights	= 0.0;
+
+					if (type_of_reset == CLEAR)
+						{
+						s -> min_value			= INFINITY;
+						s -> max_value			= -INFINITY;
+						}
+					else
+						{
+						s -> min_value			= rv -> current_value;
+						s -> max_value			= rv -> current_value;
+						}
+					
+					h = s -> histo;
+					if (h != NULL)
+						{
+						h -> sum_of_weights			= 0.0;
+						h -> underflow_sum				= 0.0;
+						h -> underflow_sum_of_weights	= 0.0;
+						h -> overflow_sum				= 0.0;
+						h -> overflow_sum_of_weights	= 0.0;
+						h -> count						= 0;
+
+						for (i = 0; i < h -> class_count; i++)
+							h -> frequency[i] = 0.0;
+						}
+					}
+				}
+
+			return;
+			}
+
+		};	// end of slx_reset_interval(...)
+
+//*****************************************************************************
+//	Interval Statement Definitions
+//*****************************************************************************
+
+	statement start_interval #interval ,... ;
+	    definition
+		{
+		int	i;
+
+		for (i = 1; #interval[i] != ""; i++)
+
+			expand(#interval[i])	"	slx_start_interval(#);\n";
+		}
+
+	statement stop_interval #interval ,... ;
+	    definition
+		{
+		int	i;
+
+		for (i = 1; #interval[i] != ""; i++)
+
+			expand(#interval[i])	"	slx_stop_interval(#);\n";
+		}
+
+	statement reset #interval ,... ;
+	    definition
+		{
+		int	i;
+
+		for (i = 1; #interval[i] != ""; i++)
+
+			expand(#interval[i])	"	slx_reset_interval(#, RESET);\n";
+		}
+
+	procedure slx_observe_rv(random_variable rv, inout interval new_interval)
+		{
+		pointer(statistics)	s;
+
+		for (s = each statistics in rv.by_interval)
+			if (s -> my_interval == &new_interval)
+
+				return; 	// rv, interval pair already exists
+
+		place new statistics(&rv, &new_interval) into rv.by_interval;
+		return;
+		}
+
+//*****************************************************************************
+//	Statistics of random variables
+//*****************************************************************************
+
+	procedure rvs_count(statistics s) returning int
+		{
+		if (s.my_interval == NULL or not s.my_interval -> active)
+			return s.count;
+		else
+			return s.root_rv -> master.count - s.count;
+		}
+
+	procedure rvs_min(statistics s) returning double
+		{
+		if (s.my_interval == NULL or not s.my_interval -> active)
+			if (s.count == 0)
+				return 0.0;
+			else
+				return s.min_value;
+		else
+			if (s.root_rv -> master.count == s.count)
+				return 0.0;
+			else
+				return s.min_value;
+		}
+
+	procedure rvs_max(statistics s) returning double
+		{
+		if (s.my_interval == NULL or not s.my_interval -> active)
+			if (s.count == 0)
+				return 0.0;
+			else
+				return s.max_value;
+		else
+			if (s.root_rv -> master.count == s.count)
+				return 0.0;
+			else
+				return s.max_value;
+		}
+
+	procedure rvs_sum(statistics s) returning double
+		{
+		pointer(random_variable)	rv = s.root_rv;
+
+		if (s.my_interval == NULL)	// master stats
+			{
+			if (rv -> weight_type != time_weighted)
+				return s.sum;
+
+			return s.sum + (time - rv -> tlast) * rv -> current_value;
+			}
+
+		// fall-thru => sum over an interval
+
+		if (s.my_interval -> active)	// interval is currently active
+
+			if (rv -> weight_type != time_weighted)
+				return rv -> master.sum - s.sum;
+			else
+				return rv -> master.sum - s.sum
+				     + (time - rv -> tlast) * rv -> current_value;
+		else
+			return s.sum;
+
+		}	// end of rvs_sum(s)
+
+	procedure rvs_time_per_unit(statistics s) returning double
+		{
+		double	count;
+
+		count = rvs_count(s);
+
+		if (count == 0.0)
+			return 0.0;
+		else
+			return rvs_sum(s) / count;
+		}
+
+//*****************************************************************************
+//	Means
+//*****************************************************************************
+
+	procedure rvs_mean(statistics s) returning double
+		{
+		nonNULL	pointer(random_variable)	rv   = s.root_rv;
+		pointer(interval)		over = s.my_interval;
+
+		if (over == NULL)		// master stats
+			{
+			if (rv -> master.count == 0)
+				return 0.0;
+
+			switch (rv -> weight_type)
+				{
+case unweighted:		
+
+				return rv -> master.sum / rv -> master.count;
+
+case weighted:
+			
+				if (rv -> master.sum_of_weights == 0.0)
+					return 0.0;
+
+				return rv -> master.sum / rv -> master.sum_of_weights;
+
+case time_weighted:		if (time == 0.0)
+					return 0.0;
+
+				return (rv -> master.sum + (time - rv -> tlast) * rv -> current_value) / time;
+				}
+			}
+
+		// fall-thru => mean over an interval
+
+		if (over -> active)	// interval is currently active
+
+			switch (rv -> weight_type)
+				{
+case unweighted:		if (rv -> master.count == s.count)
+					return 0.0;
+				else
+					return ((rv -> master.sum - s.sum)
+					       / (rv -> master.count - s.count));
+
+case weighted:			if (rv -> master.sum_of_weights == s.sum_of_weights)
+					return 0.0;
+				else
+					return (rv -> master.sum - s.sum)
+					       / (rv -> master.sum_of_weights - s.sum_of_weights);
+
+case time_weighted:		if (over -> base_time == time)
+					return 0.0;
+				else
+					return (rv -> master.sum - s.sum
+					      + (time - rv -> tlast) * rv -> current_value)
+					      / (time - over -> base_time);
+				}
+
+		// fall-thru => interval is not active
+
+		switch (rv -> weight_type)
+			{
+case unweighted:	if (s.count == 0)
+				return 0.0;
+			else
+				return s.sum / s.count;
+			
+case weighted:		if (s.sum_of_weights == 0.0)
+				return 0.0;
+
+			return s.sum / s.sum_of_weights;
+
+case time_weighted:	if (over -> base_time == 0.0)
+				return 0.0;
+
+			return s.sum / over -> base_time;
+			}
+
+		}	// end of rvs_mean(s)
+
+//*****************************************************************************
+//	Variances
+//*****************************************************************************
+
+	procedure rvs_variance(statistics s) returning double
+		{
+		nonNULL pointer(random_variable)	rv   = s.root_rv;
+		pointer(interval)		over = s.my_interval;
+
+		double				denominator,
+						updated_sum,
+						updated_sum_of_squares;
+
+		if (over == NULL)		// master statistics
+			switch (rv -> weight_type)
+				{
+case unweighted:		if (rv -> master.count < 2)
+					return 0.0;
+
+				return abs(rv -> master.sum_of_squares
+				     - (rv -> master.sum * rv -> master.sum / rv -> master.count))
+				     / (rv -> master.count - 1);
+
+case weighted:			if (rv -> master.sum_of_weights < 2.0)
+					return 0.0;
+
+				return abs(rv -> master.sum_of_squares - (rv -> master.sum * rv -> master.sum / rv -> master.sum_of_weights)) / (rv -> master.sum_of_weights - 1.0);
+
+case time_weighted:		if (time < 2.0)
+					return 0.0;
+
+				updated_sum = rv -> master.sum + (time - rv -> tlast) * rv -> current_value;
+				updated_sum_of_squares = rv -> master.sum_of_squares
+						       + (time - rv -> tlast)
+						       * pow(rv -> current_value, 2);
+
+				return abs(updated_sum_of_squares
+				     - (updated_sum * updated_sum / time))
+				     / (time - 1.0);
+				}
+
+		// fall-thru => variance over an interval
+
+		if (over -> active)
+			switch (rv -> weight_type)
+				{
+case unweighted:		denominator = rv -> master.count - s.count - 1;
+					if (denominator <= 0.0)
+						return 0.0;
+
+				return abs((rv -> master.sum_of_squares - s.sum_of_squares)
+				      - (rv -> master.sum - s.sum) * (rv -> master.sum - s.sum)
+				      / (rv -> master.count - s.count))
+
+				      / denominator;
+
+case weighted:			denominator = rv -> master.sum_of_weights
+					    - s.sum_of_weights
+					    - 1.0;
+
+				if (denominator <= 0.0)
+					return 0.0;
+
+				return abs((rv -> master.sum_of_squares - s.sum_of_squares)
+				      - (rv -> master.sum - s.sum) * (rv -> master.sum - s.sum)
+				      / (rv -> master.sum_of_weights - s.sum_of_weights))
+
+				      / denominator;
+
+case time_weighted:		denominator = time - over -> base_time - 1.0;
+				if (denominator <= 0.0)
+					return 0.0;
+
+				updated_sum = rv -> master.sum
+					    - s.sum
+					    + (time - rv -> tlast) * rv -> current_value;
+
+				updated_sum_of_squares = rv -> master.sum_of_squares
+						       - s.sum_of_squares
+						       + (time - rv -> tlast)
+						       * pow(rv -> current_value, 2);
+
+				return abs(updated_sum_of_squares
+				     - (updated_sum * updated_sum / time))
+				     / denominator;
+				}
+
+		// fall-thru => interval is not active
+
+		switch (rv -> weight_type)
+			{
+case unweighted:	if (s.count < 2)
+				return 0.0;
+
+			return abs(s.sum_of_squares
+			     - (s.sum * s.sum / s.count))
+			      / (s.count - 1);
+
+case weighted:		if (s.sum_of_weights < 2.0)
+				return 0.0;
+
+			return abs(s.sum_of_squares
+			     - (s.sum * s.sum / s.sum_of_weights))
+			     / (s.sum_of_weights - 1.0);
+
+case time_weighted:	if (over -> base_time < 2.0)
+				return 0.0;
+
+			return abs(s.sum_of_squares -
+				(s.sum * s.sum / over -> base_time))
+
+				/ (over -> base_time - 1.0);
+			}
+
+		}	// end of rvs_variance(s)
+
+//*****************************************************************************
+//	Macros for statistics of random variables
+//*****************************************************************************
+
+	macro sample_count ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"(#).master.count";
+		else
+			expand(#rv, #interval)	"rvs_count(*rv_over_interval(#, #))";
+		}
+
+	macro sample_min ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"rvs_min((#).master)";
+		else
+			expand(#rv, #interval)	"rvs_min(*rv_over_interval(#, #))";
+		}
+
+	macro sample_max ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"rvs_max((#).master)";
+		else
+			expand(#rv, #interval)	"rvs_max(*rv_over_interval(#, #))";
+		}
+
+	macro sample_sum ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"rvs_sum(#.master)";
+		else
+			expand(#rv, #interval)	"rvs_sum(*rv_over_interval(#, #))";
+		}
+
+	macro sample_mean ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"rvs_mean(#.master)";
+		else
+			expand(#rv, #interval)	"rvs_mean(*rv_over_interval(#, #))";
+		}
+
+	macro sample_variance ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"rvs_variance(#.master)";
+		else
+			expand(#rv, #interval)	"rvs_variance(*rv_over_interval(#, #))";
+		}
+
+	macro sample_stdev ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"sqrt(rvs_variance(#.master))";
+		else
+			expand(#rv, #interval)	"sqrt(rvs_variance(*rv_over_interval(#, #)))";
+		}
+
+	macro sample_cv ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv, #rv)		"(sqrt(rvs_variance(#.master)) / rvs_mean(#.master))";
+		else
+			expand(#rv, #interval, #rv, #interval)	"(sqrt(rvs_variance(*rv_over_interval(#, #))) / rvs_mean(*rv_over_interval(#, #)))";
+		}
+
+	macro sample_time_per_unit ( #rv [ over #interval ] )
+	    definition
+		{
+		if (#interval == "")
+			expand(#rv)		"rvs_time_per_unit(#.master)";
+		else
+			expand(#rv, #interval)	"rvs_time_per_unit(*rv_over_interval(#, #))";
+		}
+
+//*****************************************************************************
+//	Utility Statistical Subroutines
+//*****************************************************************************
+
+	OEM constant string(*) bad_sample_count	= "sample count is not greater than one";
+	OEM constant string(*) bad_batch_size   		= "batch size is not greater than zero";
+	OEM constant string(*) bad_max_lag_low		= "max lag is not greater than zero";
+	OEM constant string(*) bad_max_lag_high		= "max lag exceeds size of output array";
+	OEM constant string(*) poor_correlation =
+
+		"Poor correlation may indicate a lack of random stream synchonization.\n";
+
+	procedure rv_over_interval(random_variable rv, interval t) returning pointer(statistics)
+		{
+		pointer(statistics)	s;
+
+		for (s = each statistics in rv.by_interval)
+			if (s -> my_interval == &t)
+				return s;
+
+		diagnose rv, t	run_time error
+			"^ was not observed over ^";
+		}
+
+//*****************************************************************************
+//	Overlapping Batch Means - Estimated Std Error
+//*****************************************************************************
+
+procedure build_SOB(
+
+	in double		samples[*],
+	in int				scount,
+	out int			batch_size,
+	out int			batch_count,
+	out double	smean,
+	out double	stderr)
+	
+	{
+	double	low_sum, high_sum, svar_sum, ix, ixm1, batch_mean;
+	
+	int		i, ilim, j, nb, nhb, bs, hbs;
+
+	if (scount < 500)
+		{
+		diagnose scount run_time warning (scount) "_ samples are insufficient (min = 500)";
+		return;
+		}
+	
+	stderr = 0.0;
+
+	nhb = pow(scount, 1.0/3.0);		// number of half batches = cube root of sample count
+	if (nhb < 31)
+		nhb = 31;
+	else
+		nhb |= 1;								// always odd
+				
+	nb = nhb - 1;							// number of batches
+	
+	hbs = scount / nhb;					// half batch size
+	bs = hbs * 2;							// batch size
+
+	batch_size = bs;						// return some results
+	batch_count = nb;
+			
+	for (i = 1; i <= hbs; i++)
+		low_sum += samples[i];		// first half batch
+
+	smean = 0.0;
+
+	for (j = 1; j <= nb; j++)				
+		{
+		ilim = i + hbs;						// half batch
+
+		high_sum = 0.0;		
+		while (i < ilim)		
+			high_sum += samples[i++];
+
+		ix +=1.0;
+			
+		batch_mean = (low_sum + high_sum) / bs;
+		svar_sum += pow(batch_mean - smean, 2) * (ixm1 / ix);
+		smean += (batch_mean - smean) / ix;
+
+		ixm1 = ix;
+		low_sum = high_sum;
+		}
+
+	stderr = svar_sum / (ix - 1.0) / nb;
+	return;
+	}
+
+procedure report_SOB(
+
+	in string(*)		title,
+	in double		samples[*],
+	in int				scount)
+
+	{
+	double			smean, stderr;
+	int					batch_size, batch_count;
+					
+	string(30)		smean_string, stderr_string, vformat;
+	
+	OEM constant string(*)	oformat = "___________|  ___________|   _________|_________\n";
+	
+	if (scount < 500)
+		{
+		diagnose scount run_time warning (scount) "_ samples are insufficient (min = 500)";
+		return;
+		}
+	else	
+		build_SOB(samples, scount, batch_size, batch_count, smean, stderr);
+	
+	print options=bold (title)		"\n_\n\n";
+	
+	print options=bold, underline ("~Value", "~Error", "Significant Digits")		oformat;
+
+	if (abs(smean) < 1.0)
+		vformat = "~_.______";
+	
+	else if (abs(smean) < 100.0)
+		vformat = "~_.____";
+	else
+		vformat = "~_.__";
+
+	write string=smean_string (smean)	vformat;
+	write string=stderr_string (stderr)		vformat;
+		
+	print options=rtf_escapes	(smean_string, stderr_string, SignificantDigits(smean, stderr, stdout.file_flags & RTF_FORMAT != 0))	oformat;
+						
+	print (batch_count, batch_size, batch_size / 2 * (batch_count+1), scount)
+
+		"\n_ Overlapping batches of size _ used.  (_ of _ total samples)\n\n";
+
+	return;
+	}
+
+procedure SignificantDigits(double stat, double stderr, boolean underline) returning string(25)
+	{
+	string(30)	oformat, value_string, error_string, result;
+	string(1)		echar;	
+	int					vlen, elen, i, j;
+	boolean			underlined;
+		
+	if (abs(stat) < 1.0)
+		oformat = "_.______";
+	
+	else if (abs(stat) < 100.0)
+		oformat = "_.____";
+	else
+		oformat = "_.__";
+
+	write string=value_string (stat)	oformat;
+	write string = error_string (stderr)	oformat;
+
+	vlen = length(value_string);
+	elen = length(error_string);
+
+	i = vlen - elen;
+	j = 1;
+	
+	if (underline)	
+		result = "\U" cat substring(value_string, 1, i);
+	else
+		result = substring(value_string, 1, i);
+
+	while (++i <= vlen)
+		{
+		echar = substring(error_string, j, 1);			// current char of error string
+
+		switch (echar)
+			{
+case ".":
+case " ":
+case "0":
+
+			result cat= substring(value_string, i, 1);
+			++j;
+			continue;
+			}
+
+		if (echar < "5")
+			result cat= substring(value_string, i, 1);
+		else
+			if (underline)	
+				{
+				result cat= "\UX";
+				underlined = TRUE;
+				}
+			else
+				result cat= "X";
+			
+		break;
+		}
+
+	if (underline && !underlined)	
+		result cat= "\U";
+	
+	while (++i <= vlen)
+		{
+		echar = substring(error_string, ++j, 1);			// current char of error string
+
+		if (echar == ".")
+			result cat= ".";
+		else
+			result cat= "X";
+		}
+
+	return result;
+	}
+
+//*****************************************************************************
+//	Confidence Intervals for the Sample Mean
+//*****************************************************************************
+
+	procedure build_mean_ci(
+
+			in  double samples[*],
+			in  int    scount,
+			in  double level,
+			out double smean,
+			out double stdev,
+			out double half_width)
+		{
+		double	var;
+		int			i;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		StatMeanVar(samples, 1, scount, smean, var);
+		stdev = sqrt(var);
+		
+//		half_width = icdf_t(level * 0.5 + 0.5, scount - 1) * stdev;
+		half_width = icdf_t(level * 0.5 + 0.5, scount - 1) * stdev / sqrt(scount);		// 11/13/2014
+		return;
+		}
+
+	procedure report_mean_ci(string(*) title, double level, double samples[*], int scount)
+		{
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		double	smean, stdev, half_width;
+
+		build_mean_ci(samples, scount, level, smean, stdev, half_width);
+
+		print options=bold,underline	(title)	"\n_\n\n";
+		print options=bold					"Samples:  ";
+		print 			(scount)			"_  ";
+		print options=bold	(level*100)		"__% C.I.:  ";
+		print			(smean-half_width, smean+half_width)	"_.____ ... _.____  ";
+		print options=bold					"Mean:  ";
+		print 			(smean)				"|_.____  ";
+		print options=bold					"Half-Width:  ";
+		print 			(half_width)			"|_.____  ";
+		print options=bold					"Std Dev(Mean):  ";
+		print 			(stdev)				"|_.____\n\n";
+		return;
+		}
+
+//*********************************************************************************
+//	Confidence Intervals for the Sample Mean - Corrected for Autocorrelation
+//*********************************************************************************
+
+	procedure build_correlated_mean_ci(
+
+			in  double		samples[*],
+			in  int   			scount,
+			in  double		level,
+			in	int				maxlag,
+			out double	smean,
+			out double	stdev,
+			out double	half_width,
+			out double	maxlag_rho)
+		{
+		double	A, adjustment, sum, vsum;
+		double	rho[maxlag];
+		
+		int			i;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		for (i = 1; i <= scount; i++)
+			sum += samples[i];
+
+		smean = sum / scount;
+
+		for (i = 1; i <= scount; i++)
+			vsum += pow((samples[i] - smean), 2);
+
+		build_autocorrelation(samples, scount, maxlag, rho);
+		
+		maxlag_rho = rho[maxlag];
+		
+		sum = 0.0;
+		for (i = 1; i <= maxlag; i++)
+			sum += (1.0 - (double) i / scount) * rho[i];
+		
+		A = 1.0 + 2.0 * sum;
+		adjustment = (scount - 1) / (scount / A - 1.0);
+					 		
+		stdev = sqrt(vsum / (scount - 1) * adjustment / scount);
+		
+		half_width = icdf_t(0.9 * 0.5 + 0.5, scount) * stdev;
+		return;
+		}
+
+	procedure report_correlated_mean_ci(string(*) title, double level, double samples[*], int scount, int maxlag)
+		{
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		double	smean, stdev, half_width, maxlag_rho;
+
+		build_correlated_mean_ci(samples, scount, level, maxlag, smean, stdev, half_width, maxlag_rho);
+
+		print options=bold,underline	(title)	"\n_\n\n";
+		
+		print options=bold					"Samples:  ";
+		print 			(scount)				"_  ";
+		
+		print options=bold	(level*100)	"__% C.I.:  ";
+		print			(smean-half_width, smean+half_width)	"_.____ ... _.____  ";
+		
+		print options=bold					"Mean:  ";
+		print 			(smean)				"|_.____  ";
+		
+		print options=bold					"Half-Width:  ";
+		print 			(half_width)			"|_.____  ";
+		
+		print options=bold					"Std Dev(Mean):  ";
+		print 			(stdev)				"|_.____  ";
+		
+		print options=bold (maxlag)		"Rho @ Lag _:  ";
+		print 			(maxlag_rho)			"|_.____";
+
+		if (maxlag_rho > 0.05)
+			print options = bold, red	"  Too high?  (Increase Max Lag)";
+
+		print "\n\n";
+		return;
+		}
+
+//*****************************************************************************
+//	Confidence Intervals for Antithetic Variates
+//*****************************************************************************
+
+	procedure build_antithetic_mean_ci(in  double samples1[*],
+					   in  double samples2[*],
+					   in  int    scount,
+					   in  double level,
+					   out double smean,
+					   out double stdev,
+					   out double half_width,
+					   out double corr)
+		{
+		int	i;
+		double	paired[scount]; 	// temp vector for differences
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		for (i = 1; i <= scount; i++)
+			paired[i] = (samples1[i] + samples2[i]) / 2.0;
+
+		build_mean_ci(paired, scount, level, smean, stdev, half_width);
+
+		corr = correlation(samples1, samples2, scount);
+		return;
+		}
+
+	procedure report_antithetic_mean_ci(string(*)  title,
+					    double     level,
+					    double     samples1[*],
+					    double     samples2[*],
+					    int        scount)
+		{
+		double	smean, stdev, half_width, corr;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		build_antithetic_mean_ci(samples1, samples2, scount, level, smean, stdev, half_width, corr);
+
+		print options=bold,underline	(title)	"_\n\n";
+		print options=bold						"Antithetic Samples: ";
+		print 			(scount)						"_  ";
+		print options=bold	(level*100)		"__% C.I.  ";
+		print			(smean-half_width, smean+half_width)	"_.____ ... _.____  ";
+		print options=bold						"Std Dev(Mean):  ";
+		print 			(stdev)						"|_.____\n";
+
+		print 			(corr)	"Correlation between sample means: *.__\n";
+
+		if (corr > -0.15)
+			print options=italic poor_correlation;
+
+		return;
+		}
+
+//*****************************************************************************
+//	Confidence Intervals for Common Random Numbers
+//*****************************************************************************
+
+	procedure build_common_mean_ci(in  double samples1[*],
+				       in  double samples2[*],
+				       in  int	  scount,
+				       in  double level,
+				       out double smean,
+				       out double stdev,
+				       out double half_width,
+				       out double corr)
+		{
+		int	i;
+		double	paired[scount]; 	// temp vector for differences
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		for (i = 1; i <= scount; i++)
+			paired[i] = samples1[i] - samples2[i];
+
+		build_mean_ci(paired, scount, level, smean, stdev, half_width);
+
+		corr = correlation(samples1, samples2, scount);
+		return;
+		}
+
+	procedure report_common_mean_ci(string(*)  title,
+					double	   level,
+					double	   samples1[*],
+					double	   samples2[*],
+					int	   scount)
+		{
+		double	smean, stdev, half_width, corr;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		build_common_mean_ci(samples1, samples2, scount, level, smean, stdev, half_width, corr);
+
+		print options=bold,underline	(title)	"_\n\n";
+		print options=bold						"Common Samples:  ";
+		print 			(scount)						"_  ";
+		print options=bold	(level*100)		"__% C.I.  ";
+		print			(smean-half_width, smean+half_width)	"_.____ ... _.____  ";
+		print options=bold						"Std Dev(Mean):  ";
+		print 			(stdev)						"|_.____\n";
+
+		print 			(corr)	"Correlation between sample means: *.__\n\n";
+
+		if (corr < 0.5)
+			print options=italic poor_correlation;
+
+		return;
+		}
+
+//*****************************************************************************
+//	Confidence Intervals for Batch Means
+//*****************************************************************************
+
+	procedure build_batch_means_ci(in  double samples[*],
+				       in  int	  scount,
+				       in  int	  batch_size,
+				       in  double level,
+				       out double batch_means[*],
+				       out double smean,
+				       out double stdev,
+				       out double half_width)
+
+		{
+		int			batch_count, i, ilim, j;
+		double	sum;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (batch_size <= 0)
+			diagnose batch_size run_time error bad_batch_size;
+
+		batch_count = scount / batch_size;
+		i = 1;
+		for (j = 1; j <= batch_count; j++)
+			{
+			ilim = i + batch_size;
+			sum = 0.0;
+			for (; i < ilim; i++)
+				sum += samples[i];
+
+			batch_means[j] = sum / batch_size;
+			}
+
+		build_mean_ci(batch_means, batch_count, level, smean, stdev, half_width);
+		return;
+		}
+
+	procedure report_batch_means_ci(string(*) title,
+					double	  level,
+					double	  samples[*],
+					int	  scount,
+					int	  smallest_batch_size,
+					int	  largest_batch_size,
+					int	  increment)
+		{
+		OEM constant string(*)		bm_header_format =
+"________|  __________|  __________.__|  __% Confidence Interval\n";
+
+		OEM constant string(*)		bm_data_format =
+"________|  __________|  __________.__|  _______.__ ... _.__\n";
+
+		int			bs;
+		double	smean, stdev, half_width;
+		double	batch_means[scount / smallest_batch_size];
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (smallest_batch_size <= 0)
+			diagnose smallest_batch_size run_time error bad_batch_size;
+
+		if (increment <= 0)
+			diagnose increment run_time error
+				"batch size increment is not greater than zero";
+
+		print options=bold	(title)	"_\n\n";
+		print options=bold,underline	("Batches", "Batch Size", "Std Dev(Mean)", level * 100)
+			bm_header_format;
+
+		for (bs  = smallest_batch_size;
+		     bs <= largest_batch_size;
+		     bs += increment)
+			{
+			build_batch_means_ci(samples, scount, bs, level, batch_means, smean, stdev, half_width);
+			print (scount / bs, bs, stdev, smean-half_width, smean+half_width)	bm_data_format;
+			}
+
+		print	(scount, smean)	"\n_ Samples  Mean = _.__\n\n";
+		return;
+		}
+
+//*****************************************************************************
+//	Confidence Intervals for Fishman's Autoregressive Model
+//*****************************************************************************
+
+	procedure BuildFishmanAutoregressive(
+
+		in double		x[*],
+		in int				nobs,
+		in double		level,						// confidence interval level, e.g., 0.9
+		in int				maxlag,
+		out double	xbar,
+		out double	svar,
+		out double	stdev_smean,			// estimated std of sample mean
+		out int			AR_order,				// estimated autoregressive order
+		out double	residual_variance,
+		out int			dof,						// estimated equivalent degrees of freedom
+		out double	half_width)				// confidence interval half-width
+		
+		{
+		constant int		MAXLAG = 26;
+
+		double	b[MAXLAG][MAXLAG];
+		
+		double	r[MAXLAG],
+					s[MAXLAG],
+					v[MAXLAG],
+					w[MAXLAG];
+					
+		double	bsum, c2prob, lz, qu, stat, sum, vxbar;
+		int			i, j, k, q1, q2, t;
+		
+		if (maxlag > 25)
+			diagnose maxlag	run_time error "max lag ^ exceeds 25";
+
+		q1 = maxlag + 1;
+
+		for (t = 1; t <= nobs; t++)
+			sum += x[t];
+			
+		xbar = sum / nobs;
+		
+		for (i = 1; i <= q1; i++)
+			{
+			for (t = 1; t <= nobs-i+1; t++)
+				r[i] += (x[t] - xbar) * (x[t+i-1] - xbar);
+
+			r[i] /= 	(nobs-i+1);
+			}
+		
+		b[1][1] = 1.0;
+		s[1] = r[1];
+
+		for (i = 1; i <= maxlag; i++)
+			{
+			for (j = 1; j <= i; j++)
+				{
+				v[i] += b[i][j] * r[j];
+				w[i] += b[i][j] * r[i-j+2];
+				}
+
+			k = i + 1;
+			b[k][1] = 1.0;
+			b[k][k] = -w[i] / v[i];
+			
+			for (j = 2; j <= i; j++)
+				b[k][j] = b[i][j] + b[k][k] * b[i][k-j+1];
+
+			for (j = 1; j <= k; j++)
+				s[k] += b[k][j] * r[j];
+			}
+		
+		for (i = 1; i <= maxlag; i++)
+			{
+			q2 = maxlag - i + 1;
+			stat = nobs * (1.0 - s[q1] / s[i]);
+			c2prob = cdf_chi2(stat, q2);
+			
+			if (c2prob < level * 0.5 + 0.5)
+				break;
+				
+			if (q2 == 1)
+				diagnose caller run_time warning	"Unable to determine autoregressive order";
+			}
+		
+		for (j = 1; j <= i; j++)
+			bsum += b[i][j];
+		
+		vxbar = s[i] / (nobs * bsum * bsum);
+		
+		for (j = 1; j <= i; j++)
+			lz += (i - 1 - 2 * (j - 1)) * b[i][j];
+			
+		dof = nobs / (1 + 2.0 * lz / bsum) - 1.0;
+		if (dof < 1)
+			dof = 1;
+			
+		qu = icdf_t(level * 0.5 + 0.5, dof);
+		
+		svar = r[1];
+		stdev_smean = sqrt(vxbar);
+		half_width = qu * stdev_smean;
+		AR_order = i-1;
+						
+		return;
+		}
+
+	procedure ReportFishmanAutoregressive(string(*) title, double x[*], int nobs, double level, int maxlag)
+		{
+		double		smean, svar, stdev_smean, residual_variance, half_width;
+		int				AR_order, dof;
+		string(30)	ci_title;
+				
+		static OEM string(*)	heading = "|_______________________";
+		
+		BuildFishmanAutoregressive(x, nobs, level, maxlag, smean, svar, stdev_smean, AR_order, residual_variance, dof, half_width);
+
+		print options=bold	(title)	"\n_\n\n";
+
+		print options=bold	("Sample Mean")	heading;
+		print (smean)			"_.__\n";
+		
+		print options=bold	("Sample Std Dev")	heading;
+		print (sqrt(svar))		"_.__\n";
+		
+		print options=bold	("Est Std Dev(Mean)")	heading;
+		print (stdev_smean)	"_.__\n";
+		
+		write string = ci_title (level*100)	"_% Confidence Interval";
+
+		print options=bold	(ci_title)	heading;
+		print (smean-half_width, smean+half_width)		"_.__ ... _.__\n";
+		
+		print options=bold	("A/R Order")	heading;
+		print (AR_order)		"_\n";
+		
+		print options=bold	("DOF")	heading;
+		print (dof)				"_\n";
+
+		print	(nobs, smean)	"\n_ Samples  Mean = _.__\n\n";
+		return;
+		}
+	
+//*****************************************************************************
+//	Confidence Intervals for Standardized Time Series Batch Means
+//*****************************************************************************
+
+	procedure build_STS_batch_means_ci(
+
+		in  double		samples[*],
+		in  int			scount,
+		in  int			batch_size,
+		in  double		level,
+		out double	batch_means[*],
+		out double	smean,
+		out double	stdev,
+		out double	half_width)
+
+		{
+		int			batch_count, i, ilim, j, s, soffset;
+		double	A, float_bsize, sum;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (batch_size <= 0)
+			diagnose batch_size run_time error bad_batch_size;
+
+		for (i = 1; i <= scount; i++)
+			sum += samples[i];
+				
+		smean = sum / scount;
+		
+		batch_count = scount / batch_size;
+		float_bsize = batch_size;
+		
+		i = 1;
+		for (j = 1; j <= batch_count; j++)
+			{
+			ilim = i + batch_size;
+			sum = 0.0;
+
+			for (; i < ilim; i++)
+				sum += samples[i];
+
+			batch_means[j] = sum / batch_size;
+			}
+		
+		soffset = 0;
+		for (j = 1; j <= batch_count; j++) 			
+			{
+			sum = 0.0;
+			
+			sum += batch_means[j] * batch_size * (batch_size + 1) * 0.5;
+			
+			for (s = 1; s <= batch_size; s++)
+				sum -= samples[s+soffset] * s;
+			
+			A += sum * sum;
+
+			soffset += batch_size;
+			}
+
+		A *= 12.0 / (pow(float_bsize, 3) - float_bsize);
+		
+		stdev = sqrt(A / scount / batch_count);
+		half_width = cdf_t(1.0 - level * 0.5, batch_count) * stdev;
+
+		return;
+		}
+
+	procedure report_STS_batch_means_ci(string(*) title,
+					double	  level,
+					double	  samples[*],
+					int	  scount,
+					int	  smallest_batch_size,
+					int	  largest_batch_size,
+					int	  increment)
+		{
+		OEM constant string(*)		bm_header_format =
+"________|  __________|  __________.__|  __% Confidence Interval\n";
+
+		OEM constant string(*)		bm_data_format =
+"________|  __________|  __________.__|  _______.__ ... _.__\n";
+
+		int			bs;
+		double	smean, stdev, half_width;
+		double	batch_means[scount / smallest_batch_size];
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (smallest_batch_size <= 0)
+			diagnose smallest_batch_size run_time error bad_batch_size;
+
+		if (increment <= 0)
+			diagnose increment run_time error
+				"batch size increment is not greater than zero";
+
+		print options=bold	(title)	"_\n\n";
+		print options=bold,underline	("Batches", "Batch Size", "Std Dev(Mean)", level * 100)
+			bm_header_format;
+
+		for (bs  = smallest_batch_size;
+		     bs <= largest_batch_size;
+		     bs += increment)
+			{
+			build_STS_batch_means_ci(samples, scount, bs, level, batch_means, smean, stdev, half_width);
+
+			print (scount / bs, bs, stdev, smean-half_width, smean+half_width)	bm_data_format;
+			}
+
+		print				(scount, smean)	"\n_ Samples  Mean = _.__\n\n";
+		return;
+		}
+
+//*****************************************************************************
+//	Correlation / Autocorrelation / Partial Autocorrelation
+//*****************************************************************************
+
+	procedure build_autocorrelation(in  double    samples[*],
+					in  int       scount,
+					in  int       max_lag,
+					out double    autocorrelation[*])
+		{
+		double	ix, ixm1, sum, svar_sum, smean, svar;
+		int			i, lag, lag_limit;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (max_lag <= 0)
+			diagnose max_lag run_time error bad_max_lag_low;
+
+		if (max_lag > array_upper_bound(samples, 1))
+			diagnose max_lag run_time error bad_max_lag_high;
+
+		if (max_lag < scount)
+			lag_limit = max_lag;
+		else
+			lag_limit = scount - 1;
+
+		StatMeanVar(samples, 1, scount, smean, svar);
+		
+		for (lag = 1; lag <= lag_limit; lag++)
+			{
+			sum = 0.0;
+					
+			for (i = 1; i <= scount - lag; i++)
+				sum += (samples[i] - smean) * (samples[i+lag] - smean);
+			
+			if (svar == 0.0)
+				svar = 1.0;
+				
+			autocorrelation[lag] = sum / (scount-lag) / svar;
+			}
+
+		return;
+		}
+
+	 procedure report_autocorrelation(
+			string(*)	title,
+			double	samples[*],
+			int		scount,
+			int		max_lag)
+		{
+		double	autocorrelation[max_lag+1], max_corr;
+		int		i, asterisk_count;
+
+		OEM constant string(*)		ac_format =
+
+"____|           __.___|          | ************************||************************* |\n";
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (max_lag <= 0)
+			diagnose max_lag run_time error bad_max_lag_low;
+
+		if (max_lag > array_upper_bound(samples, 1))
+			diagnose max_lag run_time error bad_max_lag_high;
+
+		build_autocorrelation(samples, scount, max_lag, autocorrelation);
+
+		print options=bold	(title)		"_\n\n";
+		print options=bold, underline		("Lag", "Autocorrelation")		"____|               _|_\n";
+
+		for (i = 1; i <= max_lag; i++)
+			if (abs(autocorrelation[i]) > max_corr)
+				max_corr = abs(autocorrelation[i]);
+
+		if (max_corr == 0.0)
+			max_corr = 1.0; 	// avoid division by zero
+
+		for (i = 1; i <= max_lag; i++)
+			{
+			asterisk_count = autocorrelation[i] / max_corr * 22.0;
+			if (asterisk_count < 0)
+				print (i, autocorrelation[i],
+					substring(asterisks, 1, -asterisk_count), "|")		ac_format;
+			else
+				print (i, autocorrelation[i],
+					"", "| " cat substring(asterisks, 1, asterisk_count))	ac_format;
+			}
+
+		print				(scount)	"\n_ Samples\n\n";
+		return;
+		}
+
+	 procedure report_batch_autocorrelation(in  string(*) title,
+					       in  double samples[*],
+					       in  int	  scount,
+					       in  int	  batch_size,
+					       in  int	  max_lag)
+		{
+		double	sum, batch_means[scount/batch_size];
+
+		int	batch_count, i, ilim, j;
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (batch_size <= 0)
+			diagnose batch_size run_time error bad_batch_size;
+
+		batch_count = scount / batch_size;
+		i = 1;
+		for (j = 1; j <= batch_count; j++)
+			{
+			ilim = i + batch_size;
+			sum = 0.0;
+			for (; i < ilim; i++)
+				sum += samples[i];
+
+			batch_means[j] = sum / batch_size;
+			}
+
+		report_autocorrelation(title, batch_means, scount/batch_size, max_lag);
+		return;
+		}
+
+	procedure correlation(double samples1[*],
+			      double samples2[*],
+			      int    scount)	     returning double
+		{
+		double	mean1, mean2, sum1, sum2, rsum, vsum1, vsum2, denominator;
+		int	i;
+
+		for (i = 1; i <= scount; i++)
+			{
+			sum1 += samples1[i];
+			sum2 += samples2[i];
+			}
+
+		mean1 = sum1 / scount;
+		mean2 = sum2 / scount;
+
+		for (i = 1; i <= scount; i++)
+			{
+			vsum1 += pow((samples1[i] - mean1), 2);
+			vsum2 += pow((samples2[i] - mean2), 2);
+			}
+
+		denominator = sqrt(vsum1 * vsum2);
+
+		if (denominator == 0.0)
+			return 0.0;
+
+		for (i = 1; i <= scount; i++)
+			rsum += samples1[i] * samples2[i];
+
+		return (rsum - scount * mean1 * mean2) / denominator;
+		}
+
+//	Partial Autocorrelation
+
+	procedure build_partial_autocorrelation(
+		
+		in  double		samples[*],
+		in  int       		scount,
+		in  int       		max_lag,
+		out double		autocorrelation[*])
+		{
+		int			i, j, k, lag_limit;
+
+		double numerator, denominator, phi[max_lag] [max_lag];
+		
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (max_lag <= 0)
+			diagnose max_lag run_time error bad_max_lag_low;
+
+		if (max_lag > array_upper_bound(samples, 1))
+			diagnose max_lag run_time error bad_max_lag_high;
+
+		if (max_lag < scount)
+			lag_limit = max_lag;
+		else
+			lag_limit = scount - 1;
+
+		build_autocorrelation(samples, scount, lag_limit, autocorrelation);
+		
+		phi[1][1] = autocorrelation[1];
+		phi[2][2] = (autocorrelation[2] - pow(autocorrelation[1], 2)) / (1.0 - pow(autocorrelation[1], 2));
+		phi[2][1] = phi[1][1] - phi[2][2] * phi[1][1];
+						
+		for (k = 3; k <= lag_limit; k++)
+			{
+			numerator = autocorrelation[k];
+			denominator = 1.0;
+			
+			for (j = 1; j < k; j++)
+				{
+				numerator -= phi[k-1][j] * autocorrelation[k-j];
+				denominator -= phi[k-1][j] * autocorrelation[j];
+				}
+			
+			phi[k][k] = numerator / denominator;
+
+			for (j = 1; j < k; j++)
+				phi[k][j] = phi[k-1][j] - phi[k][k] * phi[k-1][k-j];
+			}
+		
+		for (i = 1; i <= lag_limit; i++)
+			autocorrelation[i] = phi[i][i];
+			
+		return;
+		}
+
+	 procedure report_partial_autocorrelation(
+			string(*)	title,
+			double	samples[*],
+			int		scount,
+			int		max_lag)
+
+		{
+		double	autocorrelation[max_lag+1], max_corr;
+		int		i, asterisk_count;
+
+		OEM constant string(*)		ac_format =
+
+"____|           __.___|          | ************************||************************* |\n";
+
+		if (scount < 2)
+			diagnose scount run_time error bad_sample_count;
+
+		if (max_lag <= 0)
+			diagnose max_lag run_time error bad_max_lag_low;
+
+		if (max_lag > array_upper_bound(samples, 1))
+			diagnose max_lag run_time error bad_max_lag_high;
+
+		build_partial_autocorrelation(samples, scount, max_lag, autocorrelation);
+
+		print options=bold	(title)		"_\n\n";
+		print options=bold					("", "Partial (k,k)")				"____|  |_\n";
+		print options=bold, underline		("Lag", "Autocorrelation")	"____|  |_\n";
+
+		for (i = 1; i <= max_lag; i++)
+			if (abs(autocorrelation[i]) > max_corr)
+				max_corr = abs(autocorrelation[i]);
+
+		if (max_corr == 0.0)
+			max_corr = 1.0; 	// avoid division by zero
+
+		for (i = 1; i <= max_lag; i++)
+			{
+			asterisk_count = autocorrelation[i] / max_corr * 22.0;
+
+			if (asterisk_count < 0)
+				print (i, autocorrelation[i],
+					substring(asterisks, 1, -asterisk_count), "|")		ac_format;
+			else
+				print (i, autocorrelation[i],
+					"", "| " cat substring(asterisks, 1, asterisk_count))	ac_format;
+			}
+
+		print				(scount)	"\n_ Samples\n\n";
+		return;
+		}
+
+//*****************************************************************************
+//	Internal procedure for calculating sums of ranks of two sample sets
+//*****************************************************************************
+
+	public procedure calculate_rank_sums(
+
+		double		sample1[*], 			// sample Set 1
+		int			nsample1,			// count
+		double		sample2[*],			// sample set 2
+		int			nsample2,			// count
+		out double	rank_sum1,			// output sum(ranks)
+		out double	rank_sum2)			// output sum(ranks)
+
+		{
+		double		sort1[nsample1],
+					sort2[nsample2];
+		double		rank;
+		int			i, j;
+
+		for (i = 1; i <= nsample1; i++)
+			sort1[i] = sample1[i];
+
+		for (i = 1; i <= nsample2; i++)
+			sort2[i] = sample2[i];
+
+		sort_double(sort1, 1, nsample1);
+		sort_double(sort2, 1, nsample2);
+
+		i = 1;
+		j = 1;
+		while (i <= nsample1 && j <= nsample2)
+			{
+			rank += 1.0;
+			if (sort1[i] < sort2[j])
+				{
+				rank_sum1 += rank;
+				++i;
+				}
+			else
+				{
+				rank_sum2 += rank;
+				++j;
+				}
+			}
+
+		while (i <= nsample1)
+			{
+			rank += 1.0;
+			rank_sum1 += rank;
+			++i;
+			}
+			
+		while (j <= nsample2)
+			{
+			rank += 1.0;
+			rank_sum2 += rank;
+			++j;
+			}
+
+		return;
+
+		}	// end of calculate_rank_sums(...)
+
+//*****************************************************************************
+//	Kruskal-Wallace Test for Testing Whether Two Sets of Samples Are
+//	Similarly Distributed  (Chi-Square on Squared Sums of Ranks)
+//*****************************************************************************
+
+	public procedure report_KW2(
+
+		double	sample1[*], 			// sample Set 1
+		int		nsample1,			// count
+		double	sample2[*],			// sample set 2
+		int		nsample2,			// count
+		double	level,				// significance, e.g. 0.9
+		string(*)	title)
+
+		{
+		string(6)	accept;
+		double	chi2_probability;
+
+		if (test_KW2(sample1, nsample1, sample2, nsample2, level, chi2_probability))
+			accept = "Accept";
+		else
+			accept = "Reject";
+
+		print (title, chi2_probability, accept, level)
+
+			"\n\n_\n"
+			"CDF(Test Statistic) = _.__;  _ at level .__\n";
+
+		return;
+		}
+
+	public procedure test_KW2(
+
+		double		sample1[*], 
+		int			nsample1,
+		double		sample2[*],
+		int			nsample2,
+		double		level,
+		out double	chi2_probability)	returning boolean
+
+		{
+		double		rank_sum1, rank_sum2, total_samples, test_stat, ts2;
+
+		calculate_rank_sums(sample1, nsample1, sample2, nsample2, rank_sum1, rank_sum2);
+			
+		total_samples = nsample1 + nsample2;
+		ts2 = total_samples * (total_samples+1);
+		
+/*		test_stat =	12.0 * ((rank_sum1 * rank_sum1 / nsample1) + (rank_sum2 * rank_sum2 / nsample2))
+					/ ts2;
+					
+		test_stat -= 3 * (total_samples+1);
+*/
+		test_stat =	12.0 * (rank_sum1 / ts2 * (rank_sum1 / nsample1)
+							    + rank_sum2 / ts2 * (rank_sum2 / nsample2));
+		
+		test_stat -= 3 * (total_samples+1);
+
+		chi2_probability = cdf_chi2(test_stat, 1);
+
+		if (chi2_probability <= level)
+			return TRUE;
+		else
+			return FALSE;
+		}
+
+//*****************************************************************************
+//	Mann-Whitney U Test - Tests Whether Two Sets of Samples Are Similarly Distributed
+//*****************************************************************************
+
+	public procedure report_MWU(
+
+		double	sample1[*], 			// sample Set 1
+		int		nsample1,			// count
+		double	sample2[*],			// sample set 2
+		int		nsample2,			// count
+		double	level,				// significance, e.g. 0.9
+		string(*)	title)
+
+		{
+		string(6)	accept;
+		double		normal_probability;
+
+		if (test_MWU(sample1, nsample1, sample2, nsample2, level, normal_probability))
+			accept = "Accept";
+		else
+			accept = "Reject";
+
+		print (title, normal_probability, accept, level)
+
+			"\n\n_\n"
+			"CDF(Test Statistic)  = _.__;   _ at level .__\n";
+
+		return;
+		}
+
+	public procedure test_MWU(
+
+		double		sample1[*], 
+		int			nsample1,
+		double		sample2[*],
+		int			nsample2,
+		double		level,
+		out double	normal_probability)	returning boolean
+
+		{
+		double	ns1, ns2;
+
+		double	rank_sum1, rank_sum2, U, U1, U2, test_stat;
+
+		calculate_rank_sums(sample1, nsample1, sample2, nsample2, rank_sum1, rank_sum2);
+			
+		ns1 = nsample1;
+		ns2 = nsample2;
+
+		if (nsample1 < nsample2)
+			U1 = ns1 * ns2 + (ns1 * (ns1 + 1)) * 0.5 - rank_sum1;
+		else
+			U1 = ns1 * ns2 + (ns2 * (ns2 + 1)) * 0.5 - rank_sum2;
+
+		U2 = ns1 * ns2 - U1;
+
+		if (U1 < U2)
+//			U = U1;
+			U = U2;
+		else
+//			U = U2;
+			U = U1;
+
+		test_stat = (U - ns1 * ns2 * 0.5) / sqrt(ns1 * ns2 * (ns1 + ns2 + 1) / 12.0);
+		
+		normal_probability = cdf_normal(test_stat);
+
+		if (normal_probability <= level)
+			return TRUE;
+		else
+			return FALSE;
+		}
+
+	}	// end of slx_statistics module

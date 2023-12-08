@@ -1,0 +1,181 @@
+#define SLX2
+#define STRICT_LOCAL_SCOPES
+#define INLINE_INITIALIZATION
+
+public module PlotTrace
+{
+	passive class Tracer(string(*) name_)
+	{
+		string(32) title = name_;
+		string(44) trace = title cat ".csv";
+		pointer(puck) myPuck;
+		filedef stream name = trace output;
+		boolean init = FALSE;
+		int columns = 1;
+		int blocks = 1;
+		int step = 1;
+		
+		method stop()
+		{
+			close stream;
+		}
+		
+		method cont()
+		{
+			open stream output name = trace options = append;
+		}
+		
+		method signal()
+		{
+			if (myPuck->state == MOVING)
+				yield to myPuck;
+			reactivate myPuck;
+		}
+		
+		clear
+		{
+			// conclude the current data block with two empty lines
+			init = FALSE;
+			write file = stream "\n\n";
+			step = 1;
+			++blocks;
+		}
+		
+		final
+		{
+			close stream;
+		}
+	}
+	
+	statement trace #tracer ({#expr [named #name]},...) [every #timeStep] [watch #integrator] [@until #event] [precision #prec];
+	definition
+	{
+		string(*) prec = ".____________";
+		translation trafo("_", " ");
+		string(64) expr;
+		int digits = 6;
+		int i;
+		
+		if (#prec != "")
+			read string = #prec (digits);
+		
+		prec = (digits > 0) ? substring(prec, 1, digits + 1) : "";
+		
+		expr = "-1";
+		if (#integrator != "" && #timeStep == "")
+			expr = #integrator cat "->myPuck->priority - 1";
+		
+		expand (#tracer, expr, #tracer, #tracer, #tracer)
+			|"
+			#.myPuck = fork priority # {
+				if (!#.init) {
+					#.init = TRUE;
+					write file = #.stream \"time"|;
+		
+		for (i = 1; #expr[i] != ""; ++i)
+		{
+			expr = #expr[i];
+			str_translate(expr, trafo);
+      if (#name[i] != "") { expand (#name[i]) ", \\\"#\\\""; }
+      else { expand (expr) ", \\\"#\\\""; }
+		}
+		expand "\\n\";";
+		
+		expand (#tracer, i, #tracer) |"
+					#.columns = #;
+				}"|;
+		
+		if (#timeStep != "")
+		{
+			if (#integrator != "")
+				expand (#integrator) |"
+				#->attachPuck(ACTIVE);"|;
+			
+			expand ((#event != "") ? "while (!(" cat #event cat "))" : "forever", #tracer, prec) |"
+				# {
+					write file = #.stream (time) "___#";"|;
+			
+			for (i = 1; #expr[i] != ""; ++i)
+				expand (#tracer, #expr[i], prec)
+				|"
+					write file = #.stream (#) ", ___#";"|;
+			
+			expand (#tracer, #timeStep)
+				|"
+					write file = #.stream "\n";
+					advance #;
+				}"|;
+			
+			if (#integrator != "")
+				expand (#integrator) |"
+				#->detachPuck(ACTIVE);"|;
+		}
+		else if (#integrator != "")
+		{
+			expand ((#event != "") ? "while (!(" cat #event cat "))" : "forever",
+					#integrator, #tracer, prec) |"
+				# {
+					wait until #->isBusy;
+					write file = #.stream (time) "___#";"|;
+			
+			for (i = 1; #expr[i] != ""; ++i)
+				expand (#tracer, #expr[i], prec)
+				|"
+					write file = #.stream (#) ", ___#";"|;
+			
+			expand (#tracer, #integrator)
+				|"
+					write file = #.stream "\n";
+					wait until time == #->myPuck->move_time;
+				}"|;
+		}
+		else
+		{
+			expand ((#event != "") ? "while (!(" cat #event cat "))" : "forever",
+			        #tracer, #tracer, #tracer, #tracer) |"
+				# {
+					wait;
+					write file = #.stream (#.step) "___";"|;
+			
+			for (i = 1; #expr[i] != ""; ++i)
+				expand (#tracer, #expr[i], prec)
+				|"
+					write file = #.stream (#) ", ___#";"|;
+			
+			expand (#tracer, #tracer)
+				|"
+					write file = #.stream "\n";
+					++#.step;
+				}"|;
+		}
+		
+		expand |"
+				terminate;
+			}
+		"|;
+	}
+	
+	statement plot #tracer [as #format] [using #plotFile] [<#show show>];
+	definition
+	{
+		expand (#tracer, #tracer, #tracer, #tracer, #tracer,
+		        (#format == "") ? "\"svg\"" : #format,
+		        (#plotFile == "") ? "\"trace.plt\"" : #plotFile,
+		        (#show == "show") ? "TRUE" : "FALSE", #tracer)
+		|"
+			#.stop();
+			PlotToFile(#.trace, #.columns, #.blocks, #.title cat "." cat #, #, #);
+			#.cont();
+		"|;
+	}
+	
+#ifdef WIN64
+	procedure PlotToFile(string(*) input, int columns, int blocks,
+	                     string(*) output, string(*) plotFile,
+	                     boolean show) dll = "slxplot64.dll";
+#else
+	procedure PlotToFile(string(*) input, int columns, int blocks,
+	                     string(*) output, string(*) plotFile,
+	                     boolean show) dll = "slxplot.dll";
+#endif
+}

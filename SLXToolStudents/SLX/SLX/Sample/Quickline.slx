@@ -1,0 +1,156 @@
+//*****************************************************************************
+//	QuickLine Bank Simulation
+//	Incoming customers share a common queue.
+//*****************************************************************************
+
+import 	<stats.slx>		// Statistics
+import	<h7.slx>			// GPSS/H (queueing constructs)
+
+#safesymbol	INTERACTIVE
+//efine				INTERACTIVE	ON
+
+module QuickLine
+	{
+	//	Global Variables
+	
+	double						MeanServiceTime;
+
+	int								NumberOfTellers,
+									NumberOfCustomers,
+									BusyTellers;
+			
+	control int					NumberOut;
+	
+	random_variable			TimeInQueue	histogram start=0.5 width=0.5 count=30,
+									TimeInSystem	histogram start=0.5 width=0.5 count=30;
+	
+	random_variable	(time)	TellerUtil;
+	
+	rn_stream					IAT, Service;							// random number streams
+	
+	//	Classes and sets
+	
+	set(Customer)				CommonQueue;
+
+	class Customer
+		{
+		double			ArrivalTime;
+
+		initial
+			{
+			ArrivalTime = time;
+			place ME into CommonQueue;
+			}
+		};
+	
+	class Teller
+		{
+		pointer(Customer)		c;
+		actions
+			{
+			forever
+				{
+				wait until (CommonQueue.size > 0);		// wait for something to do;
+					
+				c = first Customer in CommonQueue;
+				remove c from CommonQueue;
+	
+				tabulate TellerUtil 			= (double) (++BusyTellers) / NumberOfTellers;
+				tabulate	TimeInQueue	= time - c -> ArrivalTime;
+				
+				advance	rv_expo(Service, MeanServiceTime);
+	
+				tabulate TellerUtil			= (double) (--BusyTellers) / NumberOfTellers;
+				tabulate TimeInSystem	= time - c -> ArrivalTime;
+	
+				++NumberOut;
+				}
+			}
+		};
+		
+	procedure main()
+		{
+		double				ArrivalRate, ServiceRate, MeanIAT;
+		int						i;
+		pointer(histogram)	h;
+				
+		filedef		timeinsys		output name="timeinsys.lis";
+		filedef		timeinq		output name="timeinQ.lis";
+
+#ifdef INTERACTIVE
+		read file=stdin prompt = "Please enter the total number of customers to be processed" end = done (NumberOfCustomers);
+		
+		read file=stdin prompt = "Please enter the mean number of customers per minute" end=done (ArrivalRate);
+		
+		read file=stdin prompt = "Please enter the number of Tellers" end = done (NumberOfTellers);
+		
+		read file=stdin prompt = "Please enter the mean customer service time (minutes)" end = done (MeanServiceTime);
+#else
+		filedef infile input name = "quickline.dat";
+		
+		read file=infile end=done (NumberOfCustomers, ArrivalRate, NumberOfTellers, MeanServiceTime);
+#endif		
+
+		if (NumberOfTellers <= 0)
+			{
+			print options=red,bold "The number of tellers must be greater than zero.\n";
+			exit(0);
+			}
+		
+		if (ArrivalRate <= 0)
+			{
+			print options=red,bold  "The mean number of customers per minute must be greater than zero.\n";
+			exit(0);
+			}
+		
+		ServiceRate	= NumberOfTellers / MeanServiceTime;
+		MeanIAT		= 1.0 / ArrivalRate;
+		
+		if (ServiceRate < ArrivalRate)
+			{
+			print options=red,bold (ArrivalRate, ServiceRate)
+			
+				"Arrival rate (_.__ per minute) exceeds service capacity (_.__ per minute).\n";
+			
+			exit (0);
+			}
+			
+		for (i = 1; i <= NumberOfTellers; i++)
+			activate new Teller;
+			
+		for (i = 1; i <= NumberOfCustomers; i++)
+			{
+			advance rv_expo(IAT, MeanIAT);		// interarrival time
+			
+			new Customer;
+			}			
+	
+		print options=bold	"QuickLine Results...\n\n";
+		
+		print (NumberOfCustomers - NumberOut)		"In system at shutdown: _\n";
+		
+		wait until (NumberOut == NumberOfCustomers);		// drain the system;
+		
+		report TimeInQueue, TimeInSystem, TellerUtil;
+		
+		print options=bold,red (100.00 * ArrivalRate / ServiceRate)		"\nExpected Teller Utilization = ___._%\n";
+
+		h = TimeInSystem.histo;
+		for (i = 0; i < h -> class_count; i++)
+			{
+			write file=timeinsys (h -> lower_bound + i * h -> class_width, 100.0 * h -> frequency[i] / h -> count)
+			
+				"__.__  __.__\n";
+			}
+
+		h = TimeInQueue.histo;
+		for (i = 0; i < h -> class_count; i++)
+			{
+			write file=timeinq (h -> lower_bound + i * h -> class_width, 100.0 * h -> frequency[i] / h -> count)
+			
+				"__.__  __.__\n";
+			}
+
+done:	exit(0);
+		}
+	}

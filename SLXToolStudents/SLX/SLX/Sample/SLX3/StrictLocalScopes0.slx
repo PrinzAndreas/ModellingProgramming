@@ -1,0 +1,38 @@
+//*****************************************************************************
+//	Strict Local Scope Test
+//*****************************************************************************
+
+#define STRICT_LOCAL_SCOPES		ON
+
+module TestLocalScopes
+	{
+	class widget
+		{
+		initial
+			{
+			int		i = 1;
+			}
+
+		actions
+			{
+			int		j = 2;
+			
+			wait;
+			}
+		
+		report
+			{
+			print (ME, i, j)		"_: i = _  j = _\n";		// illegal i and j if STRICT_LOCAL_SCOPES enabled
+			}
+		};
+
+	procedure main()
+		{
+		pointer(widget)	w;
+
+		w = new widget;
+		yield;
+		report *w;
+		exit(0);
+		}
+	}

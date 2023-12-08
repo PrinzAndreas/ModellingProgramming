@@ -1,0 +1,58 @@
+//*****************************************************************************
+//	Get Memory Usage Info
+//*****************************************************************************
+
+//	Imports...
+
+module GetMemoryInfo
+	{
+	string(*)	Format = 
+	
+|"	Windows Virtual Memory:			____ MB (____ MB Avail)
+	Windows Real Memory:			____ MB (____ MB Avail)
+	Windows Paging File Memory:	____ MB (____ MB Avail)
+
+	Windows Memory Load:			____ (0...100)
+
+	SLX-Acquired Memory:			____ MB (Peak = _ MB)
+"|;
+
+	procedure main()
+		{
+		int		WindowsVM,
+				WindowsVMAvail,
+				WindowsRealMemory,
+				WindowsRealMemoryAvail,
+				WindowsPagingFileMemory,
+				WindowsPagingFileMemoryAvail,
+				WindowsMemoryLoad,
+				SLXMemoryInUse,
+				SLXMaxMemoryInUse;
+				
+		GetSLXMemoryUsage(
+		
+				WindowsVM,
+				WindowsVMAvail,
+				WindowsRealMemory,
+				WindowsRealMemoryAvail,
+				WindowsPagingFileMemory,
+				WindowsPagingFileMemoryAvail,
+				WindowsMemoryLoad,
+				SLXMemoryInUse,
+				SLXMaxMemoryInUse);
+		
+		print (	WindowsVM,
+					WindowsVMAvail,
+					WindowsRealMemory,
+					WindowsRealMemoryAvail,
+					WindowsPagingFileMemory,
+					WindowsPagingFileMemoryAvail,
+					
+					WindowsMemoryLoad,
+					
+					SLXMemoryInUse,
+					SLXMaxMemoryInUse)	Format;
+				
+		exit(0);
+		}
+	}

@@ -1,0 +1,50 @@
+//*****************************************************************************
+//	Object/Puck IDs
+//*****************************************************************************
+
+module untitled1
+	{
+	class widget
+		{
+		int		xxx;
+		
+		actions
+			{
+			print (ACTIVE, ME, ObjectID(ACTIVE -> puck_object), ObjectID(ACTIVE))
+			
+				"_:  _:  _/_\n";
+				
+			terminate;
+			}
+		};
+	
+	procedure main()
+		{
+		pointer(widget)		w;
+		
+		w = new widget;
+		ShowID(w);
+
+		w = new widget;
+		ShowID(w);
+
+		ShowID(NULL);
+
+		ShowID(ACTIVE);
+		fork
+			{
+			ShowID(ACTIVE);
+			terminate;
+			}
+		
+		yield;
+		
+		activate w;
+		yield;
+		}
+	
+	procedure ShowID(pointer(*) p)
+		{
+		print (p, ObjectID(p), UseCount(p))	"ObectID(_) = _;  Use Count = _\n";
+		}
+	}

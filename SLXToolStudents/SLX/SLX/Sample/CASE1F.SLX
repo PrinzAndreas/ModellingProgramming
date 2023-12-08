@@ -1,0 +1,89 @@
+//*****************************************************************************
+//	Case Study 1F - Three Different Prioritized Job Streams
+//*****************************************************************************
+
+module case1f
+	{
+	rn_stream			managers, workers, accounting,	// arrivals
+						service;							// printing
+
+	control boolean	printer_busy;
+
+	float				shutdown_time = 5 * 8 * 60;		// five 8-hour shifts (in minutes)
+
+	control int			jobs_in,
+						jobs_printed;
+
+	float				total_queueing_time,
+						total_printing_time;
+
+	procedure main()
+		{
+		fork priority 3
+			{
+			job_stream(managers, 10.0, 20.0, 0.5, 2.0);
+			}
+
+		fork priority 2
+			{
+			job_stream(workers, 5.0, 10.0, 1.0, 4.0);
+			}
+
+		fork priority 1
+			{
+			job_stream(accounting, 120.0, 240.0, 10.0, 20.0);
+			}
+
+		// drain the system
+
+		wait until (time >= shutdown_time and jobs_printed == jobs_in);
+
+		print ( time,
+				jobs_printed,
+				total_printing_time / time,
+				total_queueing_time / jobs_printed * 60)
+
+"Time: _.__"
+""
+"Jobs Printed:           _____|"
+"Printer Utilization:     _.___|"
+""
+"Mean Queueing Time/Job: _.__ seconds\n\n";
+
+		}	// End of main
+
+	procedure job_stream(
+
+		inout rn_stream	arrivals,
+		float				shortest_IAT,
+		float				longest_IAT,
+		float				shortest_time,
+		float				longest_time)
+
+		{
+		while (time < shutdown_time)	// simulate for a week
+			{
+			advance rv_uniform(arrivals, shortest_IAT, longest_IAT);	// interarrival time
+			fork
+				{
+				++jobs_in;												// count arrivals
+				total_queueing_time -= time;
+				wait until (not printer_busy);
+				total_queueing_time += time;
+
+				printer_busy = TRUE;
+				total_printing_time -= time;
+				advance rv_uniform(service, shortest_time, longest_time);	// printing time
+				total_printing_time += time;
+				printer_busy = FALSE;
+
+				++jobs_printed;										// count jobs out
+				terminate;
+				}
+			}
+
+		terminate;	// parent terminates
+
+		}	// End of job_stream()
+
+	}	// End of case1f

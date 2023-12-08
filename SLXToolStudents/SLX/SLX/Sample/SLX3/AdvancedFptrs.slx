@@ -1,0 +1,50 @@
+//*****************************************************************************
+//	Advanced Function Pointers
+//*****************************************************************************
+
+#define SLX2 ON
+
+module AdvancedFptrs
+	{
+	procedure main()
+		{
+		double	x = 123.456;
+		
+		pointer(procedure(double a) returning double)	fptr;
+		
+		fptr = &func;
+
+		x = bind(x, fptr);
+
+		print (x)		"x = ___.___ (should be 123.456)\n";
+		
+		x = (*joh()) (456.789);
+		
+		print (x)		"x = ___.___  (should be 456.789\n";
+		}
+
+	procedure bind(double a, pointer(procedure(double a) returning double)	fptr) returning double
+		{
+//		return (*fptr) (a);
+		return (*fptr) (a);
+		}
+	
+	procedure func(double a) returning double
+		{
+		return a;
+		}
+	
+//	procedure joh() returning pointer(procedure(enum { ON, OFF } a) returning double) 
+//	procedure joh() returning pointer(procedure(int a) returning double) 
+//	procedure joh() returning pointer(procedure(string(*) a) returning double) 
+//	procedure joh() returning pointer(procedure(double a) returning int) 
+
+	procedure joh() returning pointer(procedure(double a) returning double) 
+		{
+		int		j;
+		
+		j = 999;
+		
+		return &func;
+		}
+	}

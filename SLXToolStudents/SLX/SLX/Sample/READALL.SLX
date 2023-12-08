@@ -1,0 +1,60 @@
+module new_io
+	{
+	constant float 					zero = 0.0;
+
+	filedef 	keyboard				name = "stdin";
+	filedef 	screen				name = "stdout";
+
+	procedure main()
+		{
+		int								i;
+		float							x;
+		boolean 						true_false;
+		string(10)					string_10;
+		enum { red, green, blue }	color;
+
+		forever
+			{
+itrouble:	read	file=keyboard
+					end=done
+//					err=itrouble
+					prompt = "Please enter a value for i"	(i);
+
+			write	file=screen (i)		    "\ni = *\n\n";
+
+xtrouble:	read	file=keyboard
+					end=done
+					err=xtrouble
+					prompt = "Please enter a value for x"	(x);
+
+			write file=screen (x)		    "\nx = *.**\n\n";
+
+ttrouble:	read	file=keyboard
+					end=done
+					err=ttrouble
+					prompt = "Please enter a value for true_false"		(true_false);
+
+			write file=screen (true_false)	    "\ntrue\_false = *\n\n";
+
+ctrouble:	read	file=keyboard
+					end=done
+					err=ctrouble
+					prompt = "Please enter a value for color (red, green, or blue)"	(color);
+
+			write file=screen (color)   "\ncolor = *\n\n";
+
+strouble:	read	file=keyboard
+					end=done
+					err=strouble
+					prompt = "Please enter a value for string_10"		(string_10);
+
+			write file=screen (string_10)	   "\nstring\_10 = \"*\"\n\n";
+
+			continue;
+			}
+
+done:		write file=screen "EOF!\n\n";
+
+		exit(0);
+		}
+	}

@@ -1,0 +1,136 @@
+//*****************************************************************************
+//	Case Study 1H - Introduces Active Objects
+//*****************************************************************************
+
+module case1h
+	{
+	class printer_job
+		{
+		int				job_priority;
+		float			job_arrival_time,
+						job_printing_time;
+		};
+
+	set(printer_job) ranked(descending job_priority)	printer_queue;
+
+	rn_stream			managers, workers, accounting,	// arrivals
+						service;							// printing
+
+	constant float		shutdown_time = 5 * 8 * 60;		// five 8-hour shifts (in minutes)
+
+	control boolean		shutdown;
+
+	procedure main()
+		{
+		pointer(printer_job)		job;
+
+		fork			// priority 3 (manager) jobs
+			{
+			forever
+				{
+				advance rv_uniform(managers, 10.0, 20.0);
+						
+				job = new printer_job;
+				job -> job_arrival_time = time;
+				job -> job_priority = 3;
+				job -> job_printing_time = rv_uniform(service, 0.5, 2.0);
+
+				place job into printer_queue;
+
+				if (time >= shutdown_time)
+					terminate;
+				}
+			}
+
+		fork			// priority 2 (worker) jobs
+			{
+			forever
+				{
+				advance rv_uniform(workers, 5.0, 10.0);
+						
+				job = new printer_job;
+				job -> job_arrival_time = time;
+				job -> job_priority = 2;
+				job -> job_printing_time = rv_uniform(service, 1.0, 4.0);
+
+				place job into printer_queue;
+
+				if (time >= shutdown_time)
+					terminate;
+				}
+			}
+
+		fork			// priority 1 (accounting) jobs
+			{
+			forever
+				{
+				advance rv_uniform(accounting, 120.0, 240.0);
+						
+				job = new printer_job;
+				job -> job_arrival_time = time;
+				job -> job_priority = 1;
+				job -> job_printing_time = rv_uniform(service, 10.0, 20.0);
+
+				place job into printer_queue;
+
+				if (time >= shutdown_time)
+					terminate;
+				}
+			}
+
+		activate new printer();		// start an active object
+		wait until (shutdown);
+
+		}	// End of main
+
+	class printer()
+		{
+		float					total_queueing_time,
+								total_printing_time;
+		int						jobs_printed;
+
+		pointer(printer_job)		job;
+
+		actions
+			{
+			forever
+				{
+				wait until (printer_queue.size > 0);
+
+				job = first printer_job in printer_queue;
+				remove job from printer_queue;
+				total_queueing_time += time - job -> job_arrival_time;
+
+				total_printing_time -= time;
+				advance job -> job_printing_time;
+				total_printing_time += time;
+
+				++jobs_printed;	// count jobs out
+
+				destroy job;
+
+				if (time > shutdown_time and printer_queue.size == 0)
+					{
+					shutdown = TRUE;	
+	
+					print (
+					time,
+					jobs_printed,
+					total_printing_time / time,
+					total_queueing_time / jobs_printed * 60)
+
+"Time _.__"
+""
+"Jobs Printed:           _____|"
+"Printer Utilization:     _.___|"
+""
+"Mean Queueing Time/Job: _.__ seconds\n\n";
+
+					terminate;
+					}
+				}		// end of actions property
+			}
+
+		}	// End of job_stream()
+
+	}	// End of case1h

@@ -1,0 +1,59 @@
+//*****************************************************************************
+//	Bus Paradox
+//*****************************************************************************
+
+import	<stats.slx>
+
+module Paradox
+	{
+	rn_stream				BusIAT seed=123456789, RiderIAT;
+	random_variable		Twait histogram start=0 width=1 count=20;
+	random_variable		Samples;
+						
+	procedure main()
+		{
+		double			IntervalStart,
+							x, smean, svar;
+							
+		int					i;
+		pointer(puck)	BusQ;
+				
+		fork				// bus arrivals
+			{
+			forever
+				{
+				x = rv_triangular(BusIAT, 5.0, 10.0, 15.0);
+//				x = rv_uniform(BusIAT, 15.0, 25.0);
+//				x = rv_expo(BusIAT, 10.0);
+//				x = rv_uniform(BusIAT, 0.0, 50.0);
+//				x = rv_uniform(BusIAT, 10.0, 20.0);
+
+				tabulate Samples = x;
+				advance x;
+				
+				reactivate list=BusQ;
+				}
+			}
+
+		for (i = 1; i <= 100000; i++)
+			{
+			IntervalStart = time;
+			wait list=BusQ;
+			tabulate Twait = time - IntervalStart;
+			
+//			advance	rv_expo(RiderIAT, 500.0);
+			advance		1000.0;
+			}
+		
+		report Samples, Twait;
+
+		smean	= sample_mean(Samples);
+		svar		= sample_variance(Samples);
+		
+		print options=bold 	(smean / 2.0 + svar / (2.0 * smean), sample_mean(Twait), smean / 2.0)
+		
+			"\nTheoretical mean sampled wait time = __.____;  Realized Mean = __.____;  IAT Mean / 2.0 = __.____\n";
+		
+		exit(0);			
+		}
+	}

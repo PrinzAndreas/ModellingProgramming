@@ -1,0 +1,66 @@
+//*****************************************************************************
+//	State-Based Wait Benchmark - Ping Pong
+//*****************************************************************************
+
+//#define DELAY ON
+
+module PingPong
+	{
+	constant int			COUNT = 100000000;
+	control boolean	ping1, ping2, pong1, pong2;
+
+	procedure main()
+		{
+		double	tstart, dt;
+		int			i;
+		
+		fork
+			{
+			forever
+				{
+				wait until (ping1 || ping2);
+				ping1 = FALSE;
+				ping2 = FALSE;
+
+#ifdef DELAY
+				advance 1.0;
+#endif
+				pong1 = TRUE;
+
+#ifdef DELAY
+				advance 1.0;
+#endif
+				pong2 = TRUE;
+				}
+			}
+
+		tstart = real_time();
+		for (i = 1; i <= COUNT; i++)
+			{
+			ping1 = TRUE;
+
+#ifdef DELAY
+			advance 1.0;
+#endif
+			ping2 = TRUE;
+			
+			wait until (pong1 && pong2);
+
+#ifdef DELAY
+			advance 1.0;
+#endif
+			pong1 = FALSE;
+			pong2 = FALSE;
+			}
+
+		dt = real_time() - tstart;
+		
+		print (
+			
+			COUNT,
+			dt * (1000000000.0 / COUNT),
+			dt * (1000000000.0 / COUNT) * CPUGHz())
+		
+				"_ Iterations @ __.__ Ns  (__.__ CPU Cycles)\n";
+		}
+	}

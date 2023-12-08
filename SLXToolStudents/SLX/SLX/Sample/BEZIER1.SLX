@@ -1,0 +1,72 @@
+//*****************************************************************************
+//      Module BezierTest
+//*****************************************************************************
+
+import <stats>
+
+module BezierTest
+	{
+	constant int		NSAMP = 7500;
+
+	rn_stream		stream1		seed=100000,
+					stream2		seed=100000,
+					stream3		seed=100000,
+					stream4		seed=100000;
+
+	rv_bezier_data	mydist file = "chemxjoh.var";
+//	rv_bezier_data	mydist2 file = "erlang.var";
+
+	procedure main()
+		{
+		random_variable	bezier	histogram start=2.0 width=0.1 count = 25;
+		random_variable	weibull	histogram start=2.0 width=0.1 count = 25;
+
+		double				Ybezier[NSAMP],
+							Yweibull[NSAMP],
+							start_time,
+							x;
+
+		int					i;
+
+		for (i = 1; i <= NSAMP; i++)
+			{
+			Ybezier[i] = rv_bezier(stream1, mydist);
+			tabulate bezier = Ybezier[i];
+
+			Yweibull[i] = rv_weibull(stream2, 2.07, 0.956273, 2.959315);
+			tabulate weibull = Yweibull[i];
+			}
+
+		report rn_stream_set;
+		report random_variable_set;
+
+		report_KW2(Ybezier, NSAMP, Yweibull, NSAMP, 0.9, "Kruskal-Wallace Comparison of Bezier vs. Weibull");
+		report_MWU(Ybezier, NSAMP, Yweibull, NSAMP, 0.9, "Mann-Whitney U Test for Bezier vs. Weibull");
+
+//		exit(0);
+
+		start_time = real_time();
+		for (i = 1; i <= 1000000; i++)
+			x = rv_bezier(stream1, mydist);
+
+//		print (real_time() - start_time)	"\n\nBezier:    _____.___ Microseconds / Sample\n\n";
+
+		start_time = real_time();
+		for (i = 1; i <= 1000000; i++)
+			x = rv_weibull(stream2, 2.07, 0.956273, 2.959315);
+
+//		print (real_time() - start_time)	"Weibull:  _____.___ Microseconds / Sample\n\n";
+
+		start_time = real_time();
+		for (i = 1; i <= 1000000; i++)
+			x = rv_expo(stream3, 10.0);
+
+//		print (real_time() - start_time)	"Expo:      _____.___ Microseconds / Sample\n\n";
+
+		start_time = real_time();
+		for (i = 1; i <= 1000000; i++)
+			x = rv_normal(stream4, 0.0, 1.0);
+
+//		print (real_time() - start_time)	"Normal:   _____.___ Microseconds / Sample\n\n";
+		}
+	}

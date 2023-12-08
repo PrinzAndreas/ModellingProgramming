@@ -1,0 +1,60 @@
+//*****************************************************************************
+//	SLX Barbershop Model
+//*****************************************************************************
+
+import	<h7>	/* SLX-hosted subset of GPSS/H */
+
+module barb13
+	{
+//*****************************************************************************
+//	Global Declarations
+//*****************************************************************************
+
+	facility	joe;
+	queue	joeq;
+
+	rn_stream		Arrivals		seed=100000,
+					Service		seed=200000;
+
+  	constant float	stop_time = 480;	// 8-hour day (in minutes)
+
+//*****************************************************************************
+//	Customer Class
+//*****************************************************************************
+
+	class customer
+		{
+		int		customer_dummy;		// shows up in local data window
+		
+		actions
+			{
+			enqueue	joeq;			// get in line for server
+			seize		joe;				// grab single server
+			depart		joeq;			// exit the queue
+			
+			advance	rv_uniform(Service, 12.0, 18.0);		// service time delay
+			
+			release		joe;				// free the server
+			terminate;					// exit the system
+			}
+		};
+
+//*****************************************************************************
+//	Barbershop Model
+//*****************************************************************************
+
+	procedure main
+		{
+		int		main_dummy;			// shows up in local data window
+		
+		arrivals: customer			// schedule arriving customer objects
+			
+			iat = rv_uniform(Arrivals, 12.0, 24.0)
+			until_time = stop_time;
+
+		wait until (time >= stop_time and Q(joeq) == 0 and FNU(joe));
+
+		report  system;
+		}		
+
+	}	// End of barb13 module

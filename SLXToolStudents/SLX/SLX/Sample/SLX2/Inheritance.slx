@@ -1,0 +1,394 @@
+//*****************************************************************************
+//	Preliminary Inheritance Test
+//****************************************************************************
+
+#define	SLX2	ON
+
+module Inheritance
+	{
+//	abstract method Requiredxxxxx(string(*) inval) returning string(20);	// illegal at the module level
+	
+//	sealed 	class Vehicle		// sealed would preclude any subclasses
+	abstract	class Vehicle
+//				class Vehicle
+		{
+		public string(50)		Vname;
+
+		overridable	method GetVehicleName() returning string(50)
+//						method GetVehicleName() returning string(50)
+			{
+			return "Vehicle name: " cat Vname;
+			}
+
+		overridable method VehicleName() returning string(50)
+			{
+			return "Base Vehicle name: " cat Vname;
+			}
+
+		abstract method RequiredVehicleMethod(string(*) inval) returning string(50);
+
+		initial
+			{
+			print (ME)	" _ Vehicle initial property\n";
+			
+			Vname = "I'm a vehicle!";
+			}
+
+		final
+			{
+			print (ME)	"_ Vehicle final property\n";
+			}
+		
+		report
+			{
+			print (ME)	"_ Vehicle report property\n";
+			}
+		
+		clear
+			{
+			print (ME)	"_ Vehicle clear property\n";
+			}
+		
+		destroy
+			{
+			print (ME)	"_ Vehicle destroy property\n";
+			}
+		};
+
+	class Car subclass(Vehicle())
+		{
+		int				Cattrib;
+		string(50)	CarName;
+		
+		initial
+			{
+			print (ME)	"_ Car initial property\n";
+			CarName = Vname;
+			
+			print (CarName, Vname)		"CarName _  copied from Vname _\n";			
+			}
+
+		final
+			{
+			print (ME)	"_ Car final property\n";
+			}
+		
+//		method RequiredVehicleMethod(string(*) inval, int i)		returning string(50)		// extra arg
+//		method RequiredVehicleMethod(string(*) inval) 			returning string(49)		// wrong length
+		
+		concrete method RequiredVehicleMethod(string(*) inval) 			returning string(50)
+			{
+			return "Car RequiredAbstractMethod" cat inval;
+			}
+		};
+	
+	class Tractor subclass(Vehicle)
+		{
+		int		Tattrib;
+
+		initial
+			{
+			print (ME)	"_ Tractor initial property\n";
+			}
+
+		actions
+			{
+			print	"Tractor Actions\n";
+			terminate;
+			}
+		
+		final
+			{
+			print (ME)	"_ Tractor final property\n";
+			}
+
+		concrete method RequiredVehicleMethod(string(*) inval) 			returning string(50)
+			{
+			return "Tractor RequiredAbstractMethod" cat inval;
+			}
+		
+		override method VehicleName() returning string(50)
+			{
+			return "Tractor: " cat Vname;
+			}
+		}
+
+	class JDtractor subclass(Tractor)
+		{
+		int		JDTattrib;
+
+		initial
+			{
+			print (ME)	"_ JDtractor initial property\n";
+			}
+
+/*		actions
+			{
+			print	"JDtractor Actions\n";
+			terminate;
+			}
+*/		
+		final
+			{
+			print (ME)	"_ JDtractor final property\n";
+			}
+
+		method GetTname() returning string(50)
+			{
+			return "JDT: " cat Vname;
+			}
+		
+		override method VehicleName  returning string(50)
+			{
+			return "Tractor: " cat Vname;
+			}
+		}
+	
+	class Ctractor subclass(Tractor)
+		{
+		int		CATattrib;
+
+		initial
+			{
+			print (ME)	"_ Ctractor initial property\n";
+			}
+
+		final
+			{
+			print (ME)	"_ Ctractor final property\n";
+			}
+
+//		override method GetTname() returning string(50)		// this is not an override; it's unique to Ctractor
+		method GetTname() returning string(50)
+			{
+			return "CT: " cat Vname;
+			}
+
+		override method GetVehicleName() returning string(50)
+			{
+			return Vname;
+			}
+
+		method GetCtractorName() returning string(50)
+			{
+			return "Ctractor (class Tractor *) " cat ((class Tractor *) ME) -> VehicleName();		// cumbersome, but valid cast
+
+//			return "Ctractor super: " cat super::VehicleName();				// much better notation for the above
+
+			return "Ctractor super: " cat super::super::VehicleName();	// go up two levels
+			}
+		}
+	
+	// method required by class Vehicle is passed through class PassThru to its child classes
+	
+	abstract class PassThru subclass(Vehicle)
+		{
+		protected int		i;
+		
+		abstract method RequiredVehicleMethod(string(*) inval) returning string(50)		{  };
+		};
+	
+	class PassThruChild subclass(PassThru)
+		{
+		concrete method RequiredVehicleMethod(string(*) inval) returning string(50)
+			{
+			++i;
+			return "PassThruChild RequiredVehicleMethod" cat inval;
+			}
+		};
+	
+	class widget(int init)
+		{
+		int		i;
+		
+		initial
+			{
+			i = init;
+			}
+		
+		method WM1()
+			{
+			++i;
+			}
+		
+		method WM2()
+			{
+			WM1();
+			}
+		};
+
+	set(Vehicle)		Vset;
+		
+	procedure main()
+		{
+		widget							w(99);
+		
+		pointer(*)						u;
+		pointer(Vehicle)				v;
+		pointer(Car)					c;
+		pointer(Tractor)				t;
+		pointer(JDtractor)			jdt;
+		pointer(Ctractor)				ct;
+		pointer(PassThruChild)	ptc;
+		pointer(widget)				pw;
+		
+		ptc = new PassThruChild;
+		print (ptc -> RequiredVehicleMethod(" PTC TEST"))	"PTC Test: _\n";
+		
+		v = u;
+		jdt = u;
+		jdt = v;
+		t = v;
+		c = v;
+//		c = t;								// Tractor cannot be derived from Car
+		
+//		v = (class Vehicle *) pw;		// no class hierarchy => no casts
+		
+		t = new Tractor;
+		
+//		v = (class Vehicle *) t;		// warning: cast is unnecessary
+
+//		v		= new Vehicle;			// error: cannot instantiate an abstract class
+
+		print	"\n----------------------------\n\n";
+		
+		c		= new Car;
+
+		print	"\n----------------------------\n\n";
+
+		t		= new Tractor;
+
+		print	"\n----------------------------\n\n";
+
+JOHTRAP;
+
+		jdt		= new JDtractor;
+
+		print	"\n----------------------------\n\n";
+
+		ct		= new Ctractor;
+
+		print	"\n----------------------------\n\n";
+
+//		print(                  			v -> RequiredVehicleMethod("Test"))		"v -> RequiredVehicleMethod() = _\n";
+
+		v = t;
+
+		print(                  			v -> RequiredVehicleMethod("Test"))		"v -> RequiredVehicleMethod() = _\n";
+				
+		c 	-> Cattrib			= 999;
+		t	-> Tattrib			= 998;		
+		jdt -> JDTattrib		= 997;
+
+//		print (RequiredVehicleMethod("XYZ"))		"Free-Standing RequiredVehicleMethod: _\n";
+		
+		
+		print (ct -> GetTname())		"ct -> GetTname() = _\n";
+
+		print (jdt -> GetTname())		"jdt -> GetTname() = _\n";
+
+		print (c -> RequiredVehicleMethod(" ccc"))		"c -> RequiredAbstractMethod() = _\n";
+		
+		print (jdt -> RequiredVehicleMethod(" jjj"))		"jdt -> RequiredAbstractMethod() = _\n";
+		
+
+		print	"\n----------------------------\n\n";
+
+		activate jdt;
+		yield;
+		
+		print	"\n----------------------------\n\n";
+
+		v	-> Vname		= "Generic";
+		c	-> Vname		= "Car";
+		jdt	-> Vname		= "Greenie";		// stored in top-level class
+		
+		print (jdt -> GetVehicleName()	)	"jdt name via GetVehicleName() = _\n";
+		
+		print	"\n----------------------------\n\n";
+
+		print (v -> Vname, c -> Vname, jdt -> Vname)		"Generic Car Greenie : _  _  _\n";
+
+		print	"\n----------------------------\n\n";
+
+		destroy jdt;
+
+		print	"\n----------------------------\n\n";
+
+		jdt = new JDtractor;
+
+		print	"\n----------------------------\n\n";
+
+		(*jdt).Vname = "Brownie";
+		
+		v = c;			// OK
+		
+		print	"\n----------------------------\n\n";
+
+		c = v;			// OK
+
+		c = (pointer(Car)) v;
+//		v = (pointer(Vehicle)) c;		// compile-time warning
+		
+		u = v;
+//		u = (class Ctractor *) v;			// run-time error
+		
+		v = ct;
+		
+		print (ct -> GetCtractorName())		"GetCTractorName(): _\n";
+		
+		place ct into Vset;
+		place jdt into Vset;
+		
+//		u = NULL;
+		place u into Vset;
+		
+		activate jdt;
+				
+		for (jdt = each JDtractor in Vset)
+			print (jdt)		"Vset member: _\n";
+			
+		for (t = each Tractor in Vset)
+			print (t)		"Vset member: _\n";
+			
+		print	"\n----------------------------\n\n";
+
+		t = v;			// OK
+
+		u = new JDtractor;
+
+		print	"\n----------------------------\n\n";
+
+		print (u -> GetVehicleName())	"u -> GetVehicleName() = _\n";
+
+		print (u -> GetTname())			"u -> GetTname() = _\n";
+
+		print	"\n----------------------------\n\n";
+
+		t = u;
+		t = v;
+//		t = &w;		// illegal
+		
+		jdt = u;
+		jdt = (pointer(JDtractor)) u;
+
+		u = NULL;
+		jdt = u;
+		
+		u = new Ctractor;
+
+		print	"\n----------------------------\n\n";
+
+		print (u -> GetVehicleName())	"u -> GetVehicleName() = _\n";
+
+		print (u -> GetTname())			"u -> GetTname() = _\n";
+
+		print	"\n----------------------------\n\n";
+
+		pw = new widget(11111);
+		
+		pw -> WM2();
+		
+//		jdt = v;		// run-time error
+		}
+	}

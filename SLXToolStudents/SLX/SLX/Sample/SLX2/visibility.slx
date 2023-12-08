@@ -1,0 +1,68 @@
+//*****************************************************************************
+//	Visibility Tests
+//*****************************************************************************
+
+#define SLX2	ON
+
+module M1
+	{
+	class	M1C1
+		{
+		private int		m1c1_j;
+		};
+
+	protected public class M1C2
+		{
+		private pointer(M1C1)		m;
+		int									m1c1_j;
+		overridable int				jjj;
+		
+		initial
+			{
+			jjj = 999;
+
+			m = new M1C1;
+			m1c1_j = m -> m1c1_j;
+			}
+		};
+	}
+
+module M2
+	{
+	class M2C1
+		{
+		pointer(M1C2)	m;
+		int					m2c1_j;
+		
+		actions
+			{
+			m = new M1C2;
+		
+//			m2c1_j = m -> jjj;
+			}
+		};
+	
+	public class M2C2 subclass(M1C2)
+		{
+		int						i;
+		override double	jjj;
+
+		initial
+			{
+			jjj = 123.456;			
+			i = super::jjj;
+
+			print (i, jjj, super::jjj)		"i = _  jjj = _.___  super::jjj = ___.___\n";
+			}
+		};
+	}
+
+module MainModule
+	{
+	procedure main()
+		{
+		pointer(M2C2)		m;
+
+		m = new M2C2;
+		}
+	}

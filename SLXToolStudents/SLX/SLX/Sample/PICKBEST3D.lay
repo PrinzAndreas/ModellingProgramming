@@ -1,0 +1,174 @@
+*3D
+Define View "Pickers" CameraSphere 55.351795 -6.9167 0 64.656342 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 2 20
+Define View "Overview" CameraSphere 90 20 0 121.765343 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 2 20
+Define View "AccumSplit" Bounds 0 100 0 49.875599 CameraSphere 121.122192 2.372 0 12.315572 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 2 20
+Define Window Bounds 0 64.33121 49.12 99.84 CameraSphere 79.79229 15.948999 0 77.476082 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 2 20
+Define Window Bounds 64.33121 99.893843 49.12 99.84 CameraSphere 87.654999 -5.0347 0 23.693256 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 2 20
+Define View "ISO" CameraSphere 95.18119 17.9275 0 99.993958 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 2 20
+Define View "(Class)" CameraSphere 0 0 0 3.580307 89.999984 89.999984 0 Lighting 0 0 0 Ambient 0 0 0 Grid Size 0.1 1
+Define View "(Home)" CameraSphere 73.710907 40.477295 -15.832558 121.765343 17.999986 148.853487 0 Lighting -0.192413 -0.192413 -0.962265 Ambient 0.4 0.4 0.4 Grid Size 2 20 Menu ON Speed 8
+Define color F8 0.890196 0.239216 0.239216
+Define color F10 0.745098 0.239216 0.239216
+Define color F11 0.588235 0.937255 1
+Define color F12 0.490196 0.34902 0
+Define color F13 0.745098 0.396078 0.666667
+Define color F14 0.588235 0.490196 0.490196
+Define color F15 0 0.588235 0.192157
+Define color F18 0.666667 0.317647 0
+Define color F19 0.396078 0.490196 0.698039
+Define color F20 0 0.317647 0.317647
+Define color F21 0.890196 0.666667 0.490196
+Define color F22 0.490196 0.239216 0.490196
+Define color F23 0.745098 0.588235 0
+Define color F24 0.490196 0 0.666667
+Define color L1 0.490196 0.490196 0.490196
+Define color L2 0.666667 0.937255 1
+Define color L5 0.890196 0.666667 0.490196
+Define color L6 0.396078 0.490196 0.698039
+Color F8
+Define Class Box11 Directional Clearance 0 0.92
+Line 0 0.4 0 0 -0.4 0
+Line -0.8 -0.4 0 -0.8 0.4 0
+Line -0.8 0.4 0 0 0.4 0
+Line 0 -0.4 0 -0.8 -0.4 0
+End
+Color F21
+Define Class Box17 Directional Clearance 0 1.42
+Line 0 0.4 0 0 -0.4 0
+Line -1.3 -0.4 0 -1.3 0.4 0
+Line -1.3 0.4 0 0 0.4 0
+Line 0 -0.4 0 -1.3 -0.4 0
+End
+Color F13
+Define Class Box23 Directional Clearance 0 1.92
+Line 0 0.4 0 0 -0.4 0
+Line -1.8 -0.4 0 -1.8 0.4 0
+Line -1.8 0.4 0 0 0.4 0
+Line 0 -0.4 0 -1.8 -0.4 0
+End
+Color F2
+Define Class RedLight
+Arc 0.5 0 0 0 0 360 normal 0 0 1
+End
+Color F7
+Define Class GreenLight
+Arc 0.5 0 0 0 0 360 normal 0 0 1
+End
+Color F4
+Define Class YellowLight
+Arc 0.5 0 0 0 0 360 normal 0 0 1
+End
+Color L3
+Line  #1 0 0 0 110 0 0
+Color L4
+Line 0 -2 0 110 -2 0
+Line 110 2 0 0 2 0
+Color L1
+Line 100 -2 0 100 -14 0
+Color L6
+Line 108 0.5 0 108 -0.5 0
+Color L4
+Line 110 -2 0 110 2 0
+Color L6
+Line 138 -2 0 110 -2 0
+Color L4
+Line 123 2 0 123 -2 0
+Color L6
+Line 138 2 0 138 -2 0
+Line  #2 108 0 0 142 0 0
+Line 110 2 0 138 2 0
+Color L1
+Line  #3 140 10 0 140 -10 0
+Line 75 -2 0 75 -14 0
+Color L3
+Line 123 -5.5 0 124 -6.5 0
+Line 123 -5.5 0 122 -6.5 0
+Line 123 -6.5 0 123 -9.5 0
+Line 122 -6.5 0 124 -6.5 0
+Color L1
+Arc  #4 10 130 10 0 0.00000006 90 normal 0 0 1
+Arc  #5 10 150 -10 0 180 270 normal 0 0 1
+Line 50 -2 0 50 -14 0
+Line 0 -2 0 0 -14 0
+Line 25 -2 0 25 -14 0
+Color L4
+Line 0 2 0 0 -2 0
+Color L1
+Arc  #6 10 10 30 0 180 270 normal 0 0 1
+Arc  #7 10 10 30 0 90 180 normal 0 0 1
+Line  #8 10 20 0 130 20 0
+Line  #9 60 60 0 60 40 0
+Line  #10 100 60 0 100 40 0
+Line  #11 140 60 0 140 40 0
+Arc 1 19 41 0 -90 0.00000006 normal 0 0 1
+Line  #12 20 60 0 20 40 0
+Color L4
+Line 142 40 0 142 60 0
+Line 138 60 0 138 40 0
+Line 18 40 0 18 60 0
+Line 22 60 0 22 40 0
+Line 58 40 0 58 60 0
+Line 62 60 0 62 40 0
+Line 98 40 0 98 60 0
+Line 102 60 0 102 40 0
+Color L1
+Line  #13 170 40 0 10 40 0
+Line  #14 150 -20 0 170 -20 0
+Color L4
+Line 142 60 0 138 60 0
+Line 18 60 0 22 60 0
+Line 58 60 0 62 60 0
+Line 98 60 0 102 60 0
+Color L3
+Text 1 3.2 LJ 24 50 0 Dock 4
+Text 1 3.2 LJ 64 50 0 Dock 3
+Text 1 3.2 LJ 104 50 0 Dock 2
+Text 1 3.2 LJ 144 50 0 Dock 1
+Color L1
+Arc  #15 10 170 -10 0 -90 0.00000006 normal 0 0 1
+Arc  #16 10 170 30 0 0.00000006 90 normal 0 0 1
+Line  #17 180 30 0 180 -10 0
+Color L3
+Text 1 3 LJ 114 -12 0 Sensor
+Text 1 2.8 LJ 78 -10 0 Picker 4
+Text 1 2.8 LJ 52 -10 0 Picker 3
+Text 1 2.8 LJ 2 -10 0 Picker 1
+Text 1 3.2 LJ 26 4 0 Belt Conveyor
+Text 1 3.2 LJ 56 22 0 Loop Conveyor
+Text 1 2.8 LJ 28 -10 0 Picker 2
+Text 1 3.4 LJ 116 4 0 Conv
+Text 1 3.4 LJ 114 8 0 Accum
+CPO GreenLight BeltStatus 123 -3.5 0
+Define Path Belt Speed 1
+Segment #1 0 0 0 110 0 0 110
+End
+Define Path Accumulator1 Accumulating Speed 1
+Segment #2 108 0 0 138 0 0 30
+End
+Define Path Loop Circular Speed 2
+Segment #3 140 0 0 140 -10 0 10
+Segment #5 140 -10 0 150 -20 0 15.707963 CCW
+Segment #14 150 -20 0 170 -20 0 20
+Segment #15 170 -20 0 180 -10 0 15.707963 CCW
+Segment #17 180 -10 0 180 30 0 40
+Segment #16 180 30 0 170 40 0 15.707963 CCW
+Segment #13 170 40 0 10 40 0 160
+Segment #7 10 40 0 0 30 0 15.707963 CCW
+Segment #6 0 30 0 10 20 0 15.707963 CCW
+Segment #8 10 20 0 130 20 0 120
+Segment #4 130 20 0 140 10 0 15.707963 CW
+Segment #3 140 10 0 140 0 0 10
+End
+Define Path LDock1 Speed 0.5
+Segment #11 140 40 0 140 60 0 20
+End
+Define Path LDock2 Speed 0.5
+Segment #10 100 40 0 100 60 0 20
+End
+Define Path LDock3 Speed 0.5
+Segment #9 60 40 0 60 60 0 20
+End
+Define Path LDock4 Speed 0.5
+Segment #12 20 41 0 20 60 0 19
+End
+End

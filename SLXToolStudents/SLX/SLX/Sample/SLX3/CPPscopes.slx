@@ -1,0 +1,82 @@
+#define INLINE_INITIALIZATION			ON
+#define LOCAL_SCOPES					ON
+#define STRICT_LOCAL_SCOPES		ON
+
+//#undef INLINE_INITIALIZATION
+//#undef LOCAL_SCOPES
+//#undef STRICT_LOCAL_SCOPES
+
+module CPPscopes
+	{
+	class widget
+		{
+		static int	count;
+		int			ID;
+		
+		initial
+			{
+			ID = ++count;
+			
+			print (ME, ID)		"Creating _  ID = _\n";
+			}
+
+		final
+			{
+			print (ME, ID)		"Destroying _  ID = _\n\n";
+			}
+		};
+	
+	procedure main()
+		{
+		int		i;
+		
+		for (i = 1; i <= 2; i++)
+			proc(i);
+			
+		exit(0);
+		}
+		
+	procedure proc(int i)
+		{
+		static widget	sw[3];
+		
+		int		j;
+		
+		j = 1;
+		j = sw[j].ID;
+		
+		for (j = 1; j <= 2; j++)
+			{
+			static widget	www;
+			
+			int		k = 100, l = k;
+			int		dim = 2;
+			
+			int		ix[dim][dim];
+
+			int		iy[2][3];
+
+			widget	local_widget;
+			widget	local_widget_array[1][2];
+			
+			set(widget)	local_wset;			
+			
+			place &local_widget into local_wset;
+			
+			print (&local_wset, local_wset.size)		"_  Size: _  ";
+						
+			pointer(widget)	w;
+			
+			for (w = each widget in local_wset)
+				print (w, w -> ID)						"member: _  ID: _\n";
+				
+			print (i, j, ++k)	"i = _   j = _  k = _\n";
+			}
+			
+//		j = dim;		// illegal reference to inner scope symbol
+		return;
+		}
+	
+	}
+		
+	

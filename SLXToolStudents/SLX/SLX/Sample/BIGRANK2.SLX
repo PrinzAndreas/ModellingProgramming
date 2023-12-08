@@ -1,0 +1,72 @@
+import <h8>
+
+module test_large_ranked_sets
+	{
+	rn_stream	stream1 seed=100000;
+
+#safeifdef STUDENT_SLX
+	constant int	SIZE = 400;
+#else
+	constant int	SIZE = 4096;
+#endif
+
+	class widget
+		{
+		int	primary_key,
+			secondary_key;
+		};
+
+	set(widget) ranked(ascending primary_key, descending secondary_key)    ranked_set;
+
+	procedure main()
+		{
+		int		i, count, errors, old_primary, old_secondary;
+		int		seed = 13567;
+
+		pointer(widget) w;
+
+		for (i = 1; i <= SIZE; i++)
+			{
+			w = new widget;
+
+			seed = irand(seed);
+			w -> primary_key = seed % 10;
+
+			seed = irand(seed);
+			w -> secondary_key = seed % 10;
+
+			place w into ranked_set;
+			}
+
+//TEST		for (w = each widget in ranked_set)
+//TEST			print (w, w -> primary_key, w -> secondary_key)     "************: ** **\n";
+
+		old_primary = -1;
+		old_secondary = 999;
+		for (w = each widget in ranked_set)
+			{
+			++count;
+			if (w -> primary_key < old_primary
+			 || w -> primary_key == old_primary
+			 && w -> secondary_key > old_secondary)
+				{
+				print (count, w, w -> primary_key, w -> secondary_key, old_primary, old_secondary)
+
+"item ****: *:	** **  prior widget: ** **\n";
+
+				++errors;
+				}
+
+			old_primary = w -> primary_key;
+			old_secondary = w -> secondary_key;
+			}
+
+		if (count < SIZE)
+			print (SIZE - count)	"\n* missing widgets!\n";
+
+		print (errors)	"\nErrors: *\n\n";
+
+		print (SIZE)	"Size: *\n";
+		exit(0);
+		}
+	}

@@ -1,0 +1,38 @@
+//*****************************************************************************
+//	Case Study 1A - Networked Laser Printer
+//*****************************************************************************
+
+module case1a
+	{
+	rn_stream				Arrivals, Service;				// independent random streams
+
+	procedure main()
+		{
+		control boolean	printer_busy;
+		int					shutdown_time = 5 * 8 * 60,	// five 8-hour shifts (in minutes)
+							jobs_printed;
+
+		while (time < shutdown_time)					// simulate for a week
+			{
+			advance rv_uniform(Arrivals, 10.0, 20.0);		// interarrival time
+
+			fork
+				{
+				wait until (not printer_busy);
+
+				printer_busy = TRUE;
+				advance rv_uniform(Service, 0.5, 15.0); 	// printing time
+				printer_busy = FALSE;
+
+				++jobs_printed;
+				terminate;
+				}
+			}
+
+		print (jobs_printed)
+
+"\nJobs Printed: _\n";
+
+		}	// End of main
+
+	}	// End of case1a

@@ -1,0 +1,309 @@
+//*****************************************************************************
+//
+//	PickBestRevisited - An SLX Implementation of a Classic /H Model
+//	"Smart Loads" Version
+//
+//	N.B.  This version runs concurrently with the DLL version of P5
+//
+//	Time Unit:	Seconds
+//	Distance:		Feet
+//
+//*****************************************************************************
+
+import "conveyor"
+import <h7>
+import <proof4>
+
+module PickBest
+	{
+	typedef enum { Dock1, Dock2, Dock3, Dock4 }	BoxDest;
+
+	rn_stream			RN_Source, RN_Dest, RN_Size;
+	queue				LoopQ;
+	storage				LoopTravel capacity = 1000000;
+
+	boolean				DockXfrBusy[BoxDest];
+
+	int						ProofObjectCount;
+
+	constant float 			BELT_LENGTH = 110.0,
+							ACC1_LENGTH = 30.0,
+							LOOP_LENGTH = 454.2477,
+							LOOP_SPEED = 2.0,
+							DOCK_LENGTH = 20;
+
+	constant float			DistToDock[BoxDest] = { 147.124, 187.124, 227.124, 267.124 };
+
+	CVR_Conveyor		Belt				length = BELT_LENGTH		speed = 1.0,
+							Accumulator1	length = ACC1_LENGTH		speed = 1.0					accumulating,
+							Loop			length = LOOP_LENGTH		speed = LOOP_SPEED		circular,
+							LDock1			length = DOCK_LENGTH	speed = 1.0,
+							LDock2			length = DOCK_LENGTH	speed = 1.0,
+							LDock3			length = DOCK_LENGTH	speed = 1.0,
+							LDock4			length = DOCK_LENGTH	speed = 1.0;
+
+	pointer(Conveyor)	DockBelt[BoxDest] = { &LDock1, &LDock2, &LDock3, &LDock4 };
+
+	CVR_Sensor(Belt)				BeltEnd		position = BELT_LENGTH;
+	CVR_Sensor(Accumulator1)	Acc1End	position = ACC1_LENGTH,
+									Acc1Full	position = 15.0;				// 15-foot cushion
+
+	CVR_LoadClass				Box11		size = 11.0 / 12.0,
+									Box17 		size = 17.0 / 12.0,
+									Box23		size = 23.0 / 12.0;
+
+	class Box
+		{
+		pointer(LoadClass)	BoxClass;		// LoadClass makes it "conveyable"
+		float					r;
+		int						ProofID;
+		BoxDest				Dest;
+				
+		initial
+			{
+			ProofID = ++ ProofObjectCount;
+
+			r = rv_uniform(RN_Size, 0.0, 1.0);
+			if (r <= 0.3333)		
+				BoxClass = &Box11;		// 11-inch box
+			else if (r <= 0.6666)
+				BoxClass = &Box17;		// 17-inch carton
+			else
+				BoxClass = &Box23;		// 23-inch carton
+
+			r = rv_uniform(RN_Dest, 0.0, 1.0);
+			if (r <= 0.25)
+				Dest = Dock1;
+			else if (r <= 0.5)
+				Dest = Dock2;
+			else if (r <= 0.75)
+				Dest = Dock3;
+			else
+				Dest = Dock4;
+
+			PA_Create BoxClass -> LoadClassName ProofID;
+			}
+		};
+
+	class Picker(float LeftLimit, float RightLimit)
+		{
+		queue			PickerQ;
+		
+		POSITION	left = LeftLimit,
+						right = RightLimit,
+						PickPoint,
+						PreviousPickPoint = (LeftLimit + RightLimit) / 2.0;
+		
+		PLS			Load;		// Pointer to load status
+		pointer(Box)	B;
+
+		actions
+			{
+			forever
+				{
+				PickPoint = rv_uniform(RN_Source, left, right);		// random pick point
+
+				advance abs(PickPoint - PreviousPickPoint) * (10.0 / 25.0);		// 0-10 second walk
+
+				B = new Box;
+				PA_Place	B -> ProofID at		PickPoint, -14;
+				PA_Move	B -> ProofID 10.0	PickPoint, -2;
+
+				advance 10.0;
+
+				enqueue		PickerQ;	// measure queueing
+
+				CVR_Place	object B class B -> BoxClass on Belt at PickPoint
+								zone = (PickPoint + B -> BoxClass -> TrailingEdge - 0.5, PickPoint + 0.5)
+								PLS = Load;
+
+				depart			PickerQ;
+
+				PA_Place B -> ProofID on "Belt" at PickPoint;
+
+				CVR_Send	Load; 		// default: move to the end
+				}
+			}
+		};
+
+	class BeltToAcc1		// Belt-to-accumulator1 transfer manager
+		{
+		PLS						Load, Dummy;
+		TIME					AlarmTime;
+		pointer(Box)			B;
+		control boolean		Acc1IsFull;		// TRUE when Accumulator1 full
+
+		actions
+			{
+			fork		// Monitor the "full" sensor
+				{
+				forever
+					{
+					wait until (Acc1Full.SensorCurrentLoad != NULL);
+
+					PA_Set "BeltStatus" class "YellowLight";
+
+					AlarmTime = time + 3.0;
+					wait until (time == AlarmTime || Acc1Full.SensorCurrentLoad == NULL);
+					if (Acc1Full.SensorCurrentLoad != NULL)
+						{
+						Acc1IsFull = TRUE;		// Let the transfer manager know
+
+						PA_Set "BeltStatus" class "RedLight";
+
+						wait until (Acc1Full.SensorCurrentLoad == NULL);
+
+						Acc1IsFull = FALSE;		// Wake up the transfer manager
+						}
+
+					PA_Set "BeltStatus" class "GreenLight";
+					}
+				}
+
+			forever
+				{
+				wait until (BeltEnd.SensorCurrentLoad != NULL);
+
+				Load = BeltEnd.SensorCurrentLoad;
+				B = Load -> LoadObject;
+
+				if (Acc1IsFull)
+					{
+					CVR_ConveyorSpeed(Belt) = 0.0;
+					PA_Set path "Belt" speed 0.0;
+
+					wait until (! Acc1IsFull);
+
+					PA_Set path "Belt" speed 1.0;
+					CVR_ConveyorSpeed(Belt) = 1.0;
+					}
+
+				CVR_Remove Load from Belt;
+
+				CVR_Place	object B class B -> BoxClass on Accumulator1 at 2.0 PLS = Load;
+
+				CVR_Send	Load; 		// default: move to the end
+
+				PA_Place B -> ProofID on "Accumulator1" at 2.0;
+
+				Load = NULL;
+				}
+			}
+		};
+
+	class Acc1ToLoop		// Accumulator1-to-loop transfer manager
+		{
+		PLS				AccLoad, LoopLoad;
+		pointer(Box)	B;
+
+		actions
+			{
+			forever
+				{
+				wait until (Acc1End.SensorCurrentLoad != NULL);
+
+				AccLoad = Acc1End.SensorCurrentLoad;
+				B = AccLoad -> LoadObject;
+
+				CVR_LoadSpeed(AccLoad) = 0.0;
+
+				enqueue		LoopQ;		// measure queueing
+
+				// Place load into at least a 6-foot space
+
+				CVR_Place	object B class B -> BoxClass on Loop at 0.0
+								zone = (-3.0, 3.0)
+								PLS = LoopLoad;
+
+				depart			LoopQ;
+
+				PA_Place B -> ProofID on "Loop" at 0.0;
+
+				CVR_Remove AccLoad from Accumulator1;
+
+				SendLoadToDock(LoopLoad);
+
+				advance 2.5;				// cycle time
+				}
+			}
+
+		};	// End of Acc1ToLoop
+
+	procedure SendLoadToDock(PLS LoopLoad)
+		{
+		PLS					BeltLoad;
+		BoxDest				MyDest;
+		pointer(Box)			B;
+
+		fork
+			{
+			return;		// offspring returns
+			}
+
+		B = LoopLoad -> LoadObject;		// this box
+		MyDest = B -> Dest;
+
+		enter		LoopTravel;			// measure loop contents, transit time
+
+		advance	DistToDock[MyDest] / LOOP_SPEED;
+
+		while (DockXfrBusy[MyDest])
+			advance LOOP_LENGTH / LOOP_SPEED;	// busy => must go around the loop
+
+		leave	LoopTravel;
+
+		DockXfrBusy[MyDest] = TRUE;
+
+		CVR_Remove LoopLoad from Loop;
+
+		CVR_Place	object B class B -> BoxClass on *DockBelt[MyDest] at 0.0
+								PLS = BeltLoad;
+
+		PA_Place B -> ProofID on DockBelt[MyDest] -> title at 0.0;
+
+		fork
+			{
+			advance 40.0;			// box travel time;
+
+			CVR_Remove BeltLoad from *DockBelt[MyDest];
+			PA_Destroy B -> ProofID;
+
+			terminate;
+			}
+
+		advance 10.0;				// Cycle time
+
+		DockXfrBusy[MyDest] = FALSE;
+		terminate;
+
+		}	// End of SendLoadToDock(...)
+
+	procedure main()
+		{
+		CPA_OpenLayout "pickbest.lay";
+
+		// Activate four pickers, each patrolling a 25-foot zone
+
+		activate new Picker(0.0, 25.0);
+		activate new Picker(25.0, 50.0);
+		activate new Picker(50.0, 75.0);
+		activate new Picker(75.0, 100.0);
+
+		// Activate a "Transfer Manager" to handle belt-to-accumulation1 transfers
+
+		activate new BeltToAcc1;
+
+		// Activate a "Transfer Manager" to handle accumulation1-to-loop transfers
+
+		activate new Acc1ToLoop;
+
+		// run for 60 minutes
+
+		advance	60 * 60;
+
+		PA_End;
+
+		report(system);
+		exit(0);
+		}
+	}

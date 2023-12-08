@@ -1,0 +1,62 @@
+//*****************************************************************************
+//	Early Exit From Proc
+//*****************************************************************************
+
+#define INLINE_INITIALIZATION		ON
+//#define INLINE_INITIALIZATION	ON		// error (limit = once per run)
+#define LOCAL_SCOPES				ON
+
+module EarlyExit
+	{
+	class subwidget
+		{
+		double	xx;
+		};
+	
+	class widget
+		{
+		int		ii;
+
+		subwidget	sw;
+		
+		initial
+			{
+			print (ME)	"_ created\n";
+			}
+
+		final
+			{
+			print (ME)	"_ destroyed\n";
+			}
+		};
+	
+	widget	global_widget;
+	
+	procedure main()
+		{
+		proc();
+		exit(0);
+		}
+	
+	procedure proc()
+		{
+		static widget				w1;
+		widget						w2;
+
+		int							i = 2, j = 3;
+		int							ix [i] [j];
+		
+//		goto inside;				// illegal jump into a local scope
+		
+			{
+			widget					w;			// try commenting out this definition and uncommenting "goto inside"
+inside:	i = j;
+			goto skip;
+			}
+	
+		set(widget)				wset;
+		pointer(widget)			pw = &global_widget;
+
+skip:	return;
+		}		
+	}

@@ -1,0 +1,97 @@
+//*****************************************************************************
+//	safe ifdefs
+//*****************************************************************************
+
+//	Define #safesymbols "high" in source (prior to first references)
+
+#safesymbol Synoski		// comment out to test safety
+#safesymbol defined		// comment out to test safety
+#safesymbol GENRTS		// comment out to test safety
+
+#define Synoski	ON
+
+#ifdef Synoski
+//	TEST
+#endif
+
+#safeifdef WIN64
+//	We're running in 64-bit mode.
+#endif
+
+#safeifdef BATCHRUN
+//	We're making a batch run
+#endif
+
+#safeifdef GENRTS
+//	We're generating an RTS file
+#endif
+
+import	"safelower.slx"
+
+#safeifdef Prince1
+#endif
+
+//afeifdef Prince2
+//ndif
+
+#undef Synoski
+
+#ifdef Synoski
+//	TEST
+#endif
+
+#safesymbol defined		// placement only here (and not above) => unsafe in imported module
+
+module IfdefDemo
+	{
+	int	i;
+	
+	public class widget
+		{
+#ifdef Synoski
+		int		i;
+#else
+		int		j;
+		
+  #safeifdef defined		
+		int		k;
+  #endif
+
+#endif
+		}
+	
+	procedure main()
+		{
+		double				x, y;
+		int						i;
+		pointer(widget)		w;
+
+#ifndef defined		// no check for safety
+		x = y;
+#else
+		i = 27;
+#endif
+
+#safeifndef defined		// compile-time error if not a #safesymbol
+		x = y;
+#endif
+
+#safeifdef defined			// compile-time error if not a #safesymbol
+		i = 27;
+#endif
+
+#undef Synoski;
+
+#safeifndef Synoski		// compile-time error if not a #safesymbol
+		i = 999;
+#endif
+
+#safeifdef Synoski				// compile-time error if not a #safesymbol
+		w = new widget;
+#endif		
+		print "main\n";
+		
+		subr();			// in safelower.slx
+		exit(0);
+		}
+	}

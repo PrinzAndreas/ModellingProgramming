@@ -1,0 +1,93 @@
+import	<h7>
+
+module RealTimeBarb
+	{
+	procedure Sleep(int milliseconds)	dll = "kernel32";
+
+//*****************************************************************************
+//	Global Data
+//*****************************************************************************
+
+	facility	joe;
+	queue	joeq;
+
+	rn_stream		Arrivals		seed=100000;
+	rn_stream		Service	seed=200000;
+
+//	constant float	stop_time = 48000;
+	constant float	stop_time = 480;
+
+//*****************************************************************************
+//	Barbershop Model - Time Unit = 1 simulated minute, 1/10 real second
+//*****************************************************************************
+
+	procedure main
+		{
+		double	now,
+				base_time,
+				real_time_delay;
+
+		int		delay;
+
+		fork		// real-time synchronization
+			{
+			base_time = real_time();
+			forever
+				{
+				wait until(time != now);						// wait for simulator clock change
+				
+				real_time_delay = time * 0.1					// simulated minute = real 1/10 second
+								- (real_time() - base_time);	// real delta T
+
+				if (real_time_delay < 0.0)
+					print (-real_time_delay * 1000.0)		"_ milliseconds behind!\n";
+				else
+					{
+					delay = real_time_delay * 1000;
+
+					Sleep(delay);		// Windows time delay in milliseconds
+					}
+
+				now = time;
+				print (time)		"Time: ____._\n";
+				}
+			}
+
+		arrivals: customer
+			iat = rv_uniform(Arrivals, 12.0, 24.0)
+			until_time = stop_time;
+
+		advance	stop_time;
+
+		wait until (Q(joeq) == 0 and FNU(joe));
+
+		print (real_time() - base_time)	"\nElapsed real time = __._ seconds  (Should be 48.0)\n\n";
+		report(system);
+
+		print options=bold  "\n\nDone!\n\n";
+		exit(0);
+		}
+
+//*****************************************************************************
+//	Customer Object
+//*****************************************************************************
+
+	object customer
+		{
+		actions
+			{
+			enqueue	joeq;
+			seize		joe;
+			depart		joeq;
+			advance	rv_uniform(Service, 12.0, 18.0);
+			release	joe;
+			terminate;
+			}
+		}
+
+//*****************************************************************************
+//	Real-Time Synchronization
+//*****************************************************************************
+
+
+	}	// End of barb10 module

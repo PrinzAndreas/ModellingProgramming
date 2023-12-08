@@ -1,0 +1,111 @@
+//*****************************************************************************
+//	Component Failure Interface
+//*****************************************************************************
+
+#define SLX2	ON
+
+module Failures
+	{
+	typedef enum { IDLE, WORKING, FAILED, DESTROYED }		MSTATE;
+	typedef enum { RED, GREEN, BLUE }								COLOR;		// compiler diagnostics testing only
+
+	interface	CanFail
+		{
+//		abstract				MSTATE	mstate;		// error if uncommented ("control" mismatch)
+		abstract control 	MSTATE	mstate;
+		abstract control int			i;				// compiler test only
+//		abstract int						joh;			// uncommented => missing required variable joh
+		
+		abstract method FailNow();
+		};
+	
+	procedure ScheduleFailure(pointer(CanFail) cf, double TTF)
+		{
+		MSTATE	PriorState = IDLE;
+		double		RemTTF, FailureTime;
+		
+		JOHTRAP;
+		
+		cf -> i = 999;	// compiler test
+		
+		fork
+			{
+			RemTTF = TTF;
+			
+			forever
+				{
+				wait until (cf -> mstate != PriorState);
+			
+				if (cf -> mstate == DESTROYED)
+					terminate;								// terminate the monitor
+				
+				JOHTRAP;
+		
+				PriorState = cf -> mstate;
+			
+				if (cf -> mstate == WORKING)
+					{
+					FailureTime = time + RemTTF;
+					
+					wait until (cf -> mstate != PriorState || time >= FailureTime);
+					
+					if (time < FailureTime)
+						{
+						RemTTF = FailureTime - time;
+						continue;
+						}
+						
+					// 	Fall-thru => failure
+					
+					cf -> FailNow();
+					}
+				}
+			}
+
+		return;
+		}
+	
+	class Machine implements(CanFail)
+		{
+		concrete control int			i;							// compiler test only
+		concrete control MSTATE	mstate = IDLE;
+//		concrete control COLOR		mstate = GREEN;		// error: type mismatch
+
+		actions
+			{
+			ScheduleFailure(ME, 15.0);			// fails after 15 minutes of use
+
+			advance 10.0;
+			mstate = WORKING;
+			advance 10.0;
+			mstate = IDLE;
+			advance 10.0;
+			mstate = WORKING;
+			advance 10.0;
+			mstate = DESTROYED;
+			
+			terminate;
+			}
+
+		concrete method FailNow()
+			{
+			print (ME, time)		"_ has failed at time _.__\n";
+			return;
+			}
+		};
+	
+	procedure main()
+		{
+		activate new Machine;
+		
+		advance 100.0;		
+
+		exit(0);
+		}
+
+	class test
+		{
+		double	i;
+		};
+
+	}

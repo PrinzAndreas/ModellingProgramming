@@ -1,0 +1,25 @@
+module test_enum_iteration
+	{
+	typedef enum { RED, GREEN, BLUE }	color;
+
+	procedure main()
+		{
+		color	c;
+
+		for (c = each color)
+			{
+			print(c) "Color: *\n";
+			continue;
+			break;
+			}
+
+		for (c = each color reverse)
+			{
+			print(c) "Color: *\n";
+			continue;
+			break;
+			}
+
+		exit(0);
+		}
+	}

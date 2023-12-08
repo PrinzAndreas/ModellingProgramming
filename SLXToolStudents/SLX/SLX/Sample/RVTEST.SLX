@@ -1,0 +1,97 @@
+//*****************************************************************************
+//		Module RVTest
+//*****************************************************************************
+
+import <stats>
+
+module RVTest
+	{
+	constant int	NSAMP = 1500;
+
+	statement test #generator ( #stream , #arg,... )	file = #file;
+	  definition
+		{
+		int 		i;
+		string(30)	rv_name;
+
+		rv_name = substring(#generator, 4);
+
+		expand (#file)						"open outfile output name = \"rv@#\";\n";
+
+		expand (rv_name, rv_name)			"random_variable\t#\ttitle = \"#\";\n\n";
+		expand (#stream)					"rn_seed # = 25000000;\n";
+		expand (#generator, #stream)		"for (i = 1; i <= NSAMP; i++)"
+												"\t{"
+												"\tx = #(#, ";
+		i = 1;
+		forever
+			{
+			expand (#arg[i])				"#";
+			if (#arg[++i] == "")
+				{
+				expand						");\n";
+				break;
+				}
+
+			expand							", ";
+			}
+
+		expand (rv_name)					"\ttabulate # = x;\n";
+		expand								"\twrite file=outfile (x) \"  _.________\\n\";"
+											"\t}\n"
+											"close outfile;\n\n";
+
+//		expand(rv_name, #stream)			"report #, #;\n\n";
+		}
+
+	procedure main()
+		{
+		filedef 		outfile;
+		rn_stream	stream1;
+		double		x;
+		int 			i;
+
+		test rv_bernoulli				(stream1, 0.75) 					file = bernoul.dat;
+		test rv_beta					(stream1, 0.0, 1.0, 1.5, 5.0)		file = beta.dat;
+		test rv_binomial				(stream1, 10, 0.4)				file = binomial.dat;
+		test rv_cauchy				(stream1, 1.0, 2.0) 				file = cauchy.dat;
+		test rv_chi_square			(stream1, 25)					file = chisquar.dat;
+		test rv_discrete_uniform		(stream1, 1, 10)					file = discuni.dat;
+		test rv_erlang				(stream1, 1.0, 2.0, 3)			file = erlang.dat;
+		test rv_error				(stream1, 3.0)					file = error.dat;
+		test rv_expo				(stream1, 10.0) 					file = expo.dat;
+		test rv_expo_power			(stream1, 2.0, 3.0, 0.5)			file = expopow.dat;
+		test rv_extreme_value_a 	(stream1, 10.0, 2.0)				file = exvaluea.dat;
+		test rv_extreme_value_b 	(stream1, 10.0, 2.0)				file = exvalueb.dat;
+		test rv_F					(stream1, 3, 6) 					file = f.dat;
+		test rv_gamma				(stream1, 0.0, 1.0, 0.2)			file = gamma.dat;
+//		test rv_gamma				(stream1, 0.0, 1.0, 2.0)			file = gamma2.dat;
+		test rv_geometric			(stream1, 0.6)					file = geomet.dat;
+		test rv_inverse_gaussian	(stream1, 10.0, 1.0, 16.0)		file = invgause.dat;
+		test rv_inverse_weibull 		(stream1, 10.0, 1.0, 3.0)			file = invweib.dat;
+		test rv_bounded_johnson 	(stream1, 0.0, 1.0, 0.0, 2.0)		file = bjohnson.dat;
+		test rv_unbounded_johnson	(stream1, 0.0, 1.0, -3.0, 2.0)		file = ujohnson.dat;
+		test rv_laplace 				(stream1, 1.0, 2.0) 				file = laplace.dat;
+		test rv_log_laplace 			(stream1, 1.0, 2.0, 3.0)			file = loglap.dat;
+		test rv_log_logistic			(stream1, 0.0, 1.0, 3.0)			file = loglog.dat;
+		test rv_log_normal			(stream1, 20.0, 3.0)				file = lognorm.dat;
+		test rv_log_series			(stream1, 0.6)					file = logserie.dat;
+		test rv_negative_binomial	(stream1, 5, 0.4)				file = negbin.dat;
+		test rv_logistic				(stream1, 5.0, 2.0) 				file = logistic.dat;
+		test rv_normal				(stream1, 10.0, 3.5)				file = normal.dat;
+		test rv_pareto				(stream1, 5.0, 3.0) 				file = pareto.dat;
+		test rv_pearson5			(stream1, 1.0, 2.0, 3.0)			file = pearson5.dat;
+		test rv_pearson6			(stream1, 1.0, 2.0, 3.0, 4.0)		file = pearson6.dat;
+		test rv_poisson 				(stream1, 12.0) 					file = poisson.dat;
+		test rv_power				(stream1, 1.0, 2.0, 5.0)			file = power.dat;
+		test rv_random_walk 		(stream1, 1.0, 2.0, 3.0)			file = rwalk.dat;
+		test rv_rayleigh				(stream1, 0.0, 1.0) 				file = rayleigh.dat;
+		test rv_t					(stream1, 20)					file = studentt.dat;
+		test rv_triangular			(stream1, 1.0, 2.0, 5.0)			file = triang.dat;
+		test rv_uniform 				(stream1, 10.0, 20.0)			file = uniform.dat;
+		test rv_wald					(stream1, 10.0, 16.0)			file = wald.dat;
+		test rv_weibull 				(stream1, 0.0, 1.0, 3.0)			file = weibull.dat;
+
+		report random_variable_set, stream1;
+		}
+	}

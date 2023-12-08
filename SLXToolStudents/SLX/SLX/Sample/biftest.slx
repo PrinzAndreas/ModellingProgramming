@@ -1,0 +1,155 @@
+module biftest
+	{
+	procedure main
+		{
+		integer		i, j;
+		double		x, y;
+		double		neg7 = -7.0;
+		double		one_half = 0.5;
+		double		huge = 1.0e100;
+						
+		string(10)	v, w;
+
+		string(*)	logformat = 
+"____.____|  ____.____|\n";
+
+		string(*)	oformat = 
+"__.____| __.____|  __.____|  __.____|  __.____|  __.____|  __.____|  __.____|  __.____|  __.____|  __.____|\n";
+
+		i = 1;
+		i = abs(i);
+		i = -1;
+		i = abs(i);
+		
+		x = 1.0;
+		x = abs(x);
+		x = -1.0;
+		x = abs(x);
+
+		print options=bold,underline
+			("x", "sin(x)", "cos(x)", "tan(x)",
+			"asin(x)", "acos(x)", "atan(x)", "atan2(..)",
+			"log(x)", "exp(x)", "sqrt(x)")
+
+			oformat;
+
+		y = 1.0;
+
+		x = 0.3;
+		x = exp(x);		//DEBUG
+		
+		for (x = 0.1; x <= 1.0; x += 0.1)
+			{
+			print(x, sin(x),  cos(x), tan(x),
+				 asin(x), acos(x), atan(x), atan2(y, x),
+				 log(x), exp(x), sqrt(x))						oformat;
+
+			/* Errors */
+
+//                      x = sin;
+//                      x = sin();
+//                      x = sin(y, y);
+
+//                      v = substring;
+//                      v = substring();
+//                      v = substring(w);
+//                      v = substring(w, 1, 2, 3);
+
+			}
+
+		print options=bold,underline	("x", "log10(x)")	logformat;
+
+		for (x = 0.001; x <= 1000.0; x *= 10.0)
+			print(x, log10(x))							logformat;
+
+		print (acos(cos(one_half)))     "\nacos(cos(0.5) = *.**********\n";
+		print (asin(sin(one_half)))     "\nasin(sin(0.5) = *.**********\n";
+		print (atan(tan(one_half)))     "\natan(tan(0.5) = *.**********\n";
+		print (exp(log(one_half)))      "\nexp(log(0.5)  = *.**********\n\n";
+		
+		print	"Constant argument tests\n\n";
+		
+		print	(sin(PI))			"sin(PI) = _.______\n";
+		print	(cos(PI))			"cos(PI) = _.______\n";
+		print	(tan(PI))			"tan(PI) = _.______\n";
+		print	(asin(1.0))			"asin(1.0) = _.______\n";
+		print	(acos(1.0))			"acos(1.0) = _.______\n";
+		print	(atan(1.0))			"atan(1.0) = _.______\n";
+		print	(atan2(0.0, 1.0))		"atan2(0.0, 1.0) = _.______\n";
+		print	(log(10.0))			"log(10.0) = _.______\n";
+		print	(log10(10.0))		"log10(10.0) = _.______\n";
+		print	(exp(1.0))			"exp(1.0) = _.______\n\n";
+		
+		i = 3;
+		x = 3.0;
+
+		print (pow(i, 2), pow(i, 2.0), pow(x, 2), pow(x, 2.0), pow(x, 3), pow(x, 3.0), pow(x, 4), pow(x, 4.0))
+									"pow(3, 2)       =  _"
+									"pow(3, 2.0)    = _._________"
+									"pow(3.0, 2)    = _._________"
+									"pow(3.0, 2.0) = _._________"
+									"pow(3.0, 3)    = _._________"
+									"pow(3.0, 3.0) = _._________"
+									"pow(3.0, 4)    = _._________"
+									"pow(3.0, 4.0) = _._________\n";
+		
+//		print "\nIntentional sqrt argument error follows...\n";
+
+//            print (sqrt(-7.5))       "sqrt(-7.5)   = *.**********\n";
+
+//		print "\nIntentional log argument error follows...\n";
+
+//		x = -7.5;
+//		print (log(x))       "log(-7.5)   = *.**********\n";
+
+//		print "\nIntentional pow error follows...\n";
+//		x = 10.0;
+//		print (pow(x, 1000.0))       "pow(10.0, 1000.0)  = *.**********\n";
+		
+//		x = 10.0;
+//		print "\nIntentional pow error follows...\n";
+//		print (pow(-x, 10.0))       "pow(-10.0, 10.0)  = *.**********\n";
+
+
+//		print "\nIntentional log10 argument error follows...\n";
+
+//		print (log10(neg7))       "log(n-7.0)   = *.**********\n";
+
+//		print "\nIntentional exp argument error follows...\n";
+
+//		x = 1.0e10;
+//		print (exp(x))     "exp(1.0e10) = *.**********\n";
+
+//		print "\nIntentional sqrt argument error follows...\n";
+
+//		print (sqrt(neg7))      "sqrt(-7.0)  = *.**********\n";
+
+//		print "\nIntentional exp argument error follows...\n";
+
+//		print (exp(huge))      "exp(1.0e100)  = *.**********\n";
+
+//		x = sin(x, x);		// too many args
+//		x = atan2(x);	// too few
+		
+		x = 15.0;
+		y = 5.0;
+		
+		print (pow(x-y, 2), pow(x-y, 3))		"In-Line pow(10.0, 2) = ___.__  pow(10.0, 3) = ___.__\n\n";
+		
+//		print "\nIntentional acos argument error follows...\n";
+
+//		print (acos(huge))      "acos(1.0e100)  = *.**********\n";
+
+//		print "\nIntentional asin argument error follows...\n";
+
+//		print (asin(huge))      "asin(1.0e100)  = *.**********\n";
+
+		JOHTRAP;
+
+//		print "\nIntentional sin argument error follows...\n";
+
+//		print (sin(huge))      "sin(1.0e100)  = *.**********\n";
+
+		return;
+		}
+	}

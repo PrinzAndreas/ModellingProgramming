@@ -1,0 +1,171 @@
+//*****************************************************************************
+//	Call Center Model	
+//*****************************************************************************
+
+import	<stats.slx>
+import	<h8.slx>		// GPSS/H subset
+
+module CallCenter
+	{
+	constant int			NAGENTS				= 100,
+							NWARMUP				= 1000;		// collect stats after warmup
+							
+	constant boolean	PATIENCE				= TRUE;
+	
+	constant double	ALPHA					= 10.0,
+							BETA						= 10.0,
+							BALK_PROB			= 0.1,
+							MEAN_IAT				= 0.5,			// arrive @ 2 / sec
+							PRODUCTIVITY_STD	= 0.5,
+							RUN_TIME				= 100000.0,
+							TALK_CV				= 2.0,			// talk time coefficient of variation
+							TALK_MEAN				= 50.0;		// mean talk time = 50 sec
+									
+	int						TotalCalls, TotalCompletedCalls, TotalBalks, TotalDelays, TotalAbandoned, TotalExits;
+	
+	rn_stream			ArrivalsStream,
+							BalkStream,
+							ProductivityStream,
+							RenegeStream,
+							TalkStream;
+	
+	random_variable	T_Productivity, T_Patience, T_TalkTimeRaw, T_TalkTimeAdjusted;
+	
+	queue				AgentQ;										// stats
+	storage				AgentUtil capacity = NAGENTS;			// stats
+	
+	class Agent(int ID)
+		{
+		int					AgentID = ID;
+		double			AgentProductivity;
+		
+		initial
+			{
+			place ME into AvailableAgents;
+			
+			do
+				AgentProductivity = rv_normal(ProductivityStream, 1.0, PRODUCTIVITY_STD);
+			
+			while (AgentProductivity <= 0.1);
+				
+			tabulate T_Productivity = AgentProductivity;
+			}
+		};	
+
+	set(Agent)			AvailableAgents;
+		
+	class Call(int ID)
+		{
+		int					CallID = ID;
+		double			MaxWait, AlarmTime, TalkTime;
+		pointer(Agent)	MyAgent;
+		
+		actions
+			{
+			++TotalCalls;		// count calls
+
+			if (AvailableAgents.size == 0)
+				{
+				if (rv_uniform(BalkStream, 0.0, 1.0) < BALK_PROB)
+					{
+					++TotalBalks;
+					++TotalExits;
+					
+					terminate;
+					}
+				else	// no balk; must wait
+					{
+					if (PATIENCE)
+						MaxWait = rv_expo(RenegeStream, BETA);
+					else
+						MaxWait = rv_weibull(RenegeStream, ALPHA, BETA, 0.0);
+
+					AlarmTime = time + MaxWait;
+						
+					enqueue AgentQ;
+					wait until (time == AlarmTime || AvailableAgents.size > 0);		// reneging
+					depart AgentQ;
+										
+					if (AvailableAgents.size == 0)		// renege
+						{
+						if (TotalCalls > NWARMUP)
+							tabulate T_Patience = MaxWait;
+							
+						++TotalAbandoned;
+						terminate;
+						}
+					
+					++TotalDelays;
+					}
+				}			
+			
+			//	fall-thru => agent available
+
+			MyAgent = first Agent in AvailableAgents;		// least recently used
+			remove MyAgent from AvailableAgents;
+			
+			if (TALK_CV == 1.0)
+				TalkTime = rv_expo(TalkStream, TALK_MEAN);
+			else
+				TalkTime = rv_expo(TalkStream, TALK_MEAN);		// don't know AutoMod "l"
+
+			tabulate T_TalkTimeRaw = TalkTime;
+			
+			TalkTime *= MyAgent -> AgentProductivity;
+
+			tabulate T_TalkTimeAdjusted = TalkTime;
+			
+			enter 		AgentUtil;
+			advance	TalkTime;
+			leave		AgentUtil;
+			
+			place MyAgent into AvailableAgents;				// FIFO => LRU
+			
+			++TotalCompletedCalls;
+			terminate;
+			}
+		};
+
+	procedure main()
+		{
+		int		i;
+
+		for (i = 1; i <= NAGENTS; i++)
+			new Agent(i);
+
+		i = 0;
+		while (time < RUN_TIME)
+			{
+			advance	rv_expo(ArrivalsStream, MEAN_IAT);
+
+			activate new Call(++i);
+
+			if (i == NWARMUP+1)
+				{
+				hreset();
+				}
+			}
+
+		report system;		// GPSS/H stats
+		
+		print options=bold		"\n\nSummary\n\n";
+		
+		JOHTRAP;
+		
+		print	(TotalCalls, TotalCompletedCalls, TotalBalks, TotalDelays, TotalAbandoned)
+/*		
+"Total Calls:		_________|"
+"Completed:		_________|"
+"Balks:         		_________|"
+"Delays:       	_________|" 
+"Abandoned:		_________|\n\n";
+*/
+
+|"Total Calls:	_________| 
+Completed:	_________| 
+Balks:			_________| 
+Delays:		_________| 
+Abandoned:	_________|\n\n"|;
+
+		}		// end main
+	}			// end module

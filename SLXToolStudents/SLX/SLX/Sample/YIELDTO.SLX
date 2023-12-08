@@ -1,0 +1,43 @@
+module yeild_to_test
+	{
+	class widget
+		{
+		integer 	ii;
+		};
+
+	procedure main
+		{
+		integer 	i;
+		pointer(puck)	p1_puck;
+		widget		local_widget;
+
+		p1_puck = activate new process1(ACTIVE);
+
+		for (i = 1; i <= 500000; i++)
+			{
+// test 		print "main\n";
+// error		yield to NULL;
+// error		yield to &local_widget;
+			yield to p1_puck;
+
+//test		if (i % 100000 == 0)
+//test			print (i)		"_______\n";
+			}
+
+		print	(i+i)	"_ yields executed!\n";
+
+		exit(0);
+		}
+
+	class process1(in pointer(puck) main_puck)
+		{
+		pointer(puck)	main_guy = main_puck;
+
+		actions
+		    forever
+			{
+// test 		print "proc1\n";
+			yield to main_guy;
+			}
+		}
+	}
