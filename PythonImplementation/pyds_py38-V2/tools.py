@@ -26,6 +26,8 @@ class Integrator:
                  max_step=10 * TimeUnits.minute,
                  min_step=0.001 * TimeUnits.minute,
                  init_step=TimeUnits.minute / 4,
+                 atol=0.1,
+                 rtol=0.1,
                  params=None,
                  events=None
                  ):
@@ -36,7 +38,9 @@ class Integrator:
         self.config.tdata = tdata
         self.config.varspecs = expressions
         self.config.ics = ics
-        self.config.algparams = {'init_step': init_step, 'min_step': min_step, 'max_step': max_step, 'atol': 0.1}
+        self.config.algparams = {
+            'init_step': init_step, 'min_step': min_step, 'max_step': max_step, 'atol': atol, 'rtol': rtol
+        }
         self.config.events = [event.event for event in events]
         self.config.pars = self.params
         self.solver = Generator.Vode_ODEsystem(self.config)
@@ -55,7 +59,7 @@ class Integrator:
         return ConfigBox({'results': results, 'points': results.sample()})
 
     #  Main function
-    def solve(self, name='run'):
+    def solve(self, name='run', debug=False):
         # Begin the integration
         step = 0
         advance = lambda: self.step(name=f'{name}_{step}')
@@ -73,7 +77,8 @@ class Integrator:
                 event_times=self.current_step.results.getEventTimes(),
                 variables=variables,
                 current_step=self.current_step,
-                ics=ics
+                ics=ics,
+                debug=debug
             )
 
             # Updates the solver with new information
@@ -82,6 +87,7 @@ class Integrator:
                 pars=self.solver.pars,
                 tdata=[self.current_step.points['t'][-1], self.solver.tdata[-1]]
             )
+
             self.current_step = advance()
             results.append(self.current_step)
 
@@ -96,7 +102,7 @@ class Integrator:
 
         return points
 
-    def parse_events(self, current_step, event_times, ics, variables):
+    def parse_events(self, current_step, event_times, ics, variables, debug=False):
         for event in self.events:
             if event_times.get(event.event_args['name']):
                 temp = current_step.results.getEvents()
@@ -106,7 +112,8 @@ class Integrator:
                     **{'c_step': current_step, 'ics': ics, 'var_names': variables, 'params': self.solver.pars}
                 }
                 for callback in event.callbacks:
-                    print(f'calling: {callback.__name__}')
+                    if debug:
+                        print(f'calling: {callback.__name__}')
                     callback(**feed_dict)
 
 

@@ -1,7 +1,7 @@
 set terminal pngcairo
-set output 'output.png'
+set output 'gnuplot.png'
 
-set yrange [0:41]
+set yrange [0:42]
 # Line style for axes
 set style line 80 lt rgb "#808080"
 
@@ -22,9 +22,12 @@ set key top right box
 
 set xlabel 'Model Time [h]' offset 0,0.5
 
-plot 'tmp.dat' using 1:2 with lines title 'room', \
-     'tmp.dat' using 1:3 with lines title 'env', \
-     'tmp.dat' using 1:4 with lines title 'radiator', \
-     'tmp.dat' using 1:5 with lines title 'boiler'
+plot 'tmp.dat' using 1:2 with lines title 'TemperatureOutside', \
+     'tmp.dat' using 1:3 with lines title 'TemperatureBoiler', \
+     'tmp.dat' using 1:4 with lines title 'WantedTemperature', \
+     'tmp.dat' using 1:5 with lines title 'TemperatureRoom', \
+     'tmp.dat' using 1:6 with lines title 'TemperatureHeating', \
+     'tmp.dat' using 1:7 with lines title 'WindowHeatLoss', \
+     'tmp.dat' using 1:8 with lines title 'ValveHeating'
 
 

@@ -1,5 +1,6 @@
 from abc import ABC
 from typing import Set
+from TimeBaseSeconds import TimeUnits
 
 
 class Point(ABC):
@@ -23,18 +24,26 @@ class ValueTable:
     def add(self, t, v) -> None:
         self.data.add(Point(x=t, y=v))
 
+    def pop(self):
+        self.data = sorted(self.data, key=lambda x: x.x)[::-1]
+        return self.data.pop()
+
     def init(self) -> None:
-        p = self.data.pop()
+        p = self.pop()
         self.currentTime = p.x * self.granularity
         self.currentTemp = p.y
+        p = self.pop()
+        self.nextTime = p.x * self.granularity
+        self.nextTemp = p.y
+        #print(self.nextTime)
 
     def refresh(self, t: float) -> None:
         if t >= self.nextTime:
             self.currentTime = self.nextTime
             self.currentTemp = self.nextTemp
             try:
-                p = self.data.pop()
-                self.nextTime = p.x
+                p = self.pop()
+                self.nextTime = p.x * self.granularity
                 self.nextTemp = p.y
 
             except IndexError:  # Happens when the set self.data is empty
@@ -43,7 +52,7 @@ class ValueTable:
     def linear(self, t: float) -> float:
         self.refresh(t=t)
         numerator = self.nextTime - self.currentTime
-        return self.currentTemp + (t - self.currentTime)/(numerator + 1e-4)
+        return self.currentTemp + (t - self.currentTime) / (numerator + 1e-4) * (self.nextTemp - self.currentTemp)
 
 
 def autofill_and_initiate_value_table(csv_path, value_table: ValueTable) -> ValueTable:
@@ -58,16 +67,14 @@ def autofill_and_initiate_value_table(csv_path, value_table: ValueTable) -> Valu
     return value_table
 
 
-if __name__ == '__main__':
-    """
-       The Value Table has a method called linear that computes a float value. 
-       The linear method is used by the main script, furthermore the Value Table also has an autofill and initiate method
-       meant to read float values from a csv file and store them in the data attribute as instances of the Point class,
-       and finish off by calling the initiate method which pops a point of the data attribute, and computes the inital
-       time and temperatures.
-    """
-    path = r'C:\Users\Abraham\OneDrive - Universitetet i Agder\Desktop\AndreasPrinz\temperature_data.csv'
-    v: ValueTable = autofill_and_initiate_value_table(csv_path=path, value_table=ValueTable(unit=10))
-    print('Value Table:', len(v.data), 'datapoints')
-    for _ in range(24*3600):
-        print(v.linear(t=_))
+"""
+   The Value Table has a method called linear that computes a float value. 
+   The linear method is used by the main script, furthermore the Value Table also has an autofill and initiate method
+   meant to read float values from a csv file and store them in the data attribute as instances of the Point class,
+   and finish off by calling the initiate method which pops a point of the data attribute, and computes the inital
+   time and temperatures.
+"""
+
+path = 'temperature_data.csv'
+value_table: ValueTable = autofill_and_initiate_value_table(csv_path=path, value_table=ValueTable(unit=TimeUnits.hour))
+

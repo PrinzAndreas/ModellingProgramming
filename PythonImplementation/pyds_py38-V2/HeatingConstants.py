@@ -10,8 +10,8 @@ B_Room: float = 4.0
 
 V_ROOM: float = L_Room * B_Room * (H_Room_Low + H_Room_Top) / 2  # Room volume
 A_ROOF: float = 2 * L_Room * math.sqrt(2) * (H_Room_Top - H_Room_Low)  # Root area
-# A_WALL: float = 2 * B_Room * (H_Room_Low + H_Room_Top) * math.sqrt(2)  # Wall area, denne stemmer ikke med side 40
-A_WALL: float = 2 * L_Room * H_Room_Low + B_Room * (H_Room_Top + H_Room_Low)  # Wall area
+A_WALL: float = 2 * B_Room * (H_Room_Low + H_Room_Top) * math.sqrt(2)  # Wall area, denne stemmer ikke med side 40
+#A_WALL: float = 2 * L_Room * H_Room_Low + B_Room * (H_Room_Top + H_Room_Low)  # Wall area
 A_WINDOW: float = 1.0 * 1.4  # Window area
 A_RADIATOR: float = 4  # Raditator area
 V_RADIATOR: float = 10  # Raditator Volume
@@ -41,3 +41,4 @@ U = ConfigBox({
     'wi_open': K_OPEN_WINDOW,
     'wi_closed': K_CLOSED_WINDOW
 })
+
