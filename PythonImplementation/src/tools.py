@@ -3,8 +3,8 @@ from contextlib import contextmanager
 from PyDSTool import *
 import numpy as np
 
-from TimeBaseSeconds import TimeUnits
-from HeatingConstants import *
+from src.time_base_seconds import TimeUnits
+from src.heating_constants import *
 
 
 @contextmanager

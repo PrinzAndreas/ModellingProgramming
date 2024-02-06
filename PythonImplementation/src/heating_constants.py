@@ -1,5 +1,5 @@
 import math
-from TimeBaseSeconds import TimeUnits
+from src.time_base_seconds import TimeUnits
 from box import ConfigBox
 
 # Room dimensions

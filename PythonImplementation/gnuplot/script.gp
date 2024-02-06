@@ -22,12 +22,12 @@ set key top right box
 
 set xlabel 'Model Time [h]' offset 0,0.5
 
-plot 'tmp.dat' using 1:2 with lines title 'TemperatureOutside', \
-     'tmp.dat' using 1:3 with lines title 'TemperatureBoiler', \
-     'tmp.dat' using 1:4 with lines title 'WantedTemperature', \
-     'tmp.dat' using 1:5 with lines title 'TemperatureRoom', \
-     'tmp.dat' using 1:6 with lines title 'TemperatureHeating', \
-     'tmp.dat' using 1:7 with lines title 'WindowHeatLoss', \
-     'tmp.dat' using 1:8 with lines title 'ValveHeating'
+plot 'gnuplot/data.dat' using 1:2 with lines title 'TemperatureOutside', \
+     'gnuplot/data.dat' using 1:3 with lines title 'TemperatureBoiler', \
+     'gnuplot/data.dat' using 1:4 with lines title 'WantedTemperature', \
+     'gnuplot/data.dat' using 1:5 with lines title 'TemperatureRoom', \
+     'gnuplot/data.dat' using 1:6 with lines title 'TemperatureHeating', \
+     'gnuplot/data.dat' using 1:7 with lines title 'WindowHeatLoss', \
+     'gnuplot/data.dat' using 1:8 with lines title 'ValveHeating'
 
 

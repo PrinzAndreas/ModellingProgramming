@@ -1,6 +1,6 @@
 import numpy as np
-from HeatingConstants import *
-from ValueTable import ValueTable, autofill_and_initiate_value_table
+from src.heating_constants import *
+from src.value_table import ValueTable, autofill_and_initiate_value_table
 
 
 class ODE:

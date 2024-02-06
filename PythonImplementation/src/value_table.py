@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import Set
-from TimeBaseSeconds import TimeUnits
+from src.time_base_seconds import TimeUnits
 
 
 class Point(ABC):
