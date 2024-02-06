@@ -1,3 +1,9 @@
+# created by virtualenv automatically
+
+Lib/
+Scripts/
+pyvenv.cfg
+
 # generated diagrams
 RoomModelSLX/*.pdf
 
