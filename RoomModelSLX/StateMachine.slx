@@ -1,0 +1,138 @@
+//*****************************************************************************
+// 	Module StateMachine
+//           handle finite state machines
+//*****************************************************************************
+
+#define SLX2 ON
+#define TRACE
+
+import <TimeBaseSeconds>
+
+public module StateMachines
+{
+  abstract class FSMTime {
+    abstract method nextTime() returning double;
+  }
+  class FSMTimeAt(double t) subclass (FSMTime) { double when=t; 
+    concrete method nextTime() returning double {
+      double nextT = when;
+      while (time>nextT) nextT+=Day; // align with Day rhythm
+      return nextT;
+    }
+  }
+  class FSMTimeAfter(double t) subclass (FSMTime) { double delay=t; 
+    concrete method nextTime() returning double {
+      return time+delay;
+    }
+  }
+  class FSMTimeAtRandomUniform(pointer(rn_stream) r, double fromT, double toT) subclass (FSMTime) { 
+    pointer(rn_stream) rand=r; double startT=fromT; double endT=toT; double nextT=0;
+    concrete method nextTime() returning double {
+      if (time>nextT) nextT=rv_uniform(*rand, startT, endT); // new random time
+      while (time>nextT) nextT+=Day; // align with Day rhythm
+      return nextT;
+    }
+  }
+  class FSMTimeAtRandomNormal(pointer(rn_stream) r, double meanT, double distT) subclass (FSMTime) { 
+    pointer(rn_stream) rand=r; double mT=meanT; double dT=distT; double nextT=0;
+    concrete method nextTime() returning double {
+      if (time>nextT) nextT=rv_normal(*rand, mT, dT); // new random time
+      while (time>nextT) nextT+=Day; // align with Day rhythm
+      return nextT;
+    }
+  }
+  class FSMTimeAtRandomExponential(pointer(rn_stream) r, double meanT) subclass (FSMTime) { 
+    pointer(rn_stream) rand=r; double mT=meanT; double nextT=0;
+    concrete method nextTime() returning double {
+      if (time>nextT) nextT=rv_expo(*rand, mT); // new random time
+      while (time>nextT) nextT+=Day; // align with Day rhythm
+      return nextT;
+    }
+  }
+  class FSMTimeAfterRandomUniform(pointer(rn_stream) r, double fromT, double toT) subclass (FSMTime) { 
+    pointer(rn_stream) rand=r; double startT=fromT; double endT=toT; double nextT=0;
+    concrete method nextTime() returning double {
+      if (time>nextT) nextT=time+rv_uniform(*rand, startT, endT); // new random time
+      return nextT;
+    }
+  }
+  class FSMTimeAfterRandomNormal(pointer(rn_stream) r, double meanT, double distT) subclass (FSMTime) { 
+    pointer(rn_stream) rand=r; double mT=meanT; double dT=distT; double nextT=0;
+    concrete method nextTime() returning double {
+      if (time>nextT) nextT=time+rv_normal(*rand, mT, dT); // new random time
+      return nextT;
+    }
+  }
+  class FSMTimeAfterRandomExponential(pointer(rn_stream) r, double meanT) subclass (FSMTime) { 
+    pointer(rn_stream) rand=r; double mT=meanT; double nextT=0;
+    concrete method nextTime() returning double {
+      if (time>nextT) nextT=time+mT+rv_expo(*rand, mT); // new random time
+      return nextT;
+    }
+  }
+  
+  class FSMTransition(pointer(FSMTime) t, pointer(FSMState) s) { pointer(FSMTime) when=t; pointer(FSMState) what=s; }
+
+  passive class FSMState(string(*) theName) {
+    string(20) naming=theName;
+    set(FSMTransition) transitions;
+    double nextT=-1;
+    pointer(FSMState) nextS;
+    overridable public method enterState() {};
+    overridable public method exitState() {};
+    method addTransition(pointer(FSMTransition) t) { place t into transitions; }
+    method nextState() returning pointer(FSMState) {
+      nextTime();
+      return nextS;
+    }
+    method nextTime() returning double {
+      pointer(FSMTransition) trans;
+      if (nextT>time) return nextT;
+      nextT = (first FSMTransition in transitions)->when->nextTime()+1;
+			for (trans = each FSMTransition in transitions) {
+				if (trans->when->nextTime() < nextT) {
+					nextT = trans->when->nextTime();
+          nextS = trans->what;
+        }
+			}
+      return nextT;
+    }
+  }
+  
+/* would want to have {} instead of (), but not clear how to */
+/* put the states inside and process all of it together */
+/* then add a statement to run the statemachine with the initial state */
+  macro statemachine #name { @state #sn [@enter #into = #ival] [@leave #outof = #oval] },... 
+     @transitions { #snFrom @with #trigger @to #snTo },... @initial #isn
+	definition {
+    int i;
+
+    for (i = 1; #sn[i] != ""; ++i) {
+      expand(#sn[i],#sn[i]) "passive class FSMState#() subclass (FSMState(\"#\")) {";
+      if (#into[i] != "")
+        expand(#into[i], #ival[i]) "override public method enterState() { # = #; };";
+      if (#outof[i] != "")
+        expand(#outof[i], #oval[i]) "override public method exitState() { # = #; };";
+      expand(#sn[i]) "}";
+    }
+		
+		expand(#name) "class #_FSM {";
+    for (i = 1; #sn[i] != ""; ++i) {
+      expand(#sn[i],#sn[i]) "pointer(FSMState) # = new FSMState#();";
+    }
+		expand(#name) "rn_stream windowClose, windowOpen;";
+    
+		expand(#name) "initial {";
+    for (i = 1; #snFrom[i] != ""; ++i) {
+      expand(#snFrom[i],#trigger[i],#snTo[i]) "#->addTransition(new FSMTransition(#,#));";
+    }
+		expand(#name) "}";
+		expand(#name) "}";
+	}
+	
+  macro att #hour : #minute
+	definition {
+		expand(#hour,#minute) "new FSMTimeAt(#*Hour+#*Minute)";
+	}
+
+}

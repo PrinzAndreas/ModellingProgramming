@@ -2,6 +2,7 @@
 import <ContinuousSmall>
 import <PlotTrace>
 import <ValueTable>
+import <StateMachine>
 import <TimeBaseSeconds>
 import <TemperatureHistory>
 
@@ -9,12 +10,11 @@ import <HeatingConstants>
 
 module RoomHeating {
   //========== Experiment parameters
-  constant double TEMP_NIGHT_NOMINAL= 7;      // °C -- frost protection
-//  constant double TEMP_NIGHT_NOMINAL= 15;      // °C
-  constant double TEMP_ROOM_MIDNIGHT=   13;      // °C
-  constant double TEMP_DAY_NOMINAL=   22;      // °C
-  constant double BOILER_WATER_TEMP=  40;      // °C
-  constant double EXPERIMENT_DURATION = 2*Day;
+  public constant double TEMP_NIGHT_NOMINAL=    7;      // °C -- frost protection
+  public constant double TEMP_ROOM_MIDNIGHT=   13;      // °C -- at start
+  public constant double TEMP_DAY_NOMINAL=     22;      // °C
+  public constant double BOILER_WATER_TEMP=    40;      // °C
+  public constant double EXPERIMENT_DURATION = 2*Day;
   //========== End Experiment parameters
 
   pointer (Environment) env;
@@ -125,71 +125,54 @@ module RoomHeating {
     }
   } 
 
-	type ResidentState enum { Sleeping, Active, Working, Airing, finalAiring };
-	type ResidentEvent enum { wakeup, workStart, workEnd, needAir, enoughAir, timeToSleep };
-  class Event(double t, ResidentEvent s) { double when=t; ResidentEvent what=s; }
-  class Resident() {  
-  
-	  ResidentState myState = Sleeping;
-    set(Event) ranked (ascending when) calendar;
-    pointer(Event) currentEvent;
+  statemachine Charlie
+    state sleeping 
+      enter radiator->tempNominal = TEMP_NIGHT_NOMINAL
+      leave radiator->tempNominal = TEMP_DAY_NOMINAL ,
+    state active,
+    state working,
+    state airing 
+      enter room->k_Window = K_OPEN_WINDOW
+      leave room->k_Window = K_CLOSED_WINDOW ,
+    state preparingNight
+    transitions
+      sleeping with att 06:00 to active,
+      active   with att 10:00 to working,
+      active   with new FSMTimeAfterRandomExponential(&windowOpen, 1*Hour) to airing,
+      active   with att 22:00 to preparingNight,
+      working  with new FSMTimeAfter(04*Hour+00*Minute) to active,
+      airing   with att 10:00 to working,
+      airing   with new FSMTimeAfterRandomUniform(&windowClose, 15*Minute, 25*Minute) to active,
+      airing   with att 22:00 to preparingNight,
+      preparingNight with new FSMTimeAfterRandomNormal(&windowClose, 20*Minute, 5*Minute) to sleeping
+//    where
+//      random_1 = new FSMTimeAfterRandomUniform(&windowClose, 15*Minute, 25*Minute)
+//      random_2 = new FSMTimeAfterRandomNormal(&windowClose, 20*Minute, 5*Minute)
+//      random_3 = new FSMTimeAfterRandomExponential(&windowOpen, 1*Hour)
+    initial sleeping
     
-    rn_stream windowClose, windowOpen; // use better names
+  class Resident() subclass (Charlie_FSM) {  
+  // the subclass is just for testing, later it will be an attribute of resident coming from a call "run FSM Charlie" (or "debug FSM Charlie")
+  
+    pointer(FSMState) currentState;
+    
+//    Charlie_FSM testing;
     
     actions {
       theIntegrator->attachPuck(ACTIVE);
       
-      place new Event(6*Hour, wakeup) into calendar; // sleep until 6
-      place new Event(10*Hour, workStart) into calendar; // go to work at 10
-      place new Event(22*Hour, timeToSleep) into calendar; // prepare to bed at 22
-
+      currentState = sleeping;
+  
       print "Starting simulation";
+      
       forever {
-        currentEvent = first Event in calendar;
-        remove currentEvent from calendar;
-        print (myState) ", state is now _. ";
-        print (currentEvent->when/Hour, currentEvent->what) "At __.__, we want to _\n";
-        advance currentEvent->when - time; // wait until the time of the event
-        print ((time%Day)/Hour, (time%Hour)/Minute, floor(time/Hour)%24, floor(time/Minute)%60, myState, currentEvent->what) "__:__ (or __:__): _ -> _";
-
-        switch (currentEvent->what) {
-          case wakeup: // regulate temperature and plan next airing
-            radiator->tempNominal = TEMP_DAY_NOMINAL;
-          case workEnd: // this part applies to wakeup and workEnd
-            place new Event(time+Hour+rv_expo(windowOpen, 1 *Hour), needAir) into calendar;
-            myState = Active;
-            break;
-          case workStart: // close the window if it was still open
-            room->k_Window = K_CLOSED_WINDOW;
-            place new Event(time+4*Hour, workEnd) into calendar; // leave for 4 hours
-            place new Event(time+24*Hour, workStart) into calendar; // do the same tomorrow
-            myState = Working;
-            break;
-          case needAir: // open window and schedule closing
-            if (myState != Active) break; // do not air unless active
-            room->k_Window = K_OPEN_WINDOW;
-            place new Event(time+rv_uniform(windowClose, 15*Minute, 25*Minute), enoughAir) into calendar;
-            myState = Airing;
-            break;
-          case enoughAir: // close window and plan next airing
-            room->k_Window = K_CLOSED_WINDOW;
-            if (myState == Airing) { // plan next airing
-              place new Event(time+Hour+rv_expo(windowOpen, 1*Hour), needAir) into calendar;
-              myState = Active;
-            }
-            if (myState == finalAiring) { // go to sleep for 8 hours
-              place new Event(time+8*Hour, wakeup) into calendar;
-              myState = Sleeping;
-            }
-            break;
-          case timeToSleep:
-            radiator->tempNominal = TEMP_NIGHT_NOMINAL;
-            room->k_Window = K_OPEN_WINDOW;
-            place new Event(time+24*Hour, timeToSleep) into calendar; // do the same tomorrow
-            place new Event(time+rv_normal(windowClose, 20*Minute, 5*Minute), enoughAir) into calendar;
-            myState = finalAiring;
-            break;
-        }
+        if (currentState != NULL) { currentState->enterState(); }
+        print (currentState->naming) ", state is now _. ";
+        print (currentState->nextTime()/Hour, currentState->nextState()->naming) "At __.__, we want to go to state _\n";
+        advance currentState->nextTime()-time; // wait for next transitions
+        print ((time%Day)/Hour, (time%Hour)/Minute, floor(time/Hour)%24, floor(time/Minute)%60, currentState->naming, currentState->nextState()->naming) "__:__ (or __:__): _ -> _";
+        currentState->exitState();
+        currentState=currentState->nextState();
       }
     } 
   } 
