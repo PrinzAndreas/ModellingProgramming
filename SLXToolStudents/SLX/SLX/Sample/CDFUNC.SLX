@@ -1,0 +1,208 @@
+//**************************************************************************************
+//	Test GPSS/H-Style Discrete and Continuous Empirical Functions
+//**************************************************************************************
+
+import <stats.slx>
+
+precursor module alias_defns
+	{
+	class alias_point
+		{
+		double	prob, cutpoint, low_value, high_value;
+		};
+	
+	statement alias_discrete_empirical #name { { file = #file } | { ({ #x #y [,] }... ) } };
+	  definition
+		{
+		int			i, jlow, jhigh, count;
+		double	x, prevx, y, prevy, width, carry;
+		string(200)	filename;
+		filedef		xydata;
+
+		pointer(alias_point)								ap, aplow, aphigh;
+		set(alias_point) ranked(ascending prob)		ap_set;
+		set(alias_point) 	ranked FIFO					final_ap_set;
+		
+		if (#file != "")
+			{
+			read string=#file (filename);
+			open xydata input name=filename err=badfile;
+			}
+
+		if (#file != "")
+			{
+			forever
+				{
+				read file=xydata end=eof (x, y);
+
+				ap = new alias_point;
+				
+				ap -> low_value		= y;
+				ap -> high_value	= y;
+				ap -> prob			= x - prevx;
+				prevx					= x;
+				
+				place ap into ap_set;
+				}
+
+eof:		close xydata;
+			}
+		else
+			{
+			for (i = 1; #x[i] != ""; i++)
+				{
+				ap = new alias_point;
+				
+				read string = #x[i]	(x);
+				read string = #y[i]	(y);
+				
+				ap -> low_value		= y;
+				ap -> high_value	= y;
+				ap -> prob			= x - prevx;
+				prevx					= x;
+								
+				place ap into ap_set;
+				}
+			}
+
+		count	= ap_set.size;
+		width	= 1.0 / count;
+		
+		for (i = 1; i < count; i++)
+			{
+			aplow		= first alias_point in ap_set;
+			aphigh	= last alias_point in ap_set;
+			
+			remove aplow from ap_set;
+			remove aphigh from ap_set;
+			
+			aplow -> high_value	= aphigh -> low_value;
+			aplow -> cutpoint		= aplow -> prob + (i-1) * width;
+			aphigh -> prob 			-= width - aplow -> prob;
+			
+			place aphigh into ap_set;			// rerank with reduced prob
+			place aplow into final_ap_set;
+			}
+		
+		place first alias_point in ap_set into final_ap_set;
+				
+		expand(#name, count-1)
+
+|"		procedure #(rn_stream stream) returning double
+			{
+			double	sample = frn(stream);	// uniform random
+
+			double	alias_data[0...#] [3] =
+				{
+"|;				
+		for (ap = each alias_point in final_ap_set)
+			{
+			expand(ap -> cutpoint, ap -> low_value, ap -> high_value)
+			
+|"				{ #.######,  #.######,  #.###### }"|;
+
+			if (ap != last alias_point in final_ap_set)
+				expand	",";
+				
+			expand	"\n";
+			}
+				
+			
+		expand (count)
+|"				};
+
+			int		i = sample * #; 
+"|;
+	
+		expand
+|"			
+			if (sample >= alias_data[i] [1])
+				return alias_data[i] [3];
+			else
+				return alias_data[i] [2];
+			}
+"|;
+		return;
+
+badfile:
+		diagnose #file compile_time error	"Unable to open ^";
+		return;
+		}
+	}
+
+module test
+	{
+	rn_stream			stream1 	seed=100000;
+	
+	discrete_empirical D1 file="d1.dat";
+	discrete_empirical D2
+		(
+		0.10 	450,
+		0.29	750,
+		0.61	1000,
+		0.85	1500,
+		1.0		3000
+		);
+
+	alias_discrete_empirical D3
+		(
+		0.10 	450,
+		0.29	750,
+		0.61	1000,
+		0.85	1500,
+		1.0		3000
+		);
+
+	alias_discrete_empirical D4
+		(
+		0.10 	1,
+		0.20	2,
+		0.30	3,
+		0.40	4,
+		1.0		5
+		);
+
+	continuous_empirical C1 file="d1.dat";
+	continuous_empirical C2
+		(
+		0.10	450,
+		0.29	750,
+		0.61	1000,
+		0.85	1500,
+		1.0		3000
+		);
+
+	procedure main()
+		{
+		double				x;
+		int						i;
+
+		random_variable	D3samples histogram start = 0 width = 500 count = 10;
+		random_variable	D4samples histogram start = 0 width = 1 count = 10;
+		
+		x = D1(stream1);
+		x = D2(stream1);
+		
+		for (i = 1; i <= 1000000; i++)
+			{
+			tabulate D3samples = D3(stream1);
+			tabulate D4samples = D4(stream1);
+			}
+		
+		x = C1(stream1);
+		x = C2(stream1);
+		
+		report D3samples;
+		
+		print "\nProbabilities should be 10  19  32  24  15; mean s.b. 1317.5\n";
+
+		report D4samples;
+		
+		print "\nProbabilities should be 10  10  10  10  60; mean s.b. 4.0\n";
+		}
+
+	procedure max() returning double
+		{
+		return 10000;
+		}
+	}

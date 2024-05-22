@@ -1,0 +1,51 @@
+//*****************************************************************************
+//	New version of min(x, y, z, ...)
+//*****************************************************************************
+
+//	Imports...
+
+module NewMin
+	{
+	macro min (#expression,...)
+	  definition
+		{
+		int				i;
+		string(20)	typename = argtypename(#expression[1]);
+		
+		expand (typename, typename, #expression)
+		
+|"	inline #
+		{
+		#	temp1 = #;
+
+"|;
+		
+		for (i = 2; #expression[i]!= ""; i++)
+
+			expand(#expression[i], #expression[i])
+
+|"		if ((#) < temp1) 
+			temp1 = (#);
+"|;
+			
+		expand
+					
+|"		return temp1;
+		}
+"|;
+		}
+
+	procedure main()
+		{
+		int				i, j, k, l, m;
+		double		a, b, c, d, e;
+		string(10)	s, t;
+		
+		i = min(j, k);
+		i = min(j, k, l);
+		i = min(j, k, l, m);
+		s = min(s, t);
+		
+		a = min(b, c, d, e);
+		}
+	}

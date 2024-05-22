@@ -1,0 +1,59 @@
+//*****************************************************************************
+//	Case Study 1B - Adds Realistic Shudown Conditions and
+//	Basic Statistics to Case Study 1A
+//*****************************************************************************
+
+module case1b
+	{
+	rn_stream		arrivals, service;		// independent random streams
+
+	procedure main()
+		{
+		control boolean	printer_busy;
+
+		int					shutdown_time = 5 * 8 * 60;	// five 8-hour shifts (in minutes)
+
+		control int			jobs_in,
+							jobs_printed;
+
+		float				total_queueing_time,
+							total_printing_time;
+
+		while (time < shutdown_time)						// simulate for a week
+			{
+			advance	rv_uniform(arrivals, 10.0, 20.0);	// interarrival time
+
+			fork
+				{
+				++jobs_in;									// count arrivals
+
+				total_queueing_time -= time;
+				wait until (not printer_busy);
+				total_queueing_time += time;
+
+				printer_busy = TRUE;
+				total_printing_time -= time;
+				advance rv_uniform(service, 0.5, 15.0);	// printing time
+				total_printing_time += time;
+				printer_busy = FALSE;
+
+				++jobs_printed;
+				terminate;
+				}
+			}					
+
+		wait until (jobs_printed == jobs_in);				// drain the system
+
+		print (	jobs_printed,
+				total_printing_time / time,
+				total_queueing_time / jobs_printed * 60)
+
+""
+"Jobs Printed:           _____|"
+"Printer Utilization:     _.___|"
+""
+"Mean Queueing Time/Job: _.__ seconds\n\n";
+
+		}	// End of main
+
+	}	// End of case1b

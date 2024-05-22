@@ -1,0 +1,72 @@
+//*****************************************************************************
+//      Reneging - The Fork Approach
+//*****************************************************************************
+
+import <h8>
+
+module bank_with_reneging
+	{
+	queue			tellerq;
+	storage 		tellers capacity=5;
+
+	constant float	stop_time = 4800.0;		// 80 hours
+
+	integer 		renege_count;
+	rn_stream		stream1		seed=100000,
+					stream2 		seed=200000;
+
+//*****************************************************************************
+//	Bank Model
+//*****************************************************************************
+
+	procedure main
+		{
+		arrivals: customer
+			  iat = rv_expo(stream1, 0.2)	// 5 / minute
+			  until_time = stop_time;
+
+		advance stop_time;
+
+		print(renege_count)
+"\n\n"
+"A total of * customers reneged\n";
+
+		report(system);
+		exit(0);
+		}
+
+	object customer
+		{
+		control boolean reneged;
+
+		actions
+			{
+			enqueue tellerq;	// get in line
+			fork
+				{
+				advance 2.0;	// max waiting time
+				reneged = TRUE;
+				terminate;
+				}
+			parent
+				{
+				wait until(tellers.remaining > 0 || reneged);
+
+				if (reneged)
+					{
+					renege_count += 1;
+					depart	tellerq;
+					terminate;
+					}
+				}
+
+			enter	tellers;	// grab a teller
+			depart	tellerq;	// exit queue
+
+			advance rv_expo(stream2, 0.75);
+
+			leave	tellers;	// free teller
+			terminate;		// exit the bank
+			}
+		}
+	}

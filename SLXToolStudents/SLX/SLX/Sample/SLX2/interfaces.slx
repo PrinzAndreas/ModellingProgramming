@@ -1,0 +1,188 @@
+//*****************************************************************************
+//	Interface Definitions
+//*****************************************************************************
+
+#define SLX2 ON
+
+module Test
+	{
+	interface xface1
+		{
+		abstract method meth1a(int i) returning int;
+		abstract method meth1b(int i) returning int;
+		
+//		int			iii;			// no local variables for interfaces (yet?)
+
+//		initial					// no standard properties for interfaces (yet?)
+//			{
+//			}
+		}
+	
+	interface xface2
+		{
+		abstract method meth2a(int i) returning int;
+		abstract method meth2b(int i) returning int;
+
+//		abstract method meth1b(int i, int j) returning int;
+		abstract method meth1b(int i) returning int;
+		}
+	
+	class widget implements(xface1, xface2)
+		{
+		double	x, y;
+
+		concrete method meth1a(int i) returning int
+			{
+			return i+1;
+			}
+
+		concrete method meth1b(int i) returning int
+			{
+			return i-1;
+			}
+
+		concrete method meth2a(int i) returning int
+			{
+			return i+10;
+			}
+
+		concrete method meth2b(int i) returning int			// if commented out, required method is missing
+			{
+			return i-10;
+			}
+		};
+	
+	class special_widget subclass(widget)
+		{
+		int		swi;
+		};
+	
+	class xxx implements(xface2)
+		{
+		concrete method meth2a(int i) returning int
+			{
+			return i+10;
+			}
+
+		concrete method meth2b(int i) returning int
+			{
+			return i-10;
+			}
+
+		concrete method meth1b(int i) returning int
+			{
+			return i+1000;
+			}
+		};
+	
+	set(xface1)		set1;
+	set(xface2)		set2;
+	
+	procedure main()
+		{
+		pointer(*)						u;
+		pointer(widget)				w;
+		pointer(special_widget)	sw;
+		pointer(xxx)					x;
+		pointer(xface1)				x1;
+		double							z;		
+		int									i;
+		
+		w = new widget;
+		sw = new special_widget;
+		x = new xxx;
+		x1 = w;
+		
+//		x1 = new xface1;		// interfaces cannot be created; they can only be implemented
+		
+//		i = x1 -> x;				// no local variables for interfaces
+		
+		i = w -> meth1a(9);
+		i = sw -> meth1a(99);
+		
+		u = w;
+		w = u;
+		x1 = u;
+		
+		i = u -> meth1a(9);
+		
+		print (i)		"i = _  should be 10\n";
+		
+		place w into set1;
+		place w into set2;
+//		place x into set1;				// compile-time error: class xxx does not implement interface xface1
+		u = new widget;
+
+		place u into set1;
+				
+		u = new xxx;
+		place u into set2;
+		
+//		test1(u);							// run-time error: class xxx does not implement interface xface1
+		test1(w);
+		test2(u);
+		test2(w);	
+		test2(x);
+					
+		u = new xxx;
+//		w = u;							// run-time error: u points to an xxx, not a widget
+		
+//		place u into set1;				// run-time error: class xxx does not implement interface xface1
+		exit(0);
+		}
+
+	procedure test1(pointer(xface1) x1)
+		{
+		pointer(xface1)		localx1;
+		
+		int		i;
+		
+		i = x1 -> meth1a(99);
+
+		print (i)		"Interface 1:  i = _  should be 100\n";
+		
+		i = x1 -> meth1b(99);
+
+		print (i)		"Interface 1:  i = _  should be 98\n";
+
+		for (localx1 = each xface1 in set1)
+			{
+			i = localx1 -> meth1b(999);
+		
+			print (localx1, i)		"Interface 1 for each:  object _  i = _  should be 998\n";
+			}
+		
+		return;
+		}
+
+	procedure test2(pointer(xface2) x2)
+		{
+		pointer(xface2)		localx2;
+		
+		int		i = 111;
+		
+		i = x2 -> meth2a(99);
+
+		print (i)		"Interface 2:  i = _  should be 109\n";
+		
+		i = x2 -> meth2b(99);
+
+		print (i)		"Interface 2:  i = _  should be 89\n";
+
+		for (localx2 = each xface2 in set2)
+			{
+			i = localx2 -> meth2b(99);
+		
+			print (localx2, i)		"Interface 2 for each:  object _  i = _  should be 89\n";
+			}
+			
+		i = x2 -> meth1b(100);
+
+		if (type(*x2) == type widget)
+			print (i)		"Interface 2:  i = _  should be 99\n";
+		else
+			print (i)		"Interface 2:  i = _  should be 1100\n";
+
+		return;
+		}
+	}

@@ -1,0 +1,65 @@
+// Program to illustrate the power of compile-time features
+
+precursor module global_compile_time_stuff
+	{
+	class person(string(*) input_name)
+		{
+		string(20)	name;
+
+		initial
+			name = input_name;
+		};
+
+	set(person) ranked(ascending name)	name_queue;
+
+	filedef name_list name="names.dat";
+
+	statement read_names;
+	    definition
+		{
+		string(20)	this_name;
+		pointer(person) p;
+
+		forever
+			{
+			read file=name_list end=done (this_name);
+
+			place new person(this_name) into name_queue;
+			}
+done:		;
+		}
+
+	statement print_name;
+	    definition
+		{
+		pointer(person) p;
+		static int	count;
+
+		p = first person in name_queue;
+		if (p != NULL)
+			{
+			expand(++count, p -> name)
+
+"print	\"person # is #\\n\";";
+			remove p from name_queue;
+			}
+		else
+			expand(count)
+
+"print	\"There are only # persons\\n\";";
+		}
+	}
+
+module test_em
+	{
+	procedure main()
+		{
+		read_names;
+
+		print_name;
+		print_name;
+		print_name;
+		print_name;
+		}
+	}
+

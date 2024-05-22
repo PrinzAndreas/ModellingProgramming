@@ -1,0 +1,45 @@
+//*****************************************************************************
+//	Test Protected Class Members
+//*****************************************************************************
+
+#define SLX2	ON
+
+module ClassDefs
+	{
+	protected	class widget			// the whole class is protected
+//	class widget
+		{
+		protected int				wi;		// visible in class, subclasses, and methods
+//		int								wi;		// default = private
+//		public int						wi;		// anything goes
+		};
+	
+	public class special_widget subclass(widget)
+		{
+		int		swi;
+		
+		initial
+			{
+			swi = wi;
+			}
+
+		method set_swi()
+			{
+			swi = wi;
+			}
+		};
+	}
+
+module MainModule
+	{
+	procedure main()
+		{
+		pointer(special_widget)	sw;
+		
+		sw = new special_widget;
+		
+//		sw -> wi += 999;			// wi is protected
+		
+		sw -> set_swi();
+		}
+	}

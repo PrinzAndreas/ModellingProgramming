@@ -1,0 +1,138 @@
+import <h8>
+import <stats>
+
+module barb11		// GPSS/H Barbershop
+    {
+//*****************************************************************************
+//  Global Data
+//*****************************************************************************
+
+//	constant float		run_length = 48000;
+	constant float		run_length = 4800;
+
+	queue				joeq;
+	facility				joe;
+
+	rn_stream			Arrivals,
+						Service;
+
+	random_variable 	qtime;	// unweighted
+
+//*****************************************************************************
+//  Barbershop Model
+//*****************************************************************************
+
+    procedure main
+	{
+	constant int	NREP = 100;	// 100 replications
+
+	int		seed1 = 10000000,
+			seed2 = 20000000;
+
+	double	daily_mean[NREP],
+		anti_daily_mean[NREP];
+
+	int	i;
+
+	for (i = 1; i <= NREP; i++)
+		{
+		rn_seed Arrivals = seed1,
+			Service  = seed2;
+
+		seed1 += 10000;
+		seed2 += 10000;
+
+		activate new arrival_stream(run_length);
+
+		wait until (time >= run_length
+		       and joeq.usage.current_value == 0
+		       and joe.usage.current_value == 0);
+
+		daily_mean[i] = sample_mean(qtime);
+
+		if (i == 1)	report rn_stream_set;
+		
+		JOHTRAP;
+		
+		clear system;
+		}
+
+	report(rn_stream_set);
+
+	seed1 = 10000000;	// original seed
+	seed2 = 20000000;	// original seed
+
+	for (i = 1; i <= NREP; i++)
+		{
+		rn_seed Arrivals = seed1 antithetic,
+			Service  = seed2 antithetic;
+
+		seed1 += 10000;
+		seed2 += 10000;
+
+		activate new arrival_stream(run_length);
+
+		wait until (time >= run_length
+		       and joeq.usage.current_value == 0
+		       and joe.usage.current_value == 0);
+
+		anti_daily_mean[i] = sample_mean(qtime);
+
+		if (i == 1)	report rn_stream_set;
+		clear system;
+		}
+
+	report(rn_stream_set);
+
+	report_mean_ci("\nThetic Samples",     0.95, daily_mean,	NREP);
+	report_mean_ci("\nAntithetic Samples", 0.95, anti_daily_mean,	NREP);
+
+	report_antithetic_mean_ci("\nPaired Samples", 0.95,
+		daily_mean, anti_daily_mean, NREP);
+
+	exit(0);
+	}
+
+//*****************************************************************************
+//  arrival_stream Class
+//*****************************************************************************
+
+    class arrival_stream(double run_length_arg)
+	{
+	double	run_length = run_length_arg;			// copy ephemeral argument value
+	
+	actions
+		{
+		while (time < run_length)
+			{
+			advance rv_uniform(Arrivals, 12.0, 24.0);
+			activate new customer;
+			}
+
+		terminate;
+		}
+	};
+
+//*****************************************************************************
+//  Customer Class
+//*****************************************************************************
+
+    class customer
+	{
+	double	entry_time;
+
+	actions
+	    {
+	    enqueue	    joeq;
+	    seize	    joe;
+
+	    tabulate qtime = time - ACTIVE -> mark_time;	// TEMP
+
+	    depart	    joeq;
+	    advance	    rv_uniform(Service, 12.0, 18.0);
+	    release	    joe;
+	    terminate;
+	    }
+	}
+
+    }	// End of barb11 module

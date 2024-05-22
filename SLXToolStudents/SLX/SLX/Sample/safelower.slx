@@ -1,0 +1,44 @@
+//*****************************************************************************
+//	#safesymbol - imported file
+//*****************************************************************************
+
+#safesymbol	Prince1
+
+module lower_level
+	{
+
+#safesymbol	Prince2
+
+	public procedure subr()
+		{
+		double				x, y;
+		int						i;
+		pointer(widget)		w;
+
+#ifndef defined			// no check for safety
+		x = y;
+#else
+		i = 27;
+#endif
+
+#safeifndef defined		// compile-time error if not a #safesymbol
+		x = y;
+#endif
+
+#safeifdef defined		// compile-time error if not a #safesymbol
+		i = 27;
+#endif
+
+#safeifndef Synoski		// compile-time error if not a #safesymbol
+		i = 999;
+#endif
+
+#safeifdef Synoski		// compile-time error if not a #safesymbol
+		w = new widget;
+#endif		
+	
+		print	"lower\n";
+	
+		return;
+		}
+	}

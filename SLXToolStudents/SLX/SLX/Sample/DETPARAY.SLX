@@ -1,0 +1,52 @@
+module detach_pointer_array
+	{
+	int			count;
+
+	class atom
+		{
+		int		i = ++count;
+
+		final
+			{
+			print (ME, i)	"* (i=*) released\n";
+			}
+		};
+
+	class widget
+		{
+		pointer(atom)	warray[10];
+		pointer(*)	xarray[5];
+
+		int		x = 1,
+				y = 2,
+				z = 3;
+		};
+
+	procedure main()
+		{
+		pointer(widget) w1, w2;
+		pointer(atom)	a;
+		int		i;
+
+		w1 = new widget;
+		w2 = w1;
+		for (i=1; i<= 10; i++)
+			w1 -> warray[i] = new atom;
+
+		for (i=1; i<= 10; i++)
+			print(i, w1 -> warray[i] -> i, use_count(w1 -> warray[i]))
+
+"Atom **: **  use count: *\n";
+
+		destroy w1;
+
+		for (i=1; i<= 10; i++)
+			print(i, w2 -> warray[i] -> i, use_count(w2 -> warray[i]))
+
+"Atom **: **  use count: *\n";
+
+		destroy w2;
+		exit(0);
+		}
+	}
+

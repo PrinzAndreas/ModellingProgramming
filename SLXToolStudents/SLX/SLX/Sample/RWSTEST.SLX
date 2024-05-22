@@ -1,0 +1,41 @@
+module read_write_string_test
+	{
+	procedure main()
+		{
+		int			i;
+		float			x;
+		boolean 		true_false;
+		string(10)		string_10_digits, string_10_chars;
+		enum { red, green, blue }	color;
+
+		string(40)		buffer;
+
+		i = 111;
+		x = 222.0;
+		true_false = TRUE;
+		string_10_digits = "1234567890";
+		string_10_chars  = "ab,cd,e";
+		color = green;
+
+		write string=buffer (i, x, string_10_digits, string_10_chars, color)
+"_,_,_,\"_\",_,\n";
+
+		print (buffer)
+
+"buffer contents: _\n\n";
+
+
+		read string=buffer (i, x, string_10_digits, string_10_chars, color);
+
+		string(*)	oformat =
+"|_____________ = |__________ should be |__________\n";
+
+		print ("i",					i,					"111")			oformat;
+		print ("x",					x,					"222")			oformat;
+		print ("string 10 digits",	string_10_digits,	"1234567890")	oformat;
+		print ("string 10 chars",	string_10_chars,	"ab,cd,e")		oformat;
+		print ("color",				color,				"green")		oformat;
+
+		exit(0);
+		}
+	}

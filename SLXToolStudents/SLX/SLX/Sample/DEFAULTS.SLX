@@ -1,0 +1,39 @@
+precursor module resource_statement
+	{
+	statement	resource	{ #name  [capacity=#capy] [interruptable=#intok] },... ;
+	    definition
+		{
+		string(100)	res_capy,
+				res_intok;
+
+		integer 	i;
+
+		for (i = 1; #name[i] != ""; i++)
+			{
+			if (#capy[i] != "")
+				res_capy = #capy[i];
+			else
+				res_capy = "1.0";
+
+			if (#intok[i] != "")
+				res_intok = #intok[i];
+			else
+				res_intok = "FALSE";
+
+			expand(#name[i], res_capy, res_intok)
+"//	resource # has capacity #, interruptable = #\n";
+
+			}
+		}
+	}
+
+module advance_in_a_macro
+	{
+	procedure main()
+		{
+		resource	joh,
+				peter	capacity = 10.0,
+				thomas	capacity = 20.0 interruptable = TRUE;
+
+		}
+	}

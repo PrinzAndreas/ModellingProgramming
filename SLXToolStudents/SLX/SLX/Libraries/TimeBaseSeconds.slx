@@ -1,0 +1,21 @@
+#define SLX2
+
+//*****************************************************************************
+// Module TimeUnits
+//*****************************************************************************
+public module TimeUnits {
+	constant double Second	= 1.0;
+  
+	constant double Minute 	= 60 *Second;
+	constant double Hour		= 60 *Minute; 
+	constant double Day		  = 24 *Hour;
+	constant double Week		= 7   *Day;
+	constant double Month		= 30 *Day;
+	constant double Year		= 365 *Day;
+  
+	constant double MilliSecond		= Second /1000;
+	constant double MicroSecond		= MilliSecond /1000;
+	constant double NanoSecond		= MicroSecond /1000;
+	constant double PicoSecond		= NanoSecond /1000;
+	constant double FemtoSecond		= PicoSecond /1000;
+} // end module

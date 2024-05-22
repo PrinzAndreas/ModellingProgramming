@@ -1,0 +1,172 @@
+import <h7>
+import <stats>
+
+module barbcomn		// GPSS/H Barbershop
+    {
+//*****************************************************************************
+//  Global Data 							    321
+//*****************************************************************************
+
+	constant float		run_length = 4800;
+
+	queue				joeq;
+	facility				joe;
+
+	rn_stream			Arrivals,
+						Service;
+
+	random_variable 	qtime;	// unweighted
+
+	double				shortest_service,
+						longest_service;
+
+//*****************************************************************************
+//  Barbershop Model
+//*****************************************************************************
+
+    procedure main
+	{
+	constant int	NREP = 100;	// 100 replications
+
+	int		seed1 = 10000000,
+			seed2 = 20000000;
+
+	double	daily_mean1[NREP],	// original svc time
+		daily_mean2[NREP],	// longer svc time, no common rns
+		daily_mean3[NREP];	// longer svc time, common rns
+
+	int	i;
+
+//	open stdout output options=unbuffered;
+
+	shortest_service = 12.0;
+	longest_service = 18.0;
+
+	for (i = 1; i <= NREP; i++)
+		{
+		rn_seed Arrivals = seed1,
+			Service  = seed2;
+
+		seed1 += 10000;
+		seed2 += 10000;
+
+		activate new arrival_stream(run_length);
+
+		wait until (time >= run_length
+		       and joeq.usage.current_value == 0
+		       and joe.usage.current_value == 0);
+
+		daily_mean1[i] = sample_mean(qtime);
+
+		if (i == 1)	report rn_stream_set;
+		clear system;
+		}
+
+	report(rn_stream_set);
+
+	seed1 = 30000000;	// jump further downstream
+	seed2 = 40000000;	// jump further downstream
+
+	shortest_service = 13.0;
+	longest_service = 19.0;
+
+	for (i = 1; i <= NREP; i++)
+		{
+		rn_seed Arrivals = seed1,
+			Service  = seed2;
+
+		seed1 += 10000;
+		seed2 += 10000;
+
+		activate new arrival_stream(run_length);
+
+		wait until (time >= run_length
+		       and joeq.usage.current_value == 0
+		       and joe.usage.current_value == 0);
+
+		daily_mean2[i] = sample_mean(qtime);
+
+		if (i == 1)	report rn_stream_set;
+		clear system;
+		}
+
+	report(rn_stream_set);
+
+	report_mean_ci	     ("\nSamples[1]", 0.95, daily_mean1, NREP);
+	report_mean_ci	     ("\nSamples[2]", 0.95, daily_mean2, NREP);
+	report_common_mean_ci("\nDifference", 0.95, daily_mean1, daily_mean2, NREP);
+
+	seed1 = 10000000;	// original seed
+	seed2 = 20000000;	// original seed
+
+	for (i = 1; i <= NREP; i++)
+		{
+		rn_seed Arrivals = seed1,
+			Service  = seed2;
+
+		seed1 += 10000;
+		seed2 += 10000;
+
+		activate new arrival_stream(run_length);
+
+		wait until (time >= run_length
+		       and joeq.usage.current_value == 0
+		       and joe.usage.current_value == 0);
+
+		daily_mean3[i] = sample_mean(qtime);
+
+		if (i == 1)	report rn_stream_set;
+		clear system;
+		}
+
+	report(rn_stream_set);
+
+	report_mean_ci(       "\nSamples[1]", 0.95, daily_mean1, NREP);
+	report_mean_ci(       "\nSamples[3]", 0.95, daily_mean3, NREP);
+	report_common_mean_ci("\nDifference", 0.95, daily_mean1, daily_mean3, NREP);
+
+	exit(0);
+	}
+
+//*****************************************************************************
+//  arrival_stream Class
+//*****************************************************************************
+
+    class arrival_stream(double input_run_length)
+		{
+		double runlength = input_run_length;
+		actions
+			{
+			while (time < run_length)
+				{
+				advance rv_uniform(Arrivals, 12.0, 24.0);
+				activate new customer;
+				}
+	
+			terminate;
+			}
+		};
+
+//*****************************************************************************
+//  Customer Class
+//*****************************************************************************
+
+    class customer
+	{
+	double	entry_time;
+
+	actions
+	    {
+	    enqueue	    joeq;
+	    seize	    joe;
+
+	    tabulate qtime = time - ACTIVE -> mark_time;	// TEMP
+
+	    depart	    joeq;
+	    advance	    rv_uniform(Service, shortest_service, longest_service);
+	    release	    joe;
+	    terminate;
+	    }
+	}
+
+    }	// End of barbcomn module
