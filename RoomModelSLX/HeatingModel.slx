@@ -138,47 +138,30 @@ module RoomHeating {
     transitions
       sleeping with att 06:00 to active,
       active   with att 10:00 to working,
-      active   with new FSMTimeAfterRandomExponential(&windowOpen, 1*Hour) to airing,
+      active   with randomOpen to airing,
       active   with att 22:00 to preparingNight,
-      working  with new FSMTimeAfter(04*Hour+00*Minute) to active,
+      working  with afterr 04:00 to active,
       airing   with att 10:00 to working,
-      airing   with new FSMTimeAfterRandomUniform(&windowClose, 15*Minute, 25*Minute) to active,
+      airing   with randomClose to active,
       airing   with att 22:00 to preparingNight,
-      preparingNight with new FSMTimeAfterRandomNormal(&windowClose, 20*Minute, 5*Minute) to sleeping
-//    where
-//      random_1 = new FSMTimeAfterRandomUniform(&windowClose, 15*Minute, 25*Minute)
-//      random_2 = new FSMTimeAfterRandomNormal(&windowClose, 20*Minute, 5*Minute)
-//      random_3 = new FSMTimeAfterRandomExponential(&windowOpen, 1*Hour)
+      preparingNight with randomClose to sleeping
+//      preparingNight with randomClose to finall
+    where
+      randomOpen = normal(02:00, 00:30),
+      randomClose = uniform(00:05, 00:10)
     initial sleeping
     
-  class Resident() subclass (Charlie_FSM) {  
-  // the subclass is just for testing, later it will be an attribute of resident coming from a call "run FSM Charlie" (or "debug FSM Charlie")
-  
-    pointer(FSMState) currentState;
-    
-//    Charlie_FSM testing;
+  class Resident() {  
     
     actions {
       theIntegrator->attachPuck(ACTIVE);
       
-      currentState = sleeping;
-  
-      print "Starting simulation";
-      
-      forever {
-        if (currentState != NULL) { currentState->enterState(); }
-        print (currentState->naming) ", state is now _. ";
-        print (currentState->nextTime()/Hour, currentState->nextState()->naming) "At __.__, we want to go to state _\n";
-        advance currentState->nextTime()-time; // wait for next transitions
-        print ((time%Day)/Hour, (time%Hour)/Minute, floor(time/Hour)%24, floor(time/Minute)%60, currentState->naming, currentState->nextState()->naming) "__:__ (or __:__): _ -> _";
-        currentState->exitState();
-        currentState=currentState->nextState();
-      }
+      debug Charlie;
     } 
   } 
 
   procedure main {  
-    // integrator configuration (maybe do it silently?)
+    // integrator configuration
     double min_h  = 0.0001 * Minute;
     double max_h  = 10.0* Minute;
     double err_limit   = 0.1;

@@ -25,48 +25,17 @@ public module StateMachines
       return time+delay;
     }
   }
-  class FSMTimeAtRandomUniform(pointer(rn_stream) r, double fromT, double toT) subclass (FSMTime) { 
-    pointer(rn_stream) rand=r; double startT=fromT; double endT=toT; double nextT=0;
-    concrete method nextTime() returning double {
-      if (time>nextT) nextT=rv_uniform(*rand, startT, endT); // new random time
-      while (time>nextT) nextT+=Day; // align with Day rhythm
-      return nextT;
-    }
-  }
-  class FSMTimeAtRandomNormal(pointer(rn_stream) r, double meanT, double distT) subclass (FSMTime) { 
-    pointer(rn_stream) rand=r; double mT=meanT; double dT=distT; double nextT=0;
-    concrete method nextTime() returning double {
-      if (time>nextT) nextT=rv_normal(*rand, mT, dT); // new random time
-      while (time>nextT) nextT+=Day; // align with Day rhythm
-      return nextT;
-    }
-  }
-  class FSMTimeAtRandomExponential(pointer(rn_stream) r, double meanT) subclass (FSMTime) { 
-    pointer(rn_stream) rand=r; double mT=meanT; double nextT=0;
-    concrete method nextTime() returning double {
-      if (time>nextT) nextT=rv_expo(*rand, mT); // new random time
-      while (time>nextT) nextT+=Day; // align with Day rhythm
-      return nextT;
-    }
-  }
-  class FSMTimeAfterRandomUniform(pointer(rn_stream) r, double fromT, double toT) subclass (FSMTime) { 
+  class FSMTimeAfterRandom_uniform(pointer(rn_stream) r, double fromT, double toT) subclass (FSMTime) { 
     pointer(rn_stream) rand=r; double startT=fromT; double endT=toT; double nextT=0;
     concrete method nextTime() returning double {
       if (time>nextT) nextT=time+rv_uniform(*rand, startT, endT); // new random time
       return nextT;
     }
   }
-  class FSMTimeAfterRandomNormal(pointer(rn_stream) r, double meanT, double distT) subclass (FSMTime) { 
+  class FSMTimeAfterRandom_normal(pointer(rn_stream) r, double meanT, double distT) subclass (FSMTime) { 
     pointer(rn_stream) rand=r; double mT=meanT; double dT=distT; double nextT=0;
     concrete method nextTime() returning double {
       if (time>nextT) nextT=time+rv_normal(*rand, mT, dT); // new random time
-      return nextT;
-    }
-  }
-  class FSMTimeAfterRandomExponential(pointer(rn_stream) r, double meanT) subclass (FSMTime) { 
-    pointer(rn_stream) rand=r; double mT=meanT; double nextT=0;
-    concrete method nextTime() returning double {
-      if (time>nextT) nextT=time+mT+rv_expo(*rand, mT); // new random time
       return nextT;
     }
   }
@@ -78,8 +47,8 @@ public module StateMachines
     set(FSMTransition) transitions;
     double nextT=-1;
     pointer(FSMState) nextS;
-    overridable public method enterState() {};
-    overridable public method exitState() {};
+    overridable public method enterState() returning boolean { return TRUE; }
+    overridable public method exitState() {}
     method addTransition(pointer(FSMTransition) t) { place t into transitions; }
     method nextState() returning pointer(FSMState) {
       nextTime();
@@ -98,35 +67,84 @@ public module StateMachines
       return nextT;
     }
   }
+
+  abstract class FSM() {
+    abstract private method initialState() returning pointer(FSMState);
+    
+    method debug() { execute(TRUE); }
+    
+    method run() { execute(FALSE); }
+    
+    private method printTime() {
+      int h=floor(time/Hour)%24, m=(time/Minute)%60;
+      if (h<10) print (h) "0_:"; else print (h) "__:";
+      if (m<10) print (m) "0_: "; else print (m) "__: ";
+    }
+    
+    private method execute(boolean debug) {
+      pointer(FSMState) currentState = initialState();
   
+      if(debug) { printTime(); print (currentState->naming) "Starting state machine in state _.\n"; }
+      
+      forever {
+        if (currentState != NULL) { 
+          if (!(currentState->enterState())) {
+            if(debug) { printTime(); print "Exiting state machine.\n"; }
+            return; 
+          }
+        }
+        advance currentState->nextTime()-time; // wait for next transitions
+        if(debug) { printTime(); print (currentState->naming, currentState->nextState()->naming) "Leaving state _ and entering state _.\n"; }
+        currentState->exitState();
+        currentState=currentState->nextState();
+      }
+    }
+  }
+
+  passive class FSMStatefinal() subclass (FSMState("finalState")) {
+    override public method enterState() returning boolean { return FALSE; }
+  }
+		
 /* would want to have {} instead of (), but not clear how to */
-/* put the states inside and process all of it together */
 /* then add a statement to run the statemachine with the initial state */
   macro statemachine #name { @state #sn [@enter #into = #ival] [@leave #outof = #oval] },... 
-     @transitions { #snFrom @with #trigger @to #snTo },... @initial #isn
+     @transitions { #snFrom @with #trigger @to #snTo },... 
+     [@where { #rn = #rdist ( #rt1 : #rm1 , #rt2 : #rm2 ) },...]
+     @initial #isn
 	definition {
     int i;
 
     for (i = 1; #sn[i] != ""; ++i) {
       expand(#sn[i],#sn[i]) "passive class FSMState#() subclass (FSMState(\"#\")) {";
       if (#into[i] != "")
-        expand(#into[i], #ival[i]) "override public method enterState() { # = #; };";
+        expand(#into[i], #ival[i]) "override public method enterState() returning boolean { # = #; return TRUE; }";
       if (#outof[i] != "")
-        expand(#outof[i], #oval[i]) "override public method exitState() { # = #; };";
+        expand(#outof[i], #oval[i]) "override public method exitState() { # = #; }";
       expand(#sn[i]) "}";
     }
 		
-		expand(#name) "class #_FSM {";
+		expand(#name) "class #_FSM subclass (FSM) {";
     for (i = 1; #sn[i] != ""; ++i) {
       expand(#sn[i],#sn[i]) "pointer(FSMState) # = new FSMState#();";
     }
-		expand(#name) "rn_stream windowClose, windowOpen;";
-    
+    expand("finall") "pointer(FSMState) # = new FSMStatefinal();";
+
+    for (i = 1; #rn[i] != ""; ++i) {
+      expand(#rn[i]) "rn_stream #_Gen;";
+    }
+
+    for (i = 1; #rn[i] != ""; ++i) {
+      expand(#rn[i],#rdist[i],#rn[i],#rt1[i],#rm1[i],#rt2[i],#rm2[i]) "pointer(FSMTime) # = new FSMTimeAfterRandom_#(&#_Gen,#*Hour+#*Minute,#*Hour+#*Minute);";
+    }
+
 		expand(#name) "initial {";
     for (i = 1; #snFrom[i] != ""; ++i) {
       expand(#snFrom[i],#trigger[i],#snTo[i]) "#->addTransition(new FSMTransition(#,#));";
     }
 		expand(#name) "}";
+
+		expand(#isn) "concrete method initialState() returning pointer(FSMState) { return #; }";
+    
 		expand(#name) "}";
 	}
 	
@@ -135,4 +153,18 @@ public module StateMachines
 		expand(#hour,#minute) "new FSMTimeAt(#*Hour+#*Minute)";
 	}
 
+  macro afterr #hour : #minute
+	definition {
+		expand(#hour,#minute) "new FSMTimeAfter(#*Hour+#*Minute)";
+	}
+
+  statement debug #stm;
+  definition {
+    expand(#stm) "pointer(FSM) theFSM =new #_FSM(); theFSM->debug();";
+  }
+
+  statement run #stm;
+  definition {
+    expand(#stm) "(new #_FSM())->run();";
+  }
 }

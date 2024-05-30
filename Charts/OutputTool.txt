@@ -34,30 +34,63 @@ Execution complete
 Objects created: 237 passive and 1 active   Pucks created: 7   Peak Memory: 11 MB   Time: 12.36 Seconds
 
 NEW
-Starting simulation, state is now Sleeping. At 6.00, we want to go to state Active
-	6	:	0	 (or 	6	:	0	): Sleeping  ->  Active , state is now  Active .  At  7.10 , we want to go to state  Airing 
-	7	:	6	 (or 	7	:	5	): Active  ->  Airing , state is now  Airing .  At  7.51 , we want to go to state  Active 
-	8	:31 (or 	7	:30): Airing  ->  Active , state is now  Active .  At  10.00 , we want to go to state  Working 
-10:	0	 (or 10:	0	): Active  ->  Working , state is now  Working .  At  14.00 , we want to go to state  Active 
-14:	0	 (or 14:	0	): Working  ->  Active , state is now  Active .  At  15.38 , we want to go to state  Airing 
-15:23 (or 15:23): Active -> Airing, state is now Airing. At 15.71, we want to go to state Active
-16:42 (or 15:42): Airing -> Active, state is now Active. At 16.74, we want to go to state Airing
-17:45 (or 16:44): Active -> Airing, state is now Airing. At 17.11, we want to go to state Active
-17:	6	 (or 17:	6	): Airing  ->  Active , state is now  Active .  At  18.27 , we want to go to state  Airing 
-18:16 (or 18:16): Active -> Airing, state is now Airing. At 18.60, we want to go to state Active
-19:36 (or 18:35): Airing -> Active, state is now Active. At 20.65, we want to go to state Airing
-21:39 (or 20:39): Active -> Airing, state is now Airing. At 21.04, we want to go to state Active
-21:	3	 (or 21:	2	): Airing  ->  Active , state is now  Active .  At  22.00 , we want to go to state  PreparingNight 
-22:	0	 (or 22:	0	): Active  ->  PreparingNight , state is now  PreparingNight .  At  22.27 , we want to go to state  Sleeping 
-22:16 (or 22:16): PreparingNight -> Sleeping, state is now Sleeping. At 30.00, we want to go to state Active
-	6	:	0	 (or 	6	:	0	): Sleeping  ->  Active , state is now  Active .  At  34.00 , we want to go to state  Working 
-10:	0	 (or 10:	0	): Active  ->  Working , state is now  Working .  At  38.00 , we want to go to state  Active 
-14:	0	 (or 14:	0	): Working  ->  Active , state is now  Active .  At  39.73 , we want to go to state  Airing 
-16:44 (or 15:43): Active -> Airing, state is now Airing. At 40.08, we want to go to state Active
-16:	5	 (or 16:	4	): Airing  ->  Active , state is now  Active .  At  41.62 , we want to go to state  Airing 
-18:37 (or 17:37): Active -> Airing, state is now Airing. At 42.03, we want to go to state Active
-18:	2	 (or 18:	1	): Airing  ->  Active , state is now  Active .  At  44.70 , we want to go to state  Airing 
-21:42 (or 20:41): Active -> Airing, state is now Airing. At 44.99, we want to go to state Active
-21:59 (or 20:59): Airing -> Active, state is now Active. At 46.00, we want to go to state PreparingNight
-22:	0	 (or 22:	0	): Active  ->  PreparingNight , state is now  PreparingNight .  At  46.42 , we want to go to state  Sleeping 
-22:25 (or 22:25): PreparingNight -> Sleeping, state is now Sleeping. At 54.00, we want to go to state Active
+Starting simulation, state is now sleeping. At 6.00, we want to go to state active
+	6	:	0	 (or 	6	:	0	): sleeping  ->  active , state is now  active .  At  9.07 , we want to go to state  airing 
+	9	:	4	 (or 	9	:	4	): active  ->  airing , state is now  airing .  At  9.24 , we want to go to state  active 
+	9	:14 (or 	9	:14): airing  ->  active , state is now  active .  At  10.00 , we want to go to state  working 
+10:	0	 (or 10:	0	): active  ->  working , state is now  working .  At  14.00 , we want to go to state  active 
+14:	0	 (or 14:	0	): working  ->  active , state is now  active .  At  15.44 , we want to go to state  airing 
+15:26 (or 15:26): active -> airing, state is now airing. At 15.56, we want to go to state active
+16:34 (or 15:33): airing -> active, state is now active. At 18.29, we want to go to state airing
+18:18 (or 18:17): active -> airing, state is now airing. At 18.43, we want to go to state active
+18:26 (or 18:25): airing -> active, state is now active. At 19.94, we want to go to state airing
+20:56 (or 19:56): active -> airing, state is now airing. At 20.06, we want to go to state active
+20:	3	 (or 20:	3	): airing  ->  active , state is now  active .  At  22.00 , we want to go to state  preparingNight 
+22:	0	 (or 22:	0	): active  ->  preparingNight , state is now  preparingNight .  At  22.15 , we want to go to state  sleeping 
+22:	9	 (or 22:	9	): preparingNight  ->  sleeping , state is now  sleeping .  At  30.00 , we want to go to state  active 
+	6	:	0	 (or 	6	:	0	): sleeping  ->  active , state is now  active .  At  32.23 , we want to go to state  airing 
+	8	:14 (or 	8	:13): active  ->  airing , state is now  airing .  At  32.36 , we want to go to state  active 
+	8	:21 (or 	8	:21): airing  ->  active , state is now  active .  At  33.54 , we want to go to state  airing 
+10:32 (or 	9	:32): active  ->  airing , state is now  airing .  At  33.67 , we want to go to state  active 
+10:40 (or 	9	:40): airing  ->  active , state is now  active .  At  34.00 , we want to go to state  working 
+10:	0	 (or 10:	0	): active  ->  working , state is now  working .  At  38.00 , we want to go to state  active 
+14:	0	 (or 14:	0	): working  ->  active , state is now  active .  At  40.07 , we want to go to state  airing 
+16:	4	 (or 16:	4	): active  ->  airing , state is now  airing .  At  40.20 , we want to go to state  active 
+16:12 (or 16:12): airing -> active, state is now active. At 41.80, we want to go to state airing
+18:48 (or 17:48): active -> airing, state is now airing. At 41.96, we want to go to state active
+18:58 (or 17:57): airing -> active, state is now active. At 44.45, we want to go to state airing
+20:27 (or 20:27): active -> airing, state is now airing. At 44.55, we want to go to state active
+21:33 (or 20:33): airing -> active, state is now active. At 46.00, we want to go to state preparingNight
+22:	0	 (or 22:	0	): active  ->  preparingNight , state is now  preparingNight .  At  46.12 , we want to go to state  sleeping 
+22:	7	 (or 22:	7	): preparingNight  ->  sleeping , state is now  sleeping .  At  54.00 , we want to go to state  active 
+
+Newer:
+Starting simulation, state is now sleeping. At 6.00, we want to go to state active
+	6	:	0	 (or 	6	:	0	): sleeping  ->  active , state is now  active .  At  7.92 , we want to go to state  airing 
+	8	:55 (or 	7	:55): active  ->  airing , state is now  airing .  At  8.01 , we want to go to state  active 
+	8	:	1	 (or 	8	:	0	): airing  ->  active , state is now  active .  At  9.58 , we want to go to state  airing 
+10:35 (or 	9	:35): active  ->  airing , state is now  airing .  At  9.75 , we want to go to state  active 
+10:45 (or 	9	:44): airing  ->  active , state is now  active .  At  10.00 , we want to go to state  working 
+10:	0	 (or 10:	0	): active  ->  working , state is now  working .  At  14.00 , we want to go to state  active 
+14:	0	 (or 14:	0	): working  ->  active , state is now  active .  At  15.65 , we want to go to state  airing 
+16:39 (or 15:38): active -> airing, state is now airing. At 15.76, we want to go to state active
+16:45 (or 15:45): airing -> active, state is now active. At 17.75, we want to go to state airing
+18:45 (or 17:45): active -> airing, state is now airing. At 17.84, we want to go to state active
+18:50 (or 17:50): airing -> active, state is now active. At 20.34, we want to go to state airing
+20:21 (or 20:20): active -> airing, state is now airing. At 20.44, we want to go to state active
+20:26 (or 20:26): airing -> active, state is now active. At 22.00, we want to go to state preparingNight
+22:	0	 (or 22:	0	): active  ->  preparingNight , state is now  preparingNight .  At  22.14 , we want to go to state  sleeping 
+22:	8	 (or 22:	8	): preparingNight  ->  sleeping , state is now  sleeping .  At  30.00 , we want to go to state  active 
+	6	:	0	 (or 	6	:	0	): sleeping  ->  active , state is now  active .  At  32.15 , we want to go to state  airing 
+	8	:	9	 (or 	8	:	9	): active  ->  airing , state is now  airing .  At  32.26 , we want to go to state  active 
+	8	:16 (or 	8	:15): airing  ->  active , state is now  active .  At  34.00 , we want to go to state  working 
+10:	0	 (or 10:	0	): active  ->  working , state is now  working .  At  38.00 , we want to go to state  active 
+14:	0	 (or 14:	0	): working  ->  active , state is now  active .  At  40.85 , we want to go to state  airing 
+17:51 (or 16:51): active -> airing, state is now airing. At 41.02, we want to go to state active
+17:	1	 (or 17:	1	): airing  ->  active , state is now  active .  At  42.95 , we want to go to state  airing 
+19:57 (or 18:57): active -> airing, state is now airing. At 43.08, we want to go to state active
+19:	5	 (or 19:	4	): airing  ->  active , state is now  active .  At  45.86 , we want to go to state  airing 
+22:51 (or 21:51): active -> airing, state is now airing. At 45.97, we want to go to state active
+22:58 (or 21:58): airing -> active, state is now active. At 46.00, we want to go to state preparingNight
+22:	0	 (or 22:	0	): active  ->  preparingNight , state is now  preparingNight .  At  46.15 , we want to go to state  sleeping 
+22:	9	 (or 22:	9	): preparingNight  ->  sleeping , state is now  sleeping .  At  54.00 , we want to go to state  active 
