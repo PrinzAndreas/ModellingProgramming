@@ -21,17 +21,17 @@ public module RoomHeatingConstants {
 	constant double V_RADIATOR_WATER= 10.0;					// l 			~ mass of radiator water
 	constant double P_RADIATOR= 500;			// Watt (J/s)  		~ electrical radiator power
 
-	constant double D_WATER= 1;				// kg /l		~ density of water 
-	constant double C_WATER= 4.19 *1000;				// J /kg K	~ heat capacity of water
-	constant double D_AIR= 1.204;					// kg /m^3		~ density of air at 20°C
-	constant double C_AIR= 1.012 * 1000;				// J / (kg K)	~ heat capacity of air					
+	constant double D_WATER= 1;		   // kg /l		  ~ density of water 
+	constant double C_WATER= 4184;   // J /(kg K)	~ heat capacity of water
+	constant double D_AIR=   1.204;	 // kg /m^3		~ density of air at 20°C
+	constant double C_AIR=   1012;   // J /(kg K)	~ heat capacity of air					
 	
   // defining the mass flow of water - probably just take the result of it?
-	constant double F_WATER= 125 /Hour;					// l/h  			~ flow of water in the pipe
+	constant double F_WATER= 125 /Hour;					// l/h  	    	~ flow of water in the pipe
 
-	constant double K_RADIATOR= 30 /Second;			// J /(s m^2 K)	~ radiator heat transfer coefficient		
-	constant double K_WALL= 0.20 / Second;			// J /(s m^2 K)	~ wall heat transfer coefficient			  
-	constant double K_ROOF= 0.15 / Second;			// J /(s m^2 K)	~ roof heat transfer coefficient			  
-	constant double K_OPEN_WINDOW= 10 /Second;	// J /(s m2 * K)	~ opened window heat transfer coefficient 			
-	constant double K_CLOSED_WINDOW= 1.2 /Second;	// J /(s m2 * K)	~ closed window heat transfer coefficient 			
+	constant double U_RADIATOR= 30 /Second;			// J /(s m^2 K)	~ radiator heat transfer coefficient		
+	constant double U_WALL= 0.20 / Second;			// J /(s m^2 K)	~ wall heat transfer coefficient			  
+	constant double U_ROOF= 0.15 / Second;			// J /(s m^2 K)	~ roof heat transfer coefficient			  
+	constant double U_OPEN_WINDOW= 10 /Second;	// J /(s m2 * K)	~ opened window heat transfer coefficient 			
+	constant double U_CLOSED_WINDOW= 1.2 /Second;	// J /(s m2 * K)	~ closed window heat transfer coefficient 			
 } // end module 

@@ -2,6 +2,8 @@
 set terminal Term linewidth 1.5
 set output File
 
+set xlabel 'Model Time [h]' offset 0,0.5
+
 # Line style for axes
 set style line 80 lt rgb "#808080"
 
@@ -10,7 +12,8 @@ set style line 81 lt 0
 set style line 81 lt rgb "#808080"
 set grid back linestyle 81
 set border 3 back linestyle 80
-set xtics nomirror 2
+set yrange [*:30<*]
+set xtics nomirror 2 # every other hour
 set ytics nomirror
 
 set key autotitle columnheader
@@ -20,5 +23,4 @@ set key top right box
 # than strictly primary colors or hard-to-see colors
 # like gnuplot's default yellow.
 
-set xlabel 'Model Time [h]' offset 0,0.5
 plot for [i=2:Columns] Trace using ($1/(60*60)):(column(i)) with lines ls i

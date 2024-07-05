@@ -105,12 +105,11 @@ public module StateMachines
     override public method enterState() returning boolean { return FALSE; }
   }
 		
-/* would want to have {} instead of (), but not clear how to */
-/* then add a statement to run the statemachine with the initial state */
-  macro statemachine #name { @state #sn [@enter #into = #ival] [@leave #outof = #oval] },... 
-     @transitions { #snFrom @with #trigger @to #snTo },... 
+  statement dfsm #name { @state #sn [@enter #into = #ival] [@leave #outof = #oval] , }... 
+     @transitions { #snFrom { { @with #trigger } | { @at #h1 : #m1 } | { @after #h2 : #m2 } } @to { @final | #snTo } },... 
      [@where { #rn = #rdist ( #rt1 : #rm1 , #rt2 : #rm2 ) },...]
-     @initial #isn
+     @initial #isn ;
+
 	definition {
     int i;
 
@@ -127,7 +126,7 @@ public module StateMachines
     for (i = 1; #sn[i] != ""; ++i) {
       expand(#sn[i],#sn[i]) "pointer(FSMState) # = new FSMState#();";
     }
-    expand("finall") "pointer(FSMState) # = new FSMStatefinal();";
+    expand(#name) "pointer(FSMState) finalState = new FSMStatefinal();";
 
     for (i = 1; #rn[i] != ""; ++i) {
       expand(#rn[i]) "rn_stream #_Gen;";
@@ -139,23 +138,23 @@ public module StateMachines
 
 		expand(#name) "initial {";
     for (i = 1; #snFrom[i] != ""; ++i) {
-      expand(#snFrom[i],#trigger[i],#snTo[i]) "#->addTransition(new FSMTransition(#,#));";
+      expand(#snFrom[i]) "#->addTransition(new FSMTransition(";
+      if (#trigger[i] != "")
+        expand(#trigger[i]) "#,";
+      else if (#h1[i] != "")
+        expand(#h1[i],#m1[i]) "new FSMTimeAt(#*Hour+#*Minute),";
+      else if (#h2[i] != "")
+        expand(#h2[i],#m2[i]) "new FSMTimeAfter(#*Hour+#*Minute),";
+      if (#snTo[i] != "")
+        expand(#snTo[i]) "#));";
+      else
+        expand(#snFrom[i]) "finalState));";
     }
 		expand(#name) "}";
 
 		expand(#isn) "concrete method initialState() returning pointer(FSMState) { return #; }";
     
 		expand(#name) "}";
-	}
-	
-  macro att #hour : #minute
-	definition {
-		expand(#hour,#minute) "new FSMTimeAt(#*Hour+#*Minute)";
-	}
-
-  macro afterr #hour : #minute
-	definition {
-		expand(#hour,#minute) "new FSMTimeAfter(#*Hour+#*Minute)";
 	}
 
   statement debug #stm;
