@@ -1,8 +1,9 @@
 # Understanding Modelling and Programming
 ## Companion Material
 
-Welcome to the online resources for the book
-![book cover page](images/Bookcover.png "Book cover page").
+Welcome to the online resources for the book *Understanding Modelling and Programming*
+
+![book cover page](images/Bookcover_small.png "Book cover page").
 
 ### Slides
 * Slideset for book
