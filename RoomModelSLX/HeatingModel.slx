@@ -11,7 +11,7 @@ import <HeatingConstants>
 module RoomHeating {
   //========== Experiment parameters
   public constant double TEMP_NOFREEZE       =  7;      // °C -- frost protection
-  public constant double TEMP_DAY_NOMINAL    = 22;      // °C
+  public constant double TEMP_DAY_NOMINAL    = 21;      // °C
   public constant double BOILER_WATER_TEMP   = 40;      // °C
   public constant double EXPERIMENT_DURATION = 2*Day;
   //========== End Experiment parameters
@@ -208,7 +208,7 @@ module RoomHeating {
           ) 
       every 10*Second watch theIntegrator;
 
-    advance EXPERIMENT_DURATION;
+    wait until time >= EXPERIMENT_DURATION;
     
     plot diagram as "pdf" using (EXPERIMENT_DURATION>3*Day)?"plot_day.plt":"plot_hour.plt";
     plot observed as "pdf" using (EXPERIMENT_DURATION>3*Day)?"plot_day.plt":"plot_hour.plt";
