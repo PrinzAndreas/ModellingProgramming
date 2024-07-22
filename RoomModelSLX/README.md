@@ -16,4 +16,4 @@ Moreover, the following libraries are used.
 * StateMachine - describing discrete behaviour as state machines
 
 ## SLX tool
-The SLX tool is courtesy of James O. Henriksen.
+The [SLX tool](../SLXToolStudents) is courtesy of James O. Henriksen.

@@ -23,7 +23,7 @@ Welcome to the online resources for the book *Understanding Modelling and Progra
 * Hints for exercise solutions
 
 ### Model descriptions
-* [SLX Model Description](RomModelSLX)
+* [SLX Model Description](RoomModelSLX)
 * Python Model Description
 * SysML Model
 
