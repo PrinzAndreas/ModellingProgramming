@@ -4,8 +4,10 @@ Lib/
 Scripts/
 pyvenv.cfg
 
-# generated diagrams
-RoomModelSLX/*.pdf
+# unpacked SLX tool
+SLXToolStudents/SLX
+SLXToolStudents/SLX/*
 
-# generated data
+# generated diagrams and data
+RoomModelSLX/*.pdf
 RoomModelSLX/*.csv

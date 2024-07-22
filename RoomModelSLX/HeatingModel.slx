@@ -1,11 +1,11 @@
 #define SLX2 ON
-import <ContinuousSmall>
-import <PlotTrace>
-import <ValueTable>
-import <StateMachine>
-import <TimeBaseSeconds>
-import <TemperatureHistory>
+import <Libraries/TimeBaseSeconds>
+import <Libraries/ContinuousSmall>
+import <Libraries/PlotTrace>
+import <Libraries/ValueTable>
+import <Libraries/StateMachine>
 
+import <TemperatureHistory>
 import <HeatingConstants>
 
 module RoomHeating {

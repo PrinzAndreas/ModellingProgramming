@@ -1,5 +1,5 @@
 #define SLX2 ON
-import <ValueTable>
+import <Libraries/ValueTable>
 
 public module TemperatureHistory {
 
