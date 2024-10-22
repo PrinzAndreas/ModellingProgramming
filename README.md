@@ -5,10 +5,10 @@ Welcome to the online resources for the book *Understanding Modelling and Progra
 
 ![book cover page](images/coverSmall.jpg "Book cover page").
 
-### Model descriptions
-* [SLX Model Description](RoomModelSLX)
-* [Python Model Description](RoomModelPython)
-* [SysML Model Description](RoomModelSysML)
+### [Model descriptions](ModelDescriptions)
+* [SLX Model Description](ModelDescriptions/RoomModelSLX)
+* [Python Model Description](ModelDescriptions/RoomModelPython)
+* [SysML Model Description](ModelDescriptions/RoomModelSysML)
 
 ### Data
 * Temperature Data
