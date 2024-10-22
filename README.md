@@ -3,27 +3,21 @@
 
 Welcome to the online resources for the book *Understanding Modelling and Programming*
 
-![book cover page](images/Bookcover_small.png "Book cover page").
-
-### Slides
-* Slideset for book
-* Slideset problem pictures
-* Slideset book illustrations
-
-### Illustrations
-* Figures
-* Drawings
-* Diagrams
-
-### Data
-* Temperature Data
-* Simulation data
-
-### Teaching support
-* Hints for exercise solutions
+![book cover page](images/coverSmall.jpg "Book cover page").
 
 ### Model descriptions
 * [SLX Model Description](RoomModelSLX)
 * Python Model Description
 * SysML Model
 
+### Data
+* Temperature Data
+* Simulation data
+
+### Illustrations
+* Figures
+* Drawings
+* Diagrams
+
+### Teaching support
+* Hints for exercise solutions
