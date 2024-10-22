@@ -7,17 +7,17 @@ Welcome to the online resources for the book *Understanding Modelling and Progra
 
 ### Model descriptions
 * [SLX Model Description](RoomModelSLX)
-* Python Model Description
-* SysML Model
+* [Python Model Description](RoomModelPython)
+* [SysML Model Description](RoomModelSysML)
 
 ### Data
 * Temperature Data
 * Simulation data
 
-### Illustrations
-* Figures
-* Drawings
-* Diagrams
+### [Illustrations](Illustrations)
+* [Figures](Illustrations/Figures)
+* [Drawings](Illustrations/Drawings)
+* [Diagrams](Illustrations/Diagrams)
 
 ### Teaching support
 * Hints for exercise solutions

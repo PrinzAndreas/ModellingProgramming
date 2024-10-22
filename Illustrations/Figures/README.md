@@ -1,7 +1,3 @@
-## Illustrations
+## Illustrations/Figures
 
-* [Figures](Figures)
-
-* [Drawings](Drawings)
-
-* [Diagrams](Diagrams)
+* Work in progress
