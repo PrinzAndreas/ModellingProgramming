@@ -3,7 +3,7 @@
 
 Welcome to the online resources for the book *Understanding Modelling and Programming*
 
-![book cover page](images/coverSmall.jpg "Book cover page").
+[![book cover page](images/coverSmall.jpg "Book cover page")](https://link.springer.com/book/9783031712791).
 
 ### [Model descriptions](ModelDescriptions)
 * [SLX Model Description](ModelDescriptions/RoomModelSLX)
