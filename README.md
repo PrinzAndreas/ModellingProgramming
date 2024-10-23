@@ -1,7 +1,7 @@
 # Understanding Modelling and Programming
 ## Companion Material
 
-Welcome to the online resources for the book *Understanding Modelling and Programming*
+Welcome to the online resources for the book [*Understanding Modelling and Programming*}(https://link.springer.com/book/9783031712791).
 
 [![book cover page](images/coverSmall.jpg "Book cover page")](https://link.springer.com/book/9783031712791).
 
@@ -10,14 +10,14 @@ Welcome to the online resources for the book *Understanding Modelling and Progra
 * [Python Model Description](ModelDescriptions/RoomModelPython)
 * [SysML Model Description](ModelDescriptions/RoomModelSysML)
 
-### Data
-* Temperature Data
-* Simulation data
+### [Data](Data)
+* [Temperature Data](Data/TemperaturData)
+* [Simulation Data](Data/SimulationData)
 
 ### [Illustrations](Illustrations)
 * [Figures](Illustrations/Figures)
 * [Drawings](Illustrations/Drawings)
 * [Diagrams](Illustrations/Diagrams)
 
-### Teaching support
-* Hints for exercise solutions
+### [Teaching support](Teaching)
+* [Hints for exercise solutions](Teaching/SolutionHints)
