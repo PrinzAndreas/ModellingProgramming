@@ -1,3 +1,3 @@
-## Illustrations/Diagrams
+## Illustrations / Diagrams
 
-* Work in progress
+* Work in progress ![work in progress](/images/comingSoon.png "work in progress")
