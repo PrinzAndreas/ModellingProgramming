@@ -1,4 +1,4 @@
-# <title>Understanding Modelling and Programming</title>
+<title>Understanding Modelling and Programming</title>
 ## Companion Material
 
 Welcome to the online resources for the book [*Understanding Modelling and Programming*](https://link.springer.com/book/9783031712791).
