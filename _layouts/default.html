@@ -18,8 +18,12 @@
     We try to find the top page, and this is the one with no title (strange behaviour of HTML).
     See also the title in the top page.
 -->
+      {% assign siteTitle = "Understanding Modelling and Programming (Companion)" %}
       {% if page.title %}
-      <h1><a href="{{ "/" | absolute_url }}">Understanding Modelling and Programming (Companion)</a></h1>
+      <h1><a href="{{ "/" | absolute_url }}">Understanding Modelling and Programming (Companion), {{ siteTitle }}</a></h1>
+      {% endif %}
+      {% if siteTitle contains page.title %}
+      <h1><a href="{{ "/" | absolute_url }}">Now we are talking! - {{ siteTitle }}</a></h1>
       {% endif %}
 
       {{ content }}
