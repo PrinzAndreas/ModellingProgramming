@@ -1,4 +1,3 @@
-<title>top</title>
 # Understanding Modelling and Programming
 ## Companion Material
 
