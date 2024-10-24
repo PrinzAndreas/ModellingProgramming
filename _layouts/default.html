@@ -19,18 +19,9 @@
     See also the title in the top page.
 -->
       {% assign siteTitle = "Understanding Modelling and Programming (Companion)" %}
-      {% if page.title %}
-      <h1><a href="{{ "/" | absolute_url }}">{{ siteTitle }}</a></h1>
-      {% endif %}
       {% if siteTitle contains page.title %}
-      <h1><a href="{{ "/" | absolute_url }}">Now we are talking! - {{ siteTitle }}</a></h1>
       {% else %}
-      <h1>not contained |{{ siteTitle }}|{{ page.title }}|</a></h1>
-      {% endif %}
-      {% if siteTitle contains "Understanding" %}
-      <h1><a href="{{ "/" | absolute_url }}">this works! - {{ siteTitle }}</a></h1>
-      {% else %}
-      <h1>not working |{{ siteTitle }}|{{ page.title }}|</a></h1>
+      <h1><a href="{{ "/" | absolute_url }}">{{ siteTitle }}</a></h1>
       {% endif %}
 
       {{ content }}
