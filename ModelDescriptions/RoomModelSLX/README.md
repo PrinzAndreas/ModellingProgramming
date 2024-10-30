@@ -1,5 +1,4 @@
-# Understanding Modelling and Programming (Companion)
-## SLX model descriptions
+## SLX description of Room
 
 The SLX model description includes the following files.
 
