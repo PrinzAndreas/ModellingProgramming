@@ -1,12 +1,12 @@
 ## SLX description of Room
 
-The SLX model description includes the following files.
+The [SLX model description](https://github.com/PrinzAndreas/ModellingProgramming/tree/main/ModelDescriptions/RoomModelSLX) includes the following files.
 
-* HeatingModel.slx - main program and experiment description
-* HeatingConstants.slx - constants used for the heating model
-* TemperatureHistory.slx - historical temperature data
+* [HeatingModel.slx](https://github.com/PrinzAndreas/ModellingProgramming/blob/main/ModelDescriptions/RoomModelSLX/HeatingModel.slx) - main program and experiment description
+* [HeatingConstants.slx](https://github.com/PrinzAndreas/ModellingProgramming/blob/main/ModelDescriptions/RoomModelSLX/HeatingConstants.slx) - constants used for the heating model
+* [TemperatureHistory.slx](https://github.com/PrinzAndreas/ModellingProgramming/blob/main/ModelDescriptions/RoomModelSLX/TemperatureHistory.slx) - historical temperature data
 
-Moreover, the following libraries are used.
+Moreover, the following [SLX tool](../../SLXToolStudents) libraries are used.
 
 * TimeBaseSeconds - establishing seconds as time granularity
 * ContinuousSmall - handling of differential equations
@@ -14,5 +14,4 @@ Moreover, the following libraries are used.
 * ValueTable - using tables of values
 * StateMachine - describing discrete behaviour as state machines
 
-## SLX tool
-The [SLX tool](../SLXToolStudents) is courtesy of James O. Henriksen.
+The SLX descriptions can be executed using the [SLX tool](../../SLXToolStudents) (courtesy of James O. Henriksen).
