@@ -3,8 +3,8 @@ import <Libraries/ValueTable>
 
 public module TemperatureHistory {
 
-	statement load history data @into #var;
-	definition {
+  statement load history data @into #var;
+  definition {
       expand(#var) |"fill # with 
         ( 0,  4), // start with previous day
       //April 22, 2023 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2023-04-22
@@ -42,5 +42,5 @@ public module TemperatureHistory {
         (144+ 7,  2), (144+ 8,  4), (144+ 9,  7), (144+10,  8), (144+11,  8), (144+12,  8), 
         (144+13,  9), (144+14, 10), (144+15,  9), (144+16,  8), (144+17,  8), (144+18,  9), 
         (144+19,  8), (144+20,  7), (144+21,  7), (144+22,  6), (144+23,  5), (144+24,  4);"|;
-	}
+  }
 }

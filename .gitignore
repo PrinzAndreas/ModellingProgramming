@@ -9,5 +9,5 @@ SLXToolStudents/SLX
 SLXToolStudents/SLX/*
 
 # generated diagrams and data
-RoomModelSLX/*.pdf
-RoomModelSLX/*.csv
+ModelDescriptions/RoomModelSLX/*.pdf
+ModelDescriptions/RoomModelSLX/*.csv

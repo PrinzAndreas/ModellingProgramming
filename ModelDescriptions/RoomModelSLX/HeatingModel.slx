@@ -5,7 +5,7 @@ import <Libraries/PlotTrace>
 import <Libraries/ValueTable>
 import <Libraries/StateMachine>
 
-import <TemperatureHistory>
+import <TemperatureHistory2022>
 import <HeatingConstants>
 
 module RoomHeating {
