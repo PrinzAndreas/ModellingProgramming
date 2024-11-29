@@ -1,36 +1,17 @@
-#define SLX2
-
 //*****************************************************************************
 // Module RoomHeatingConstants
+//       general constants for the room model
 //*****************************************************************************
+
+#define SLX2 ON
+
 public module RoomHeatingConstants {
 
-	// room dimensions
-  constant double H_Room_Low = 0.7;   // m - low height of room
-  constant double H_Room_Top = 3.7;   // m - top height of room
-  constant double L_Room     = 6.0;   // m - length of room
-  constant double B_Room     = 4.0;   // m - breadth of room
-  constant double A_SIDE     = L_Room*(H_Room_Low+H_Room_Top)/2; // m^2 - side wall area
-  constant double A_LOW      = B_Room*H_Room_Low;   // m^2 - area of lower wall
-  constant double A_WALL     = A_SIDE + 2*A_LOW;  // m^2 - wall area
-	constant double V_ROOM     = B_Room*A_SIDE;	// m^3 - air volume in the room
-	constant double A_ROOF     = 2*B_Room*(H_Room_Top-H_Room_Low)*sqrt(2);					// m^2			- roof area
-	constant double A_WINDOW   = 1.0*1.4;	     // m^2 - window area
-	constant double A_RADIATOR = 4*2.0*0.5; // m^2 - radiator area
-	
-	constant double V_RADIATOR_WATER= 10.0;					// l 			~ mass of radiator water
-	constant double P_RADIATOR= 500;			// Watt (J/s)  		~ electrical radiator power
+  constant double D_water = 1;           // kg /l     - density of water 
+  constant double D_air   = 1.204;       // kg /m^3   - density of air at 20°C
+  constant double C_water = 4184;        // J /(kg K) - heat capacity of water
+  constant double C_air   = 1004;        // J /(kg K) - heat capacity of air
 
-	constant double D_WATER= 1;		   // kg /l		  ~ density of water 
-	constant double C_WATER= 4184;   // J /(kg K)	~ heat capacity of water
-	constant double D_AIR=   1.204;	 // kg /m^3		~ density of air at 20°C
-	constant double C_AIR=   1004;   // J /(kg K)	~ heat capacity of air					
-	
-  constant double F_WATER= 0.5 /Second;				// l/s  	    	~ flow of water in the pipe
+  constant double F_water = 0.5 /Second; // l/s       - flow of water in the pipe
 
-	constant double U_RADIATOR= 30 /Second;			// J /(s m^2 K)	~ radiator heat transfer coefficient		
-	constant double U_WALL= 0.20 / Second;			// J /(s m^2 K)	~ wall heat transfer coefficient			  
-	constant double U_ROOF= 0.15 / Second;			// J /(s m^2 K)	~ roof heat transfer coefficient			  
-	constant double U_OPEN_WINDOW= 10 /Second;	// J /(s m2 * K)	~ opened window heat transfer coefficient 			
-	constant double U_CLOSED_WINDOW= 1.2 /Second;	// J /(s m2 * K)	~ closed window heat transfer coefficient 			
 } // end module 

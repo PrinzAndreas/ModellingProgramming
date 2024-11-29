@@ -1,3 +1,11 @@
+//*****************************************************************************
+// Module RoomHeating
+//       heating model for the room
+//       - Environment including a boiler
+//       - Room including a radiator (water or electrical) and a window
+//       - Resident (Charlie)
+//*****************************************************************************
+
 #define SLX2 ON
 import <Libraries/TimeBaseSeconds>
 import <Libraries/ContinuousSmall>
@@ -10,142 +18,170 @@ import <HeatingConstants>
 
 module RoomHeating {
   //========== Experiment parameters
-  public constant double TEMP_NOFREEZE       =  7;      // °C -- frost protection
-  public constant double TEMP_DAY_NOMINAL    = 21;      // °C
-  public constant double BOILER_WATER_TEMP   = 40;      // °C
+  public constant double T_NOFREEZE       =  7;      // °C - frost protection
+  public constant double T_DAY_TARGET     = 21;      // °C
   public constant double EXPERIMENT_DURATION = 2*Day;
-  //========== End Experiment parameters
+  //========== End experiment parameters
 
+// global elements: environment, room, and resident
   pointer (Environment) env;
   pointer (Room)        room;
-  pointer (Resident)    resident;
+  pointer (Resident)    charlie;
 
+// class Environment having a boiler and featuring environment temperature
   passive class Environment implements (Behavior) {
     ContinuousVariable T;
     ValueTable T_table(Hour);
     pointer (Boiler) b;
-    
+
     initial {
-      b = new Boiler(BOILER_WATER_TEMP);
+      b = new Boiler();
       load history data into T_table;
       T.state = T_table.linear(0);
 
-      theIntegrator->attachODE(ME, 1);  
+      theIntegrator->attachODE(ME, 1);
     }
-  
+
     concrete method derivatives(double t) {
       T.state = T_table.linear(time);
     }
   }
 
-  passive class Boiler (double T_init) implements (Behavior) {
+// class Boiler, having constant temperature
+  passive class Boiler () implements (Behavior) {
+    constant double T_water = 40; // °C
     ContinuousVariable T;
-    double T_value = T_init; // °C
-  
-    initial {
-      T.state= T_value;
-      theIntegrator->attachODE(ME, 0);
-    } 
-  
-    concrete method derivatives(double t) {
-      T.state= T_value;
-    } 
-  } 
 
-  passive class Room() implements (Behavior) {  
+    initial {
+      T.state = T_water;
+      theIntegrator->attachODE(ME, 0);
+    }
+
+    concrete method derivatives(double t) {
+      T.state = T_water;
+    }
+  }
+
+// class Room, having a window and a radiator
+  passive class Room() implements (Behavior) {
+    constant double h_top  = 3.7;   // m - top height of room
+    constant double h_low  = 0.7;   // m - low height of room
+    constant double b      = 6.0;   // m - breadth of room
+    constant double l      = 4.0;   // m - length of room
+    /*constant*/ double A_side = b*(h_low+h_top)/2; // m^2 - side wall area
+    /*constant*/ double A_low  = l*h_low;           // m^2 - area of lower wall
+    /*constant*/ double A_wa   = A_side + 2*A_low;  // m^2 - wall area
+    /*constant*/ double V      = l*A_side;          // m^3 - air volume in the room
+    /*constant*/ double A_ro   = 2*l*sqrt(2)*(h_top-h_low); // m^2 - roof area
+    constant double U_wa   = 0.20 / Second; // J /(s m^2 K)  - wall heat transfer coefficient
+    constant double U_ro   = 0.15 / Second; // J /(s m^2 K)  - roof heat transfer coefficient
+
     ContinuousVariable T; 
     pointer (Window) w;
     pointer (Radiator) r;
-  
+
     initial {
-      w= new Window();
-      r= new WaterRadiator(1.0);
-//    r= new ElectricalRadiator(0.2);
-      T.state = r->tT;
+      w = new Window();
+      r = new WaterRadiator(1.0);
+//    r = new ElectricalRadiator(0.2); // option: electrical
+      T.state = r->tT; // starting with the radiator target temperature
       theIntegrator->attachVar(&T);
       theIntegrator->attachODE(ME, 1);
     }
-        
-    concrete method derivatives(double t) {
-      double radiatorGainRate = (r->T.state - T.state) * U_RADIATOR * A_RADIATOR;
-      double wallLossRate = (T.state - env->T.state) * A_WALL * U_WALL;
-      double roofLossRate = (T.state - env->T.state) * A_ROOF * U_ROOF;
-      double windowLossRate = (T.state - env->T.state) * A_WINDOW * w->u_Window.state;
-      T.rate = (radiatorGainRate - windowLossRate - wallLossRate - roofLossRate) / (C_AIR * V_ROOM *D_AIR);
-    }
-  } 
 
+    concrete method derivatives(double t) {
+      double Q_R_Rate = r->U * r->A * (r->T.state - T.state);
+      double Q_wiRate = w->U * w->A * (T.state - env->T.state);
+      double Q_waRate = U_wa * A_wa * (T.state - env->T.state);
+      double Q_roRate = U_ro * A_ro * (T.state - env->T.state);
+      T.rate = (Q_R_Rate - Q_wiRate - Q_waRate - Q_roRate) / (V * D_air * C_air);
+    }
+  }
+
+// class Window, can be open or closed
   passive class Window() implements(Behavior) {
     boolean isOpen = FALSE;
-    ContinuousVariable u_Window;
-  
+    constant double A = 1.0*1.4;       // m^2 - window area
+    constant double U_open   = 10 /Second;  // J /(s m2 * K) - opened window heat transfer coefficient
+    constant double U_closed = 1.2 /Second; // J /(s m2 * K) - closed window heat transfer coefficient
+    double U;
+
     initial {
-      u_Window.state= U_CLOSED_WINDOW;
+      U = U_closed;
       theIntegrator->attachODE(ME, 0);
-    } 
-  
+    }
+
     concrete method derivatives(double t) {
-      u_Window.state= isOpen?U_OPEN_WINDOW:U_CLOSED_WINDOW;
-    } 
+      U = isOpen?U_open:U_closed;
+    }
   }
-  
+
+// class Radiator can be on or off, with target temperature tT and temperature T
   abstract passive class Radiator() implements(Behavior) {
-    double tT=TEMP_NOFREEZE;
-    boolean isOn=FALSE;
-    double lambda=0; // thermostat opening
+    constant double A = 4*2.0*0.5; // m^2 - radiator area
+    constant double V = 10.0; // l - volume of radiator water
+    constant double U = 30 /Second; // J /(s m^2 K) - heat transfer coefficient
+    double tT = T_NOFREEZE;
+    boolean isOn = FALSE;
+    double lambda = 0; // thermostat opening
 
     ContinuousVariable T;
-    
+
     initial {
       T.state = tT;
       theIntegrator->attachVar(&T);
-      theIntegrator->attachODE(ME, 1);  
-    } 
+      theIntegrator->attachODE(ME, 1);
+    }
   }
-  
+
+// class WaterRadiator, special case of radiator
   passive class WaterRadiator(double phi_init) subclass(Radiator) implements (Behavior) {
-    double phi=phi_init;   //°C       ~ hysteresis of temperature control
-    
-    concrete method derivatives(double t)  {
+    double phi = phi_init;   //°C       ~ hysteresis of temperature control
+
+    concrete method derivatives(double t) {
       double tempDiff = tT - room->T.state;
-      double T1, T2;
+      double Q_loss, T_gain, T_loss;
 
-      tT = isOn?TEMP_DAY_NOMINAL:TEMP_NOFREEZE;
+      tT = isOn ? T_DAY_TARGET : T_NOFREEZE;
 
-      if (tempDiff <=0) lambda=0.0;
-      else if (tempDiff >= phi) lambda=1.0;
-      else lambda= tempDiff / phi;
-    
-      T1 = lambda * F_WATER / V_RADIATOR_WATER  * (env->b->T.state - T.state) ;
-      T2 = U_RADIATOR * A_RADIATOR * (room->T.state - T.state ) / (V_RADIATOR_WATER * D_WATER * C_WATER);  
-      T.rate = T1 + T2;
-    } 
-  } 
+      if (tempDiff <=0) lambda = 0.0;
+      else if (tempDiff >= phi) lambda = 1.0;
+      else lambda = tempDiff / phi;
 
+      Q_loss = U * A * (T.state - room->T.state);
+      T_gain = (lambda * F_water / V) * (env->b->T.state - T.state);
+      T_loss = Q_loss / (V * D_water * C_water);
+      T.rate = T_gain - T_loss;
+    }
+  }
+
+// class ElectricalRadiator, special case of radiator
   passive class ElectricalRadiator(double phi_init) subclass(Radiator) implements (Behavior) {
-    double phi=phi_init;   //°C       ~ hysteresis of temperature control
-    
-    concrete method derivatives(double t)  {
+    constant double P = 500; // Watt (J/s) - electrical radiator power
+    double phi=phi_init;     //°C          - hysteresis of temperature control
+
+    concrete method derivatives(double t) {
       double tempDiff = tT - room->T.state;
       double inpPower, outpPower;
 
-      if (lambda>0 && tempDiff <= 0) lambda=0.0;
-      if (lambda<1 && tempDiff >= phi) lambda=1.0;
+      if (lambda > 0.0 && tempDiff <= 0)   lambda = 0.0;
+      if (lambda < 1.0 && tempDiff >= phi) lambda = 1.0;
       
-      inpPower= (lambda * P_RADIATOR) / (C_WATER * V_RADIATOR_WATER * D_WATER);		
+      inpPower = (lambda * P) / (C_water * V * D_water);
       // below should be the same as for the room, see also water case
-      outpPower = U_RADIATOR * A_RADIATOR * (room->T.state - T.state ) / (V_RADIATOR_WATER * D_WATER * C_WATER);  
+      outpPower = U * A * (room->T.state - T.state ) / (V * D_water * C_water);
       T.rate = inpPower + outpPower;
-      } 
-  } 
+    }
+  }
 
+// state machine for resident Charlie
   dfsm Charlie
-    state sleeping 
+    state sleeping
       enter room->r->isOn = FALSE
       leave room->r->isOn = TRUE,
     state active,
     state working,
-    state airing 
+    state airing
       enter room->w->isOpen = TRUE
       leave room->w->isOpen = FALSE,
     state preparingNight,
@@ -159,59 +195,60 @@ module RoomHeating {
       airing   with randomClose to active,
       airing   at 22:00 to preparingNight,
       preparingNight with randomClose to sleeping
-//      preparingNight with randomClose to final
     where
       randomOpen = normal(02:00, 00:30),
       randomClose = uniform(00:05, 00:10)
     initial sleeping;
-    
-  class Resident() {  
-    
+
+// class Resident running the state machine Charlie
+  class Resident() {
+
     actions {
       theIntegrator->attachPuck(ACTIVE);
-      
+
       debug Charlie; // could also: run Charlie;
-    } 
-  } 
+    }
+  }
 
-  procedure main {  
+// main activity: starting and stopping the simulation
+  procedure main {
     // integrator configuration
-    double min_h  = 0.0001 * Minute;
-    double max_h  = 10.0* Minute;
-    double err_limit   = 0.1;
-    theIntegrator= new RKM_Integrator (max_h, min_h, RELATIVE, err_limit);  
-    
-    env =      new Environment;
-    room =     new Room;
-    resident = new Resident();
-    
-    Tracer diagram ("RoomChart");
-    Tracer observed ("RoomObserved");
+    double min_h = 0.0001 * Minute;
+    double max_h = 10.0* Minute;
+    double err_limit = 0.1;
+    theIntegrator = new RKM_Integrator (max_h, min_h, RELATIVE, err_limit);
 
-    activate resident;
+    env     = new Environment;
+    room    = new Room;
+    charlie = new Resident;
+
+    Tracer diagram ("RoomChart");      // tracing all data
+    Tracer observed ("RoomObserved");  // tracing main data
+
+    activate charlie;
 
     theIntegrator->attachPuck(ACTIVE);
-    activate theIntegrator;     
+    activate theIntegrator;
 
-    trace diagram 
-          ( env->T.state named env.T, env->b->T.state named env.b.T, 
-            room->T.state named room.T, (room->w->isOpen?1:0)*10.0 named room.w.isOpen, 
-            room->r->T.state named room.r.T, room->r->tT named room.r.tT, room->r->lambda *10.0 named room.r.lambda 
-          ) 
+    trace diagram
+          ( env->T.state named env.T, env->b->T.state named env.b.T,
+            room->T.state named room.T, (room->w->isOpen?1:0)*10.0 named room.w.isOpen,
+            room->r->T.state named room.r.T, room->r->tT named room.r.tT, room->r->lambda *10.0 named room.r.lambda
+          )
       every 10*Second watch theIntegrator;
 
-    trace observed 
+    trace observed
           ( env->T.state named env.T,
-            room->T.state named room.T, 
+            room->T.state named room.T,
             (room->w->isOpen?1:0)*10.0 named room.w.isOpen,
             (room->r->isOn?1:0)*10.0 named room.r.isOn
-          ) 
+          )
       every 10*Second watch theIntegrator;
 
     wait until time >= EXPERIMENT_DURATION;
-    
+
     plot diagram as "pdf" using (EXPERIMENT_DURATION>3*Day)?"plot_day.plt":"plot_hour.plt";
     plot observed as "pdf" using (EXPERIMENT_DURATION>3*Day)?"plot_day.plt":"plot_hour.plt";
     exit(0);
   }
-} 
+}

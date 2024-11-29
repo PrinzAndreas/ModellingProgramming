@@ -1,3 +1,8 @@
+//*****************************************************************************
+//  Module TemperatureHistory
+//    historical temperature data for Grimstad 2023, April 22 - April 28
+//*****************************************************************************
+
 #define SLX2 ON
 import <Libraries/ValueTable>
 
