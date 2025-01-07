@@ -3,8 +3,7 @@
 Here we have collected the Figures of the book. You can see their number in the book by hovering over them.
 Some of the figures can be found under [drawings](../Drawings), [diagrams](../Diagrams), or [SysML](../../ModelDescriptions/RoomModelSysML).
 
-* Figures from Chapter 2
-
+### Figures from Chapter 2
 [<img src="Figure_2_1.png" alt="Figure 2.1" width="100">](Figure_2_1.png)
 [<img src="Figure_2_2.png" alt="Figure 2.2" width="100">](Figure_2_2.png)
 [<img src="Figure_2_3a.png" alt="Figure 2.3a" width="100">](Figure_2_3a.png)
@@ -15,16 +14,14 @@ Some of the figures can be found under [drawings](../Drawings), [diagrams](../Di
 [<img src="Figure_2_12.png" alt="Figure 2.12" width="100">](Figure_2_12.png)
 [<img src="Figure_2_13.png" alt="Figure 2.13" width="100">](Figure_2_13.png)
 
-* Figures from Chapter 3
-
+### Figures from Chapter 3
 [<img src="Figure_3_1.png" alt="Figure 3.1" width="100">](Figure_3_1.png)
 [<img src="Figure_3_2.png" alt="Figure 3.2" width="100">](Figure_3_2.png)
 [<img src="Figure_3_5.png" alt="Figure 3.5" width="100">](Figure_3_5.png)
 [<img src="Figure_3_6.png" alt="Figure 3.6" width="100">](Figure_3_6.png)
 [<img src="Figure_3_8.png" alt="Figure 3.8" width="100">](Figure_3_8.png)
 
-* Figures from Chapter 5
-
+### Figures from Chapter 5
 [<img src="Figure_5_1.png" alt="Figure 5.1" width="100">](Figure_5_1.png)
 [<img src="Figure_5_2.png" alt="Figure 5.2" width="100">](Figure_5_2.png)
 [<img src="Figure_5_3.png" alt="Figure 5.3" width="100">](Figure_5_3.png)
@@ -37,8 +34,7 @@ Some of the figures can be found under [drawings](../Drawings), [diagrams](../Di
 [<img src="Figure_5_12a.png" alt="Figure 5.12a" width="100">](Figure_5_12a.png)
 [<img src="Figure_5_12b.png" alt="Figure 5.12b" width="100">](Figure_5_12b.png)
 
-* Figures from Chapter 6
-
+### Figures from Chapter 6
 [<img src="Figure_6_2.png" alt="Figure 6.2" width="100">](Figure_6_2.png)
 [<img src="Figure_6_4a.png" alt="Figure 6.4a" width="100">](Figure_6_4a.png)
 [<img src="Figure_6_4b.png" alt="Figure 6.4b" width="100">](Figure_6_4b.png)
@@ -48,6 +44,5 @@ Some of the figures can be found under [drawings](../Drawings), [diagrams](../Di
 [<img src="Figure_6_8.png" alt="Figure 6.8" width="100">](Figure_6_8.png)
 [<img src="Figure_6_10.png" alt="Figure 6.10" width="100">](Figure_6_10.png)
 
-* Figures from Chapter 7
-
+### Figures from Chapter 7
 [<img src="Figure_7_1.png" alt="Figure 7.1" width="100">](Figure_7_1.png)
