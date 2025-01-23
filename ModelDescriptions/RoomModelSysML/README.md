@@ -15,7 +15,7 @@ In addition, we have collected the SysML code examples use in the book.
 [<img src="Figure_6_11.png" alt="Figure 6.11" width="100">](Figure_6_11.png)
 
 ### SysML code examples (diagrams) from the book
-[<img src="dfsm.png" alt="state machine diagram" width="100">](dfsm.png)
-[<img src="diffEq.png" alt="differential equation diagram" width="100">](diffEq.png)
-[<img src="domain.png" alt="block definition diagram" width="100">](domain.png)
 [<img src="snapshot.png" alt="internal block diagram" width="100">](snapshot.png)
+[<img src="domain.png" alt="block definition diagram" width="100">](domain.png)
+[<img src="diffEq.png" alt="differential equation diagram" width="100">](diffEq.png)
+[<img src="dfsm.png" alt="state machine diagram" width="100">](dfsm.png)
