@@ -20,10 +20,11 @@ You can see their Figure number in the book by hovering over them.
 [<img src="Figure_4_4d.png" alt="Figure 4.4d" width="100">](Figure_4_4d.png)
 [<img src="Figure_4_6a.png" alt="Figure 4.6a" width="100">](Figure_4_6a.png)
 [<img src="Figure_4_6b.png" alt="Figure 4.6b" width="100">](Figure_4_6b.png)
+[<img src="../../images/pdf-icon.png" alt="Figure 5.7" width="100">](Figure_5_7.pdf)
 
 ### Additional Observation Diagrams
 Complete week 2022, April 22-28
-[<img src="RoomObserved2022April22-28.pdf" alt="Observed Room Data 2022, April 22-28" width="100">](RoomObserved2022April22-28.pdf)
+[<img src="/images/pdf-icon.png" alt="Observed Room Data 2022, April 22-28" width="100">](RoomObserved2022April22-28.pdf)
 
 Daily diagrams 2022, April 22-28
 [<img src="RoomObserved2022April22.pdf" alt="Observed Room Data 2022, April 22" width="100">](RoomObserved2022April22.pdf)
