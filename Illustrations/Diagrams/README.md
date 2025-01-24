@@ -1,4 +1,72 @@
 ## Diagrams
 
-* Work in progress  
-![work in progress](../../images/comingSoon.png "work in progress")
+This page contains diagrams related to the book, both the diagrams contained in the book and more simulation diagrams.
+
+### Diagrams from Book
+You can see their Figure number in the book by hovering over them.
+
+[<img src="Figure_2_5a.png" alt="Figure 2.5a" width="100">](Figure_2_5a.png)
+[<img src="Figure_2_5b.png" alt="Figure 2.5b" width="100">](Figure_2_5b.png)
+[<img src="Figure_2_5c.png" alt="Figure 2.5c" width="100">](Figure_2_5c.png)
+[<img src="Figure_2_5d.png" alt="Figure 2.5d" width="100">](Figure_2_5d.png)
+[<img src="Figure_2_7.png" alt="Figure 2.7" width="100">](Figure_2_7.png)
+[<img src="Figure_2_11a.png" alt="Figure 2.11a" width="100">](Figure_2_11a.png)
+[<img src="Figure_2_11b.png" alt="Figure 2.11b" width="100">](Figure_2_11b.png)
+[<img src="Figure_3_4a.png" alt="Figure 3.4a" width="100">](Figure_3_4a.png)
+[<img src="Figure_3_4b.png" alt="Figure 3.4b" width="100">](Figure_3_4b.png)
+[<img src="Figure_4_4a.png" alt="Figure 4.4a" width="100">](Figure_4_4a.png)
+[<img src="Figure_4_4b.png" alt="Figure 4.4b" width="100">](Figure_4_4b.png)
+[<img src="Figure_4_4c.png" alt="Figure 4.4c" width="100">](Figure_4_4c.png)
+[<img src="Figure_4_4d.png" alt="Figure 4.4d" width="100">](Figure_4_4d.png)
+[<img src="Figure_4_6a.png" alt="Figure 4.6a" width="100">](Figure_4_6a.png)
+[<img src="Figure_4_6b.png" alt="Figure 4.6b" width="100">](Figure_4_6b.png)
+
+### Additional Observation Diagrams
+Complete week 2022, April 22-28
+[<img src="RoomObserved2022April22-28.pdf" alt="Observed Room Data 2022, April 22-28" width="100">](RoomObserved2022April22-28.pdf)
+
+Daily diagrams 2022, April 22-28
+[<img src="RoomObserved2022April22.pdf" alt="Observed Room Data 2022, April 22" width="100">](RoomObserved2022April22.pdf)
+[<img src="RoomObserved2022April23.pdf" alt="Observed Room Data 2022, April 23" width="100">](RoomObserved2022April23.pdf)
+[<img src="RoomObserved2022April24.pdf" alt="Observed Room Data 2022, April 24" width="100">](RoomObserved2022April24.pdf)
+[<img src="RoomObserved2022April25.pdf" alt="Observed Room Data 2022, April 25" width="100">](RoomObserved2022April25.pdf)
+[<img src="RoomObserved2022April26.pdf" alt="Observed Room Data 2022, April 26" width="100">](RoomObserved2022April26.pdf)
+[<img src="RoomObserved2022April27.pdf" alt="Observed Room Data 2022, April 27" width="100">](RoomObserved2022April27.pdf)
+[<img src="RoomObserved2022April28.pdf" alt="Observed Room Data 2022, April 28" width="100">](RoomObserved2022April28.pdf)
+
+Complete week 2023, April 22-28
+[<img src="RoomObserved2023April22-28.pdf" alt="Observed Room Data 2023, April 22-28" width="100">](RoomObserved2023April22-28.pdf)
+
+Daily diagrams 2023, April 22-28
+[<img src="RoomObserved2023April22.pdf" alt="Observed Room Data 2023, April 22" width="100">](RoomObserved2023April22.pdf)
+[<img src="RoomObserved2023April23.pdf" alt="Observed Room Data 2023, April 23" width="100">](RoomObserved2023April23.pdf)
+[<img src="RoomObserved2023April24.pdf" alt="Observed Room Data 2023, April 24" width="100">](RoomObserved2023April24.pdf)
+[<img src="RoomObserved2023April25.pdf" alt="Observed Room Data 2023, April 25" width="100">](RoomObserved2023April25.pdf)
+[<img src="RoomObserved2023April26.pdf" alt="Observed Room Data 2023, April 26" width="100">](RoomObserved2023April26.pdf)
+[<img src="RoomObserved2023April27.pdf" alt="Observed Room Data 2023, April 27" width="100">](RoomObserved2023April27.pdf)
+[<img src="RoomObserved2023April28.pdf" alt="Observed Room Data 2023, April 28" width="100">](RoomObserved2023April28.pdf)
+
+### Additional SLX Simulation Diagrams
+Complete week 2022, April 22-28
+[<img src="RoomChart2022April22-28.pdf" alt="Chart Room Data 2022, April 22-28" width="100">](RoomChart2022April22-28.pdf)
+
+Daily diagrams 2022, April 22-28
+[<img src="RoomChart2022April22.pdf" alt="Simulated Room Data 2022, April 22" width="100">](RoomChart2022April22.pdf)
+[<img src="RoomChart2022April23.pdf" alt="Simulated Room Data 2022, April 23" width="100">](RoomChart2022April23.pdf)
+[<img src="RoomChart2022April24.pdf" alt="Simulated Room Data 2022, April 24" width="100">](RoomChart2022April24.pdf)
+[<img src="RoomChart2022April25.pdf" alt="Simulated Room Data 2022, April 25" width="100">](RoomChart2022April25.pdf)
+[<img src="RoomChart2022April26.pdf" alt="Simulated Room Data 2022, April 26" width="100">](RoomChart2022April26.pdf)
+[<img src="RoomChart2022April27.pdf" alt="Simulated Room Data 2022, April 27" width="100">](RoomChart2022April27.pdf)
+[<img src="RoomChart2022April28.pdf" alt="Simulated Room Data 2022, April 28" width="100">](RoomChart2022April28.pdf)
+
+Complete week 2023, April 22-28
+[<img src="RoomChart2023April22-28.pdf" alt="Chart Room Data 2023, April 22-28" width="100">](RoomChart2023April22-28.pdf)
+
+Daily diagrams 2023, April 22-28
+[<img src="RoomChart2023April22.pdf" alt="Simulated Room Data 2023, April 22" width="100">](RoomChart2023April22.pdf)
+[<img src="RoomChart2023April23.pdf" alt="Simulated Room Data 2023, April 23" width="100">](RoomChart2023April23.pdf)
+[<img src="RoomChart2023April24.pdf" alt="Simulated Room Data 2023, April 24" width="100">](RoomChart2023April24.pdf)
+[<img src="RoomChart2023April25.pdf" alt="Simulated Room Data 2023, April 25" width="100">](RoomChart2023April25.pdf)
+[<img src="RoomChart2023April26.pdf" alt="Simulated Room Data 2023, April 26" width="100">](RoomChart2023April26.pdf)
+[<img src="RoomChart2023April27.pdf" alt="Simulated Room Data 2023, April 27" width="100">](RoomChart2023April27.pdf)
+[<img src="RoomChart2023April28.pdf" alt="Simulated Room Data 2023, April 28" width="100">](RoomChart2023April28.pdf)

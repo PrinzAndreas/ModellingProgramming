@@ -1,0 +1,21 @@
+//*****************************************************************************
+//  Module TemperatureHistory
+//    historical temperature data for Grimstad 2022, April 22 - April 28
+//*****************************************************************************
+
+#define SLX2 ON
+import <Libraries/ValueTable>
+
+public module TemperatureHistory {
+
+  statement load history data @into #var;
+  definition {
+      expand(#var) |"fill # with 
+        (0,  4), 
+      //April 28, 2022 - https://www.yr.no/nb/historikk/graf/1-7667/Norge/Agder/Grimstad/Grimstad?q=2022-04-28
+        ( 1,  3), ( 2,  2), ( 3,  1), ( 4,  0), ( 5,  0), ( 6,  1), 
+        ( 7,  6), ( 8,  8), ( 9, 10), (10, 12), (11, 13), (12, 15), 
+        (13, 14), (14, 14), (15, 14), (16, 14), (17, 14), (18, 13), 
+        (19, 11), (20, 12), (21,  8), (22,  9), (23,  6), (24,  5);"|;
+  }
+}
