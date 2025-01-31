@@ -1,5 +1,8 @@
 ## SLX description of Room
 
+[SLX (Simulation Language with eXtensibility)](https://wolverinesoftware.com/SLXOverview.html) is a language to describe simulations.
+It is used in the book to describe the room model and run experiments with it.
+
 The [SLX model description](https://github.com/PrinzAndreas/ModellingProgramming/tree/main/ModelDescriptions/RoomModelSLX) includes the following files.
 
 * [HeatingModel.slx](https://github.com/PrinzAndreas/ModellingProgramming/blob/main/ModelDescriptions/RoomModelSLX/HeatingModel.slx) - main program and experiment description
