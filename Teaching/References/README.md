@@ -6,7 +6,7 @@ We provide a few relevant references to material that can be used in teaching in
 ![work in progress](../../images/comingSoon.png "work in progress")
 
 ### Other publications of the authors
-You can find all authors on Google Scholar as follows.
+You can find the authors on dblp, Google Scholar, CRISTIN, and ResearchGate as follows.
 * Andreas Prinz:          [dblp](https://dblp.uni-trier.de/pid/59/807.html), [Google Scholar](https://scholar.google.com/citations?user=IwpfSKUAAAAJ), [CRISTIN](https://wo.cristin.no/as/WebObjects/cristin.woa/wa/fres?sort=ar&pnr=1690&action=sok), [ResearchGate](https://www.researchgate.net/profile/Andreas-Prinz)
 * Birger Møller-Pedersen: [dblp](https://dblp.uni-trier.de/pid/03/1262.html), [Google Scholar](https://scholar.google.com/citations?user=Gabhe2cAAAAJ), [CRISTIN](https://wo.cristin.no/as/WebObjects/cristin.woa/wa/fres?sort=ar&pnr=22927&la=no&action=sok), [ResearchGate](https://www.researchgate.net/profile/Birger-Moller-Pedersen)
 * Joachim Fischer:        [dblp](https://dblp.uni-trier.de/pid/41/4643.html), [ResearchGate](https://www.researchgate.net/profile/Joachim-Fischer-5)
