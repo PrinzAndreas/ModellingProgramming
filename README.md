@@ -21,4 +21,5 @@ Welcome to the online resources for the book [*Understanding Modelling and Progr
 
 ### [Teaching support](Teaching)
 * [Hints for exercise solutions](Teaching/SolutionHints)
+* [Figures and Slides](Teaching/SlidesFigures)
 * [References](Teaching/References)
