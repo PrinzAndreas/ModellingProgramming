@@ -4,6 +4,9 @@
 Using some libraries, it can be used to describe simulations.
 The book sketches how the room model can be described using Python such that one can run experiments with it.
 
+* Work in progress
+![work in progress](../../images/comingSoon.png "work in progress")
+
 The [Python model description](https://github.com/PrinzAndreas/ModellingProgramming/tree/main/ModelDescriptions/RoomModelPython) includes the following files.
 
 * [main.ipynb](https://github.com/PrinzAndreas/ModellingProgramming/blob/main/ModelDescriptions/RoomModelPython/main.ipynb) - main program and experiment description
