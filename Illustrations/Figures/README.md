@@ -21,10 +21,14 @@ Some of the figures can be found under [drawings](../Drawings), [diagrams](../Di
 [<img src="Figure_3_6.png" alt="Figure 3.6" width="100">](Figure_3_6.png)
 [<img src="Figure_3_8.png" alt="Figure 3.8" width="100">](Figure_3_8.png)
 
+### Figures from Chapter 4
+[<img src="Figure_4_1.png" alt="Figure 4.1" width="100">](Figure_4_1.png)
+
 ### Figures from Chapter 5
 [<img src="Figure_5_1.png" alt="Figure 5.1" width="100">](Figure_5_1.png)
 [<img src="Figure_5_2.png" alt="Figure 5.2" width="100">](Figure_5_2.png)
 [<img src="Figure_5_3.png" alt="Figure 5.3" width="100">](Figure_5_3.png)
+[<img src="Figure_5_4.png" alt="Figure 5.4" width="100">](Figure_5_4.png)
 [<img src="Figure_5_5.png" alt="Figure 5.5" width="100">](Figure_5_5.png)
 [<img src="Figure_5_6.png" alt="Figure 5.6" width="100">](Figure_5_6.png)
 [<img src="Figure_5_8.png" alt="Figure 5.8" width="100">](Figure_5_8.png)
