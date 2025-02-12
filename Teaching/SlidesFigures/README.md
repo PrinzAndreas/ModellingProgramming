@@ -1,7 +1,7 @@
 ## Slides and Figures
 
 * Work in progress  
-![work in progress](../images/comingSoon.png "work in progress")
+![work in progress](../../images/comingSoon.png "work in progress")
 
 ### Figures about pitfalls of Modelling
 The following figures are reproduced and translated by Tomas Jonsson from Professor Lars Kristiansson’s book,
