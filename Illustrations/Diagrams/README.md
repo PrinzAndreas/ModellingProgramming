@@ -23,6 +23,9 @@ You can see their Figure number in the book by hovering over them.
 [<img src="../../images/pdf-icon.png" alt="Figure 5.7" width="50">](Figure_5_7.pdf)
 
 ### Additional Observation Diagrams
+Observation diagrams show the temperatures of the environment and the room together with the opening of the window and whether the radiator is on or off.
+Check also the [complete data sheets](../../Data/SimulationData/#observation-data).
+
 Complete week 2022, April 22-28
 [<img src="../../images/pdf-icon.png" alt="Observed Room Data 2022, April 22-28" width="50">](RoomObserved2022April22-28.pdf)
 
@@ -48,6 +51,9 @@ Daily diagrams 2023, April 22-28
 [<img src="../../images/pdf-icon.png" alt="Observed Room Data 2023, April 28" width="50">](RoomObserved2023April28.pdf)
 
 ### Additional SLX Simulation Diagrams
+Simulation diagrams show the data of observation diagram and, in addition, the boiler and radiator temperatures, the radiator target temperature, and the opening of the radiator valve.
+Check also the [complete data sheets](../../Data/SimulationData/#slx-simulation-data).
+
 Complete week 2022, April 22-28
 [<img src="../../images/pdf-icon.png" alt="Simulated Room Data 2022, April 22-28" width="50">](RoomChart2022April22-28.pdf)
 
