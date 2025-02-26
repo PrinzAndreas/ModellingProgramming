@@ -23,3 +23,6 @@ Welcome to the online resources for the book [*Understanding Modelling and Progr
 * [Hints for exercise solutions](Teaching/SolutionHints)
 * [Figures and Slides](Teaching/SlidesFigures)
 * [References](Teaching/References)
+
+### Feedback and Questions
+* Please submit your feedback and questions as [issues in GitHub](https://github.com/PrinzAndreas/ModellingProgramming/issues).
