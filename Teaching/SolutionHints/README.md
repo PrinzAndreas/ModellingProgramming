@@ -8,16 +8,16 @@
 <summary> Task description </summary>
 Consider a clock somewhere in your household or school.
 The purpose is to read the time.
-</details>
 
 Which perspective of the clock helps you determine the time? 
 Which aspects of reality do you consider, and which do you ignore?
 Which precision of the relevant attributes is meaningful?
+</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
-<img src="/PrinzAndreas/ModellingProgramming/raw/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+<img src="https://github.com/PrinzAndreas/ModellingProgramming/blob/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
 </details>
 
 ### 2.2 (Alarm Clock System)
@@ -33,7 +33,7 @@ Describe at least one system snapshot using these parts and attributes.
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
-<img src="/PrinzAndreas/ModellingProgramming/raw/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
 </details>
 
 ### 2.3 (Alternative Clock Perspective)
@@ -47,7 +47,7 @@ Which perspective supports your chosen purpose? What is the system in this new p
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
-<img src="/PrinzAndreas/ModellingProgramming/raw/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+<img src="../../images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
 </details>
 
 ### 2.4 (Clock Descriptions)
@@ -60,5 +60,5 @@ Create three different snapshot descriptions of such a clock. Then describe poss
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
-<img src="/PrinzAndreas/ModellingProgramming/raw/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+<img src="../../images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
 </details>
