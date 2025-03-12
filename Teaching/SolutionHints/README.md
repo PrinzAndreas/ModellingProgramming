@@ -20,8 +20,7 @@ There is an analog wall clock in my office.
 It has a very simple design with numbers 1 .. 12 and two hands - a short hour hand and a long minute hand.<br/>
 * For determining time, I need to look at where the hands of the clock point.<br/>
 * I only consider the angle of the hands (two numbers). The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape the numbers, the existence of the numbers, the mechanism that makes the clock work (eletronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
-* For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.<br/>
-
+* For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.<br/><br/>
 My fitness studio has a digital clock. It has a large display with four digits which are separated by a colon. The digits are shown with a seven segment display each.<br/>
 * For determining the time, I read the first two numbers as the hour and the last two numbers as the minute.<br/>
 * We only consider the numbers displayed with the seven segment displays. The colour of the display or its slanting is irrelevant. Other characters like colon or point are not relevant either. All the electronics behind is not relevant as is the clock casing or placement.<br/>
