@@ -16,8 +16,16 @@ Which precision of the relevant attributes is meaningful?
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+There is an analog wall clock in my office.
+It has a very simple design with numbers 1 .. 12 and two hands - a short hour hand and a long minute hand.
+* For determining time, I need to look at where the hands of the clock point.
+* I only consider the angle of the hands (two numbers). The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape the numbers, the existence of the numbers, the mechanism that makes the clock work (eletronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.
+* For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.
+
+My fitness studio has a digital clock. It has a large display with four digits which are separated by a colon. The digits are shown with a seven segment display each.
+* For determining the time, I read the first two numbers as the hour and the last two numbers as the minute.
+* We only consider the numbers displayed with the seven segment displays. The colour of the display or its slanting is irrelevant. Other characters like colon or point are not relevant either. All the electronics behind is not relevant as it the clock casing or placement.
+* We need to be ble to distinguish the off state from the on state for each of the segments in the display, such that the precision is 1 in a range of 0 .. 1. Please note that the accuracy of the clock, i.e. its difference to the actual time, is not of concern here. Even a static clock adheres to the perspective. The accuracy of the clock is relevant when we consider it as a model of time.
 </details>
 
 ### 2.2 Alarm Clock System
