@@ -1,6 +1,5 @@
 import math
 from src.time_base_seconds import TimeUnits
-from box import ConfigBox
 
 # Room dimensions
 H_Room_Low: float = 0.7
@@ -33,12 +32,10 @@ K_ROOF: float = 0.15 / TimeUnits.second  # Uro - Roof heat transfer coefficient
 K_OPEN_WINDOW: float = 10 / TimeUnits.second  # Uwi_open Open window heat transfer coefficient
 K_CLOSED_WINDOW: float = 1.2 / TimeUnits.second  # Uwi_closed Closed window heat transfer coefficient
 
-# Configbox for .notation as in U.wa gives access to the K_WALL heat transfer coefficient
-U = ConfigBox({
-    'he': K_RADIATOR,
-    'wa': K_WALL,
-    'ro': K_ROOF,
-    'wi_open': K_OPEN_WINDOW,
-    'wi_closed': K_CLOSED_WINDOW
-})
-
+# Access using .notation as in U.wa gives access to the K_WALL heat transfer coefficient
+class U:
+    he = K_RADIATOR
+    wa = K_WALL
+    ro = K_ROOF
+    wi_open = K_OPEN_WINDOW
+    wi_closed = K_CLOSED_WINDOW

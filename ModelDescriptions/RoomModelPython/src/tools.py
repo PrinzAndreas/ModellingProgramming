@@ -5,7 +5,9 @@ import numpy as np
 
 from src.time_base_seconds import TimeUnits
 from src.heating_constants import *
-
+from collections import OrderedDict
+from box import ConfigBox
+from tqdm import tqdm
 
 @contextmanager
 def timer():
@@ -61,35 +63,42 @@ class Integrator:
     #  Main function
     def solve(self, name='run', debug=False):
         # Begin the integration
+        dt = 0
         step = 0
         advance = lambda: self.step(name=f'{name}_{step}')
         self.current_step = advance()
         results = [self.current_step]
 
-        # Integrate until an event is triggered, update the system & continue the integration
-        while self.current_step.points['t'][-1] != self.solver.tdata[-1]:
-            step += 1
-            variables = self.current_step.points.coordnames
-            ics = {v: self.current_step.points[v][-1] for v in variables}
 
-            # Executes the callback function associated with each event
-            self.parse_events(
-                event_times=self.current_step.results.getEventTimes(),
-                variables=variables,
-                current_step=self.current_step,
-                ics=ics,
-                debug=debug
-            )
+        with tqdm(total=int(self.tdata[-1])) as progress_bar:
+            # Integrate until an event is triggered, update the system & continue the integration
+            while self.current_step.points['t'][-1] != self.solver.tdata[-1]:
+                step += 1
+                dt = self.current_step.points['t'][-1] - dt
+                variables = self.current_step.points.coordnames
+                ics = {v: self.current_step.points[v][-1] for v in variables}
 
-            # Updates the solver with new information
-            self.update(
-                ics=ics,
-                pars=self.solver.pars,
-                tdata=[self.current_step.points['t'][-1], self.solver.tdata[-1]]
-            )
+                # Executes the callback function associated with each event
+                self.parse_events(
+                    event_times=self.current_step.results.getEventTimes(),
+                    variables=variables,
+                    current_step=self.current_step,
+                    ics=ics,
+                    debug=debug
+                )
 
-            self.current_step = advance()
-            results.append(self.current_step)
+                # Updates the solver with new information
+                self.update(
+                    ics=ics,
+                    pars=self.solver.pars,
+                    tdata=[self.current_step.points['t'][-1], self.solver.tdata[-1]]
+                )
+
+                self.current_step = advance()
+                results.append(self.current_step)
+
+                progress_bar.n = int(self.current_step.points['t'][-1])
+                progress_bar.refresh() 
 
         # Process and return results
         points = ConfigBox({
