@@ -21,10 +21,6 @@ It has a very simple design with numbers 1 .. 12 and two hands - a short hour ha
 * For determining time, I need to look at where the hands of the clock point.<br/>
 * I only consider the angle of the hands (two numbers). The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape the numbers, the existence of the numbers, the mechanism that makes the clock work (eletronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
 * For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.<br/><br/>
-My fitness studio has a digital clock. It has a large display with four digits which are separated by a colon. The digits are shown with a seven segment display each.<br/>
-* For determining the time, I read the first two numbers as the hour and the last two numbers as the minute.<br/>
-* We only consider the numbers displayed with the seven segment displays. The colour of the display or its slanting is irrelevant. Other characters like colon or point are not relevant either. All the electronics behind is not relevant as is the clock casing or placement.<br/>
-* We need to be ble to distinguish the off state from the on state for each of the segments in the display, such that the precision is 1 in a range of 0 .. 1. Please note that the accuracy of the clock, i.e. its difference to the actual time, is not of concern here. Even a static clock adheres to the perspective. The accuracy of the clock is relevant when we consider it as a model of time.
 </details>
 
 ### 2.2 Alarm Clock System
@@ -39,8 +35,16 @@ Describe at least one system snapshot using these parts and attributes.
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+I have a digital radio controlled alarm clock in my office which I take with me to meetings such that I can read the time without looking at my wrist.
+The alarm clock display shows the current temperature, second, hours, minutes, the day and month, and the weekday. The digits are shown with a seven segment display each.
+There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button and at the back there is a compartment for the battery.<br/>
+* For determining the time, I read the hour digits as the hour and the minute digits as the minute.<br/>
+* All other information on the display is irrelevant as is the colour of the display or its lighting. All the electronics behind is not relevant as is the clock casing or placement.<br/>
+* As the clock is radio controlled and adjusts austomatically, I do not care for any of the buttons.<br/>
+* It is important that the battery has enough power.<br/>
+* This boils down to the alarm clock system having three parts: the clock casing including a display, the battery cover, and the battery. It would be possible to consider the display as a separate element.<br/>
+* The relevant attributes are the hour and minute on the display, and the charging status of the battery. It is possible to also consider the connection status to the controlling atomic clock.<br/>
+* A system snapshot is clock.display.hour=11, clock.display.minute=27, clock.battery.status=64%.
 </details>
 
 ### 2.3 Alternative Clock Perspective
