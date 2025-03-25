@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en-US" }}">
+<html lang="{{ page.lang | default: site.lang | default: "en-UK" }}">
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -33,6 +33,17 @@
       </div>
       {% endif %}
 -->
+    <hr/>
+    <div class="menu">
+      <span>1</span>
+      <span>2</span>
+      <span>3</span>
+    </div>
+    <style>
+.menu {text-align:justify;}
+.menu:after { content:' '; display:inline-block; width: 100%; height: 0 }
+.menu > span {display:inline-block} 
+    </style>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
     <script>anchors.add();</script>
