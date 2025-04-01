@@ -1,7 +1,8 @@
 ## Hints for Exercise Solutions
 
-* Work in progress  
-![work in progress](../../images/comingSoon.png "work in progress")
+This page presents ideas to solve the reflection exercises of the book.
+As the tasks are formulated very openly, there is not just one solution to each of them.
+Rather, they are starting points to discover different models and perspectives.
 
 ### 2.1 Clock Perspective
 <details>
@@ -20,11 +21,7 @@ There is an analog wall clock in my office.
 It has a very simple design with numbers 1 .. 12 and two hands - a short hour hand and a long minute hand.<br/>
 * For determining time, I need to look at where the hands of the clock point.<br/>
 * I only consider the angle of the hands (two numbers). The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape the numbers, the existence of the numbers, the mechanism that makes the clock work (eletronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
-* For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.<br/><br/>
-My fitness studio has a digital clock. It has a large display with four digits which are separated by a colon. The digits are shown with a seven segment display each.<br/>
-* For determining the time, I read the first two numbers as the hour and the last two numbers as the minute.<br/>
-* We only consider the numbers displayed with the seven segment displays. The colour of the display or its slanting is irrelevant. Other characters like colon or point are not relevant either. All the electronics behind is not relevant as is the clock casing or placement.<br/>
-* We need to be ble to distinguish the off state from the on state for each of the segments in the display, such that the precision is 1 in a range of 0 .. 1. Please note that the accuracy of the clock, i.e. its difference to the actual time, is not of concern here. Even a static clock adheres to the perspective. The accuracy of the clock is relevant when we consider it as a model of time.
+* For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.
 </details>
 
 ### 2.2 Alarm Clock System
@@ -39,8 +36,16 @@ Describe at least one system snapshot using these parts and attributes.
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+I have a digital radio controlled alarm clock in my office which I take with me to meetings such that I can read the time without looking at my wrist.
+The alarm clock display shows the current temperature, second, hours, minutes, the day and month, and the weekday. The digits are shown with a seven segment display each.
+There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button and at the back there is a compartment for the battery.<br/>
+* For determining the time, I read the hour digits as the hour and the minute digits as the minute.<br/>
+* All other information on the display is irrelevant as is the colour of the display or its lighting. All the electronics behind is not relevant as is the clock casing or placement.<br/>
+* As the clock is radio controlled and adjusts austomatically, I do not care for any of the buttons.<br/>
+* It is important that the battery has enough power.<br/>
+* This boils down to the alarm clock system having three parts: the clock casing including a display, the battery cover, and the battery. It would be possible to consider the display as a separate element.<br/>
+* The relevant attributes are the hour and minute on the display, and the charging status of the battery. It is possible to also consider the connection status to the controlling atomic clock.<br/>
+* A system snapshot is clock.display.hour=11, clock.display.minute=27, clock.battery.status=64%.
 </details>
 
 ### 2.3 Alternative Clock Perspective
@@ -53,8 +58,17 @@ Which perspective supports your chosen purpose? What is the system in this new p
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+In Grimstad, there is a church with a clock on its tower. It is widely visible and shows the time. It also has a bell and in former times it would ring regularly to announce the time.
+We will look at the clock as a means of navigation for the boats that are sailing around Grimstad. The visual clock is obviously to small to aid in navigation - the clock tower is better suited for that purpose.
+However, the bell of the clock is a good means of navigation, in particular in the case of fog. It provides an approximate direction for the harbour, which can be improved with visual clues when one approaches the shore.<br/>
+* For navigation, the frequency of the bell signal is essential as well as its pattern.<br/>
+* The placement of the clock is important in order to know the direction.<br/>
+* Differences in sound to other bells in the vicinity are also important to know such that the clock is identifiable.<br/>
+* When hearing the bell, the direction from where it comes is important and maybe the strength of the sound.<br/>
+* We do not care for the hands or the colour of the clock or even the time it shows.<br/>
+* In this perspectivem, the clock is a defined point in space which has a regular acoustic signal.<br/>
+* Possible attributes are its location, the direction from where the signal came, the frequency of the signal, and the delay until the next signal.<br/>
+* A possible system state is location: 58.34314231863526, 8.59555405017648, direction: 320&deg;, frequency: 15', delay: 6'
 </details>
 
 ### 2.4 Clock Descriptions
