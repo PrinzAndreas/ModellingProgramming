@@ -1,6 +1,19 @@
 import numpy as np
 from src.heating_constants import *
-from src.value_table import ValueTable, autofill_and_initiate_value_table
+from src.experiment import Experiment
+from src.value_table import ValueTable, autofill_and_initiate_value_table, VALUE_TABLE_PATH, INDEX_COL
+
+
+class System:
+    env = None
+    boiler = None
+    room = None
+    water_radiator = None
+    electric_radiator = None
+    radiator = None
+    window_rate = None
+    opening_rate = None
+    wanted_temperature = None
 
 
 class ODE:
@@ -62,8 +75,7 @@ class Environment(ODE):
 
     @staticmethod
     def get_value_table():
-        path = r'data/environment/temperature_data.csv'
-        return autofill_and_initiate_value_table(csv_path=path, value_table=ValueTable(unit=TimeUnits.hour))
+        return autofill_and_initiate_value_table(csv_path=VALUE_TABLE_PATH, value_table=ValueTable(unit=TimeUnits.hour), index_col=INDEX_COL)
 
     def refresh_value_table(self):
         self.vTable = self.get_value_table()
@@ -72,13 +84,13 @@ class Environment(ODE):
 class Room(ODE):
     def __init__(self, notation):
         super().__init__(notation=notation)
-        self.state = TEMP_NIGHT_NOMINAL
+        self.state = Experiment.Variables.TEMP_NIGHT_NOMINAL
         self.open = False
 
     def dy_dt(self, t):
-        radiator_power = K_RADIATOR * A_RADIATOR * (radiator.state - self.state)
-        wall_loss_rate = A_WALL * K_WALL * (self.state - env.state)
-        window_loss_rate = A_WINDOW * {False: U.wi_closed, True: U.wi_open}[self.open] * (self.state - env.state)
+        radiator_power = K_RADIATOR * A_RADIATOR * (System.radiator.state - self.state)
+        wall_loss_rate = A_WALL * K_WALL * (self.state - System.env.state)
+        window_loss_rate = A_WINDOW * {False: U.wi_closed, True: U.wi_open}[self.open] * (self.state - System.env.state)
         self.rate = (radiator_power - window_loss_rate - wall_loss_rate) / (C_AIR * D_AIR * V_ROOM)
         return self.rate
 
@@ -90,21 +102,21 @@ class Radiator(ODE):
     def __init__(self, notation, hyst=1):
         super().__init__(notation=notation)
         self.on: bool = False
-        self.state = TEMP_NIGHT_NOMINAL
-        self.tempNominal = TEMP_NIGHT_NOMINAL
+        self.state = Experiment.Variables.TEMP_NIGHT_NOMINAL
+        self.tempNominal = Experiment.Variables.TEMP_NIGHT_NOMINAL
         self.hyst = hyst
         self.temp_diff = 0
 
     def dy_dt(self, t):
         opening = self.opening()
-        self.dq = (self.state - room.state) * A_RADIATOR * U.he
-        dt_gain = opening * (F_WATER / V_RADIATOR) * (boiler.state - self.state)
+        self.dq = (self.state - System.room.state) * A_RADIATOR * U.he
+        dt_gain = opening * (F_WATER / V_RADIATOR) * (System.boiler.state - self.state)
         dt_loss = self.dq / (D_AIR * C_WATER * V_RADIATOR)
         self.rate = dt_gain - dt_loss
         return self.rate
 
     def opening(self):
-        self.temp_diff = self.tempNominal - room.state
+        self.temp_diff = self.tempNominal - System.room.state
         if self.temp_diff <= 0:
             res = 0
 
@@ -124,10 +136,10 @@ class WaterRadiator(Radiator):
         self.state = init_temp
 
     def dy_dt(self, t):
-        temp_in = boiler.state
+        temp_in = System.boiler.state
         opening = self.opening()
         T1 = opening * (F_WATER / V_RADIATOR_WATER) * (temp_in - self.state)
-        T2 = K_RADIATOR * A_RADIATOR * (room.state - self.state) / (V_RADIATOR_WATER * D_WATER * C_WATER)
+        T2 = K_RADIATOR * A_RADIATOR * (System.room.state - self.state) / (V_RADIATOR_WATER * D_WATER * C_WATER)
         self.rate = T1 + T2
         return self.rate
 
@@ -140,23 +152,21 @@ class ElectricalRadiator(Radiator):
 
     def dy_dt(self, t):
         inpPower = (self.opening() * P_RADIATOR) / (C_WATER * V_RADIATOR_WATER * D_WATER)
-        outPower = K_RADIATOR * A_RADIATOR * (room.state - self.state) / (V_RADIATOR_WATER * D_WATER * C_WATER)
+        outPower = K_RADIATOR * A_RADIATOR * (System.room.state - self.state) / (V_RADIATOR_WATER * D_WATER * C_WATER)
         self.rate = inpPower + outPower
         return self.rate
 
 
-TEMP_NIGHT_NOMINAL = 15
-TEMP_DAY_NOMINAL = 22
-
 # Instantiate the ODE's
-env = Environment(notation='env')
-boiler = Boiler(notation='boiler')
-room = Room(notation='room')
-water_radiator = WaterRadiator(notation='radiator', init_temp=TEMP_NIGHT_NOMINAL, init_hyst=1)
-electric_radiator = ElectricalRadiator(notation='radiator', init_temp=TEMP_NIGHT_NOMINAL, init_hyst=0.2)
-radiator = [water_radiator, electric_radiator][0]
-window_rate = Rate(notation='window')
-opening_rate = Rate(notation='opening')
-wanted_temperature = Rate(notation='wanted')
-wanted_temperature.state = TEMP_NIGHT_NOMINAL  # Set the initial states
-room.state = TEMP_NIGHT_NOMINAL  # Set the initial states
+def init_odes(water_radiator_or_electric_radiator: bool = False):
+    System.env = Environment(notation='env')
+    System.boiler = Boiler(notation='boiler')
+    System.room = Room(notation='room')
+    System.water_radiator = WaterRadiator(notation='radiator', init_temp=Experiment.Variables.TEMP_NIGHT_NOMINAL, init_hyst=1)
+    System.electric_radiator = ElectricalRadiator(notation='radiator', init_temp=Experiment.Variables.TEMP_NIGHT_NOMINAL, init_hyst=0.2)
+    System.radiator = [System.water_radiator, System.electric_radiator][int(water_radiator_or_electric_radiator)]
+    System.window_rate = Rate(notation='window')
+    System.opening_rate = Rate(notation='opening')
+    System.wanted_temperature = Rate(notation='wanted')
+    System.wanted_temperature.state = Experiment.Variables.TEMP_NIGHT_NOMINAL  # Set the initial states
+    System.room.state = Experiment.Variables.TEMP_NIGHT_NOMINAL  # Set the initial states
