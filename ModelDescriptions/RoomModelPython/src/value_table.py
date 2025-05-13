@@ -55,9 +55,9 @@ class ValueTable:
         return self.currentTemp + (t - self.currentTime) / (numerator + 1e-4) * (self.nextTemp - self.currentTemp)
 
 
-def autofill_and_initiate_value_table(csv_path, value_table: ValueTable) -> ValueTable:
+def autofill_and_initiate_value_table(csv_path, value_table: ValueTable, index_col=0) -> ValueTable:
     import pandas as pd
-    data = pd.read_csv(csv_path, index_col=0)
+    data = pd.read_csv(csv_path, index_col=index_col)
     for _ in data.values:
         x, y = _[:2]
         value_table.add(t=x, v=y)
@@ -75,6 +75,12 @@ def autofill_and_initiate_value_table(csv_path, value_table: ValueTable) -> Valu
    time and temperatures.
 """
 
-path = r'data/environment/temperature_data.csv'
-value_table: ValueTable = autofill_and_initiate_value_table(csv_path=path, value_table=ValueTable(unit=TimeUnits.hour))
+VALUE_TABLE_PATH = r'data/environment/temperature_data.csv'
+INDEX_COL = 0
+
+VALUE_TABLE_PATH = r'data/environment/temp_2022_april_20-28.csv'
+VALUE_TABLE_PATH = r'data/environment/temp_2023_april_20-28.csv'
+INDEX_COL = None
+
+value_table: ValueTable = autofill_and_initiate_value_table(csv_path=VALUE_TABLE_PATH, value_table=ValueTable(unit=TimeUnits.hour), index_col=INDEX_COL)
 
