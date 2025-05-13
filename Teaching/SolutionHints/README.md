@@ -85,16 +85,12 @@ We consider the clock of Big Ben, which is the Great Clock of Westminster at the
 The clock is an analogue clock and is shown in four directions. This means a system status contains four clock readings, which all should be the same at all times.
 This is normally ensured by the mechanics inside the tower. Each clock reading can be represented by the angle of its hour and minute hands with the precision of integers.
 We only look at the north clock now.
-If we use degrees for the angle starting from the hands pointing up, then we can identify three situations as follows.
-
+If we use degrees for the angle starting from the hands pointing up, then we can identify three situations as follows.<br><br>
 bigben.clock.north.hour=0, bigben.clock.north.minute=0 <br>
 bigben.clock.north.hour=160, bigben.clock.north.minute=120 <br>
-bigben.clock.north.hour=81, bigben.clock.north.minute=253
-
-We can translate these states into digital time readings as follows: 12:00, 5:20, 2:42.
-
-When we consider a discrete execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.
-
+bigben.clock.north.hour=81, bigben.clock.north.minute=253<br><br>
+We can translate these states into digital time readings as follows: 12:00, 5:20, 2:42.<br>
+When we consider a discrete execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
 A continuous execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
 </details>
 
