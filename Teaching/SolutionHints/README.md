@@ -105,8 +105,13 @@ What is the perspective used and what are the behaviours?
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+For a model, we need a shared perspective. As the Boeing 737 is more complex, we adapt the perspective to the paper plane.
+We consider one body, two wings, and the possibility to be airborne. For this, we consider the 3D position of the plane, its speed and the direction it is facing.
+We ignore the material, the inside of the body, and the wheels. If we want, we can consider flaps.<br>
+
+Now we can map between 3D paper plane and Boeing 747 movements. With some scaling, we can get the movements to match. 
+Obviously, we can only consider scenarios where the plane descends, as the paper plane does not any thrust.
+We can look at gliding ond maybe landing.
 </details>
 
 ### 3.2 Music
