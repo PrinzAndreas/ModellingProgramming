@@ -124,8 +124,16 @@ Do the symbols describe the music correctly? Which perspective is applied? How d
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Music is a very complex phenomenon involving arrangements of sound, see <a href="https://en.wikipedia.org/wiki/Music">Wikipedia</a>. To make it tangible, we can look at some of its elements: pitch, melody, harmony, rhythm, texture, timbre, expression, and form.<br>
+Even though the underlying phenomenon is sound, we do not look at the physics of sound waves, but consider the perception of sound, see <a href="https://en.wikipedia.org/wiki/Sound">Wikipedia</a>. Again, there are several possible elements to consider: pitch, duration, loudness, timbre, texture, and spatial location.<br>
+We select a restricted perspective and consider pitch, duration, and loudness. We measure the pitch as the frequency of the sound wave, duration as the time it takes from start to end and the loudness by the pressure level in decibel.<br>
+Notes in sheet music can express pitch, duration, and loudness. This way, notes can describe music on our perspective. As we often create music in terms on notes, these notes describe the music correctly.<br>
+However, we know that musical notes are not able to describe all possible changes in pitch, duration, and loudness. 
+The expressible pitches are limited, related to a reference frequency (concert pitch).
+Also the expressible durations are limited, given in fractions of the musical meter.
+For loudness, expressivity is even less.
+That means not all musical ideas can be expressed with musical notes.<br>
+Different instruments are similar under our perspective. We might need an extended perspective to distinguish them.<br>
 </details>
 
 ### 3.3 Geocentric Worldview
