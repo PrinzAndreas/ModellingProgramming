@@ -147,8 +147,12 @@ Which perspective is needed to make it a correct model?
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+As with all models, the question is about the purpose of the model. We want to account for the movements of the stars and the planets.
+First, it must be noted that for the movements of the stars there is basically no difference between a geocentric and a heliocentric worldview, because all stars are very far apart from our solar system.
+When it comes to the planets, there are very early methods to predict the movements of the planets, the sun and the moon.
+There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
+Due to the placement of the Earth in the center, various corrections have to be applied to ensure correctness.
+With those, the model can predict the planet movements with reasonable precision.
 </details>
 
 ### 3.4 Heating Model
