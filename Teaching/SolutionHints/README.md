@@ -152,7 +152,8 @@ First, it must be noted that for the movements of the stars there is basically n
 When it comes to the planets, there are very early methods to predict the movements of the planets, the sun and the moon.
 There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
 Due to the placement of the Earth in the center, various corrections have to be applied to ensure correctness.
-With those, the model can predict the planet movements with reasonable precision.
+With those, the model can predict the planet movements with reasonable precision.\\
+On the other hand, the models gets much simpler when using a heliocentric perspective.
 </details>
 
 ### 3.4 Heating Model
