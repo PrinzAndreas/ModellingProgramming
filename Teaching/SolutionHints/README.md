@@ -153,7 +153,7 @@ When it comes to the planets, there are very early methods to predict the moveme
 There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
 Due to the placement of the Earth in the center, various corrections have to be applied to ensure correctness.
 With those, the model can predict the planet movements with reasonable precision.\\
-On the other hand, the models gets much simpler when using a heliocentric perspective.
+However, the model gets much simpler when using a heliocentric perspective.
 </details>
 
 ### 3.4 Heating Model
@@ -161,13 +161,16 @@ On the other hand, the models gets much simpler when using a heliocentric perspe
 <summary> Task description </summary>
 Recheck Episode 11.
 
-Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model\index{model|)} to take care of the invalid assumptions?
+Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model to take care of the invalid assumptions?
 </details>
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.
+
+Validity of the assumptions is related to the purpose of the model and the implied data accuracy. Although Charlies movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature accuracy of 1 degree is not fine enough to register Charlies influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlies room is also heated and has almost the same temperature as Charlies room.
+
+When we want to consider the distribution of temperature in the room, we need more temperature measurement spots and a model for the heat diffusion in the room.
 </details>
 
 ### 4.1 Time
