@@ -183,8 +183,12 @@ When is a clock a correct model and when is the model incorrect? How is this inf
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+In our understanding, time is the inherent ordering of snapshots. This means we can understand time as IDs for snapshots.
+A clock is a way to provide these IDs inside of snapshots. A simple correctness understanding would say that the clock should equal the time, which implies that the clock is incorrect when it does not equal the time.
+
+However, care is needed, because equality depends on the perspective, in particular the accuracy and precision of the clock.
+The precision of the clock introduces an extra challenge, because any precision means that clock readings are discrete instead of continuous.
+In this sense, it is impossible to have a real continuous clock. Again, the perspective decides whether this is acceptable or not.
 </details>
 
 ### 4.2 Architecture
