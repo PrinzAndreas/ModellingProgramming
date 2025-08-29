@@ -152,7 +152,7 @@ First, it must be noted that for the movements of the stars there is basically n
 When it comes to the planets, there are very early methods to predict the movements of the planets, the sun and the moon.
 There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
 Due to the placement of the Earth in the center, various corrections have to be applied to ensure correctness.
-With those, the model can predict the planet movements with reasonable precision.\\
+With those, the model can predict the planet movements with reasonable precision.<br/>
 However, the model gets much simpler when using a heliocentric perspective.
 </details>
 
@@ -166,10 +166,8 @@ Add more implicit assumptions for that case. Determine which of the given and th
 
 <details>
 <summary> Solution hints </summary>
-Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.
-
-Validity of the assumptions is related to the purpose of the model and the implied data accuracy. Although Charlies movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature accuracy of 1 degree is not fine enough to register Charlies influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlies room is also heated and has almost the same temperature as Charlies room.
-
+Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.<br/>
+Validity of the assumptions is related to the purpose of the model and the implied data accuracy. Although Charlies movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature accuracy of 1 degree is not fine enough to register Charlies influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlies room is also heated and has almost the same temperature as Charlies room.<br/>
 When we want to consider the distribution of temperature in the room, we need more temperature measurement spots and a model for the heat diffusion in the room.
 </details>
 
@@ -184,8 +182,7 @@ When is a clock a correct model and when is the model incorrect? How is this inf
 <details>
 <summary> Solution hints </summary>
 In our understanding, time is the inherent ordering of snapshots. This means we can understand time as IDs for snapshots.
-A clock is a way to provide these IDs inside of snapshots. A simple correctness understanding would say that the clock should equal the time, which implies that the clock is incorrect when it does not equal the time.
-
+A clock is a way to provide these IDs inside of snapshots. A simple correctness understanding would say that the clock should equal the time, which implies that the clock is incorrect when it does not equal the time.<br/>
 However, care is needed, because equality depends on the perspective, in particular the accuracy and precision of the clock.
 The precision of the clock introduces an extra challenge, because any precision means that clock readings are discrete instead of continuous.
 In this sense, it is impossible to have a real continuous clock. Again, the perspective decides whether this is acceptable or not.
@@ -201,8 +198,9 @@ Sometimes, the drawing is prepared after the building is finished. Can we say th
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Obviously, the answer to the question depends on the perspective chosen. Let us assume that the perspective for the drawing and for the building coincide.
+Then the measurements in the building should match the data available in the drawing, and hence model-of can go in both ways.<br/>
+On this basis, we should check what was the original. If the original was the drawing, and the building is based later, then the building can be considered the model. Otherwise, the prescribed building by the drawing can be considered the model.
 </details>
 
 ### 4.3 Discretization
