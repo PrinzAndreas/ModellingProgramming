@@ -213,8 +213,50 @@ If we start with continuous data given by the cosine function, how can we extrac
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
+Work in progress<br/>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+<br/>
+The cosine function is a real-valued function from reals. If we want to extract a value for every full minute, we first need to agree on what real number constitutes a minute. For simplicity, we assume a time base of minutes, such that the first minute has the real value 1.0. Alternatively, we could have chosen a time base of seconds, where the first minute would be at the real value 60.0.<br/>
+From here, we just create a table of values as follows.
+<table>
+  <thead>
+    <tr>
+      <th scope="col">time point in minute</th>
+      <th scope="col">time base minute</th>
+      <th scope="col">time base second</th>
+      <th scope="col">time base minute*pi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">0</th>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th scope="row">1</th>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td colspan=4>...</td>
+    </tr>
+  </tbody>
+</table>
 </details>
 
 ### 4.4 Darts
