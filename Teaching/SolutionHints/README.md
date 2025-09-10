@@ -213,11 +213,8 @@ If we start with continuous data given by the cosine function, how can we extrac
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br/>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
-<br/>
 The cosine function is a real-valued function from reals. If we want to extract a value for every full minute, we first need to agree on what real number constitutes a minute. For simplicity, we assume a time base of minutes, such that the first minute has the real value 1.0. Alternatively, we could have chosen a time base of seconds, where the first minute would be at the real value 60.0. Another alternative would be to choose a time base of &#x3C0;/2. In this case, the values of sine would switch between 0, 1, and -1.<br/>
-From here, we just create a table of values as follows.
+From here, we just create a table of values as follows. Of course, you choose only one column with the appropriate time base.
 <table>
   <thead>
     <tr>
@@ -230,39 +227,39 @@ From here, we just create a table of values as follows.
   <tbody>
     <tr>
       <th scope="row">0</th>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td style="text-align: center;">0.0</td>
+      <td style="text-align: center;">0.0</td>
+      <td style="text-align: center;">0.0</td>
     </tr>
     <tr>
       <th scope="row">1</th>
-      <td>0.84</td>
-      <td>-0.30</td>
-      <td>1.0</td>
+      <td style="text-align: center;">0.84</td>
+      <td style="text-align: center;">-0.30</td>
+      <td style="text-align: center;">1.0</td>
     </tr>
     <tr>
       <th scope="row">2</th>
-      <td>0.91</td>
-      <td>0.58</td>
-      <td>0.0</td>
+      <td style="text-align: center;">0.91</td>
+      <td style="text-align: center;">0.58</td>
+      <td style="text-align: center;">0.0</td>
     </tr>
     <tr>
       <th scope="row">3</th>
-      <td>0.14</td>
-      <td>-0.80</td>
-      <td>-1.0</td>
+      <td style="text-align: center;">0.14</td>
+      <td style="text-align: center;">-0.80</td>
+      <td style="text-align: center;">-1.0</td>
     </tr>
     <tr>
       <th scope="row">4</th>
-      <td>-0.76</td>
-      <td>0.95</td>
-      <td>0.0</td>
+      <td style="text-align: center;">-0.76</td>
+      <td style="text-align: center;">0.95</td>
+      <td style="text-align: center;">0.0</td>
     </tr>
     <tr>
       <th scope="row">...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
+      <td style="text-align: center;">...</td>
+      <td style="text-align: center;">...</td>
+      <td style="text-align: center;">...</td>
     </tr>
   </tbody>
 </table>
