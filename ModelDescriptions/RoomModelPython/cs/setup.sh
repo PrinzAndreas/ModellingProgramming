@@ -1,9 +1,10 @@
-# INSTALL REQUIREMENTS
-pip install --user -r cs/requirements.txt
-
-# INSTALL GNUPLOT
 apt update 
-apt install gnuplot -y
+apt install -y python3.6 python3.6-dev python3-pip gnuplot 
+update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
 
-# REMOVE EXCESS PYTHON INTERPRETERS 
-rm -rf $(find /usr/bin -type f -name python*)
+
+# INSTALL REQUIREMENTS
+pip install -r cs/requirements.txt
+
+# # REMOVE EXCESS PYTHON INTERPRETERS 
+# rm -rf $(find /usr/bin -type f -name python*)

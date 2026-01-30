@@ -18,8 +18,8 @@ import <HeatingConstants>
 
 module RoomHeating {
   //========== Experiment parameters
-  public constant double T_NOFREEZE       =  7;      // °C - frost protection
-  public constant double T_DAY_TARGET     = 21;      // °C
+  public constant double T_NOFREEZE       =  7;      // ï¿½C - frost protection
+  public constant double T_DAY_TARGET     = 21;      // ï¿½C
   public constant double EXPERIMENT_DURATION = 2*Day;
   //========== End experiment parameters
 
@@ -49,7 +49,7 @@ module RoomHeating {
 
 // class Boiler, having constant temperature
   passive class Boiler () implements (Behavior) {
-    constant double T_water = 40; // °C
+    constant double T_water = 40; // ï¿½C
     ContinuousVariable T;
 
     initial {
@@ -136,7 +136,7 @@ module RoomHeating {
 
 // class WaterRadiator, special case of radiator
   passive class WaterRadiator(double phi_init) subclass(Radiator) implements (Behavior) {
-    double phi = phi_init;   //°C       ~ hysteresis of temperature control
+    double phi = phi_init;   //ï¿½C       ~ hysteresis of temperature control
 
     concrete method derivatives(double t) {
       double tempDiff = tT - room->T.state;
@@ -158,7 +158,7 @@ module RoomHeating {
 // class ElectricalRadiator, special case of radiator
   passive class ElectricalRadiator(double phi_init) subclass(Radiator) implements (Behavior) {
     constant double P = 500; // Watt (J/s) - electrical radiator power
-    double phi=phi_init;     //°C          - hysteresis of temperature control
+    double phi=phi_init;     //ï¿½C          - hysteresis of temperature control
 
     concrete method derivatives(double t) {
       double tempDiff = tT - room->T.state;
