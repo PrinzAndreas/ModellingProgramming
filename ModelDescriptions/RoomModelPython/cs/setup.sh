@@ -1,5 +1,6 @@
+export DEBIAN_FRONTEND=noninteractive
 apt update 
-apt install gnuplot 
+apt install -y gnuplot 
 # update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
 
 
