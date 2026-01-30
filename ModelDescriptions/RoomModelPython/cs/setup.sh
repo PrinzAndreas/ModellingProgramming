@@ -1,5 +1,5 @@
 apt update 
-apt install -y gnuplot 
+apt install gnuplot 
 # update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
 
 
