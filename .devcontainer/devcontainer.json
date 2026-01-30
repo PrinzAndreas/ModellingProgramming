@@ -3,7 +3,7 @@
 {
 	"name": "Python 3.6.13",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ubuntu:20.04", 
+	"image": "python:3.6.13-buster", // CONFIGURE PYTHON VERSION
 	"workspaceFolder": "/workspaces/ModellingProgramming/ModelDescriptions/RoomModelPython/",
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {}
