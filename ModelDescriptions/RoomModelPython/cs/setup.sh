@@ -1,9 +1,14 @@
 export DEBIAN_FRONTEND=noninteractive
+
+# Backup current sources.list
+cp /etc/apt/sources.list /etc/apt/sources.list.backup
+
+# Update sources.list to use archive.debian.org for old releases
+sed -i 's|archive.debian.org/debian-security/debian-security|archive.debian.org/debian-security|g' /etc/apt/sources.list
+
+# Update package lists
 apt update 
 apt install -y gnuplot 
-# apt install -y python3.6 python3.6-dev python3-pip 
-# update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
-
 
 # INSTALL REQUIREMENTS
 pip install -r cs/requirements.txt
