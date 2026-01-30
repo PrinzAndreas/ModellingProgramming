@@ -81,8 +81,17 @@ Create three different snapshot descriptions of such a clock. Then describe poss
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+We consider the clock of Big Ben, which is the Great Clock of Westminster at the north end of the Palace of Westminster in London, England.
+The clock is an analogue clock and is shown in four directions. This means a system status contains four clock readings, which all should be the same at all times.
+This is normally ensured by the mechanics inside the tower. Each clock reading can be represented by the angle of its hour and minute hands with the precision of integers.
+We only look at the north clock now.
+If we use degrees for the angle starting from the hands pointing up, then we can identify three situations as follows.<br><br>
+bigben.clock.north.hour=0, bigben.clock.north.minute=0 <br>
+bigben.clock.north.hour=160, bigben.clock.north.minute=120 <br>
+bigben.clock.north.hour=81, bigben.clock.north.minute=253<br><br>
+We can translate these states into digital time readings as follows: 12:00, 5:20, 2:42.<br>
+When we consider a discrete execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
+A continuous execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
 </details>
 
 ### 3.1 Paper plane
@@ -96,8 +105,13 @@ What is the perspective used and what are the behaviours?
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+For a model, we need a shared perspective. As the Boeing 737 is more complex, we adapt the perspective to the paper plane.
+We consider one body, two wings, and the possibility to be airborne. For this, we consider the 3D position of the plane, its speed and the direction it is facing.
+We ignore the material, the inside of the body, and the wheels. If we want, we can consider flaps.<br>
+
+Now we can map between 3D paper plane and Boeing 747 movements. With some scaling, we can get the movements to match. 
+Obviously, we can only consider scenarios where the plane descends, as the paper plane does not any thrust.
+We can look at gliding ond maybe landing.
 </details>
 
 ### 3.2 Music
@@ -110,8 +124,16 @@ Do the symbols describe the music correctly? Which perspective is applied? How d
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Music is a very complex phenomenon involving arrangements of sound, see <a href="https://en.wikipedia.org/wiki/Music">Wikipedia</a>. To make it tangible, we can look at some of its elements: pitch, melody, harmony, rhythm, texture, timbre, expression, and form.<br>
+Even though the underlying phenomenon is sound, we do not look at the physics of sound waves, but consider the perception of sound, see <a href="https://en.wikipedia.org/wiki/Sound">Wikipedia</a>. Again, there are several possible elements to consider: pitch, duration, loudness, timbre, texture, and spatial location.<br>
+We select a restricted perspective and consider pitch, duration, and loudness. We measure the pitch as the frequency of the sound wave, duration as the time it takes from start to end and the loudness by the pressure level in decibel.<br>
+Notes in sheet music can express pitch, duration, and loudness. This way, notes can describe music on our perspective. As we often create music in terms on notes, these notes describe the music correctly.<br>
+However, we know that musical notes are not able to describe all possible changes in pitch, duration, and loudness. 
+The expressible pitches are limited, related to a reference frequency (concert pitch).
+Also the expressible durations are limited, given in fractions of the musical meter.
+For loudness, expressivity is even less.
+That means not all musical ideas can be expressed with musical notes.<br>
+Different instruments are similar under our perspective. We might need an extended perspective to distinguish them.<br>
 </details>
 
 ### 3.3 Geocentric Worldview
@@ -125,8 +147,13 @@ Which perspective is needed to make it a correct model?
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+As with all models, the question is about the purpose of the model. We want to account for the movements of the stars and the planets.
+First, it must be noted that for the movements of the stars there is basically no difference between a geocentric and a heliocentric worldview, because all stars are very far apart from our solar system.
+When it comes to the planets, there are very early methods to predict the movements of the planets, the sun and the moon.
+There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
+Due to the placement of the Earth in the center, various corrections have to be applied to ensure correctness.
+With those, the model can predict the planet movements with reasonable precision.<br/>
+However, the model gets much simpler when using a heliocentric perspective.
 </details>
 
 ### 3.4 Heating Model
@@ -134,13 +161,14 @@ Work in progress<br>
 <summary> Task description </summary>
 Recheck Episode 11.
 
-Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model\index{model|)} to take care of the invalid assumptions?
+Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model to take care of the invalid assumptions?
 </details>
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.<br/>
+Validity of the assumptions is related to the purpose of the model and the implied data accuracy. Although Charlies movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature accuracy of 1 degree is not fine enough to register Charlies influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlies room is also heated and has almost the same temperature as Charlies room.<br/>
+When we want to consider the distribution of temperature in the room, we need more temperature measurement spots and a model for the heat diffusion in the room.
 </details>
 
 ### 4.1 Time
@@ -153,8 +181,11 @@ When is a clock a correct model and when is the model incorrect? How is this inf
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+In our understanding, time is the inherent ordering of snapshots. This means we can understand time as IDs for snapshots.
+A clock is a way to provide these IDs inside of snapshots. A simple correctness understanding would say that the clock should equal the time, which implies that the clock is incorrect when it does not equal the time.<br/>
+However, care is needed, because equality depends on the perspective, in particular the accuracy and precision of the clock.
+The precision of the clock introduces an extra challenge, because any precision means that clock readings are discrete instead of continuous.
+In this sense, it is impossible to have a real continuous clock. Again, the perspective decides whether this is acceptable or not.
 </details>
 
 ### 4.2 Architecture
@@ -167,8 +198,9 @@ Sometimes, the drawing is prepared after the building is finished. Can we say th
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Obviously, the answer to the question depends on the perspective chosen. Let us assume that the perspective for the drawing and for the building coincide.
+Then the measurements in the building should match the data available in the drawing, and hence model-of can go in both ways.<br/>
+On this basis, we should check what was the original. If the original was the drawing, and the building is based later, then the building can be considered the model. Otherwise, the prescribed building by the drawing can be considered the model.
 </details>
 
 ### 4.3 Discretization
@@ -181,8 +213,57 @@ If we start with continuous data given by the cosine function, how can we extrac
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+The cosine function is a real-valued function from reals. If we want to extract a value for every full minute, we first need to agree on what real number constitutes a minute. For simplicity, we assume a time base of minutes, such that the first minute has the real value 1.0. Alternatively, we could have chosen a time base of seconds, where the first minute would be at the real value 60.0. Another alternative would be to choose a time base of &#x3C0;/2. In this case, the values of sine would switch between 0, 1, and -1.<br/>
+From here, we just create a table of values as follows. Of course, you choose only one column with the appropriate time base.
+<table>
+  <thead>
+    <tr>
+      <th scope="col">time point in minute</th>
+      <th scope="col">time base minute</th>
+      <th scope="col">time base second</th>
+      <th scope="col">time base minute&times;&#x3C0;/2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">0</th>
+      <td style="text-align: center;">0.0</td>
+      <td style="text-align: center;">0.0</td>
+      <td style="text-align: center;">0.0</td>
+    </tr>
+    <tr>
+      <th scope="row">1</th>
+      <td style="text-align: center;">0.84</td>
+      <td style="text-align: center;">-0.30</td>
+      <td style="text-align: center;">1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td style="text-align: center;">0.91</td>
+      <td style="text-align: center;">0.58</td>
+      <td style="text-align: center;">0.0</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td style="text-align: center;">0.14</td>
+      <td style="text-align: center;">-0.80</td>
+      <td style="text-align: center;">-1.0</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td style="text-align: center;">-0.76</td>
+      <td style="text-align: center;">0.95</td>
+      <td style="text-align: center;">0.0</td>
+    </tr>
+    <tr>
+      <th scope="row">...</th>
+      <td style="text-align: center;">...</td>
+      <td style="text-align: center;">...</td>
+      <td style="text-align: center;">...</td>
+    </tr>
+  </tbody>
+</table>
+The perspective influences at which place we read the sine function. It also determines the precision and accuracy of the result.
 </details>
 
 ### 4.4 Darts
