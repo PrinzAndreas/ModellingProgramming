@@ -1,3 +1,9 @@
+# ----------------------------------------------------------------
+# This module contains callback functions for the ODE integrator
+# Callbacks are functions that are called at specific events during the integration process
+# They are used to update the state of the system, compute rates, and perform other necessary actions
+# ----------------------------------------------------------------
+
 import numpy as np
 from src.odes import System
 from src.experiment import Experiment
@@ -69,5 +75,27 @@ def open_close_window_event(start, duration=None):
     open_window.attach_callback(func=lambda **kwargs: System.room.set_open(open=True))
     close_window.attach_callback(func=lambda **kwargs: System.room.set_open(open=False))
     return open_window, close_window
+
+
+def close_window(**kwargs):
+    System.room.set_open(open=False)
+
+def open_window(**kwargs):
+    System.room.set_open(open=True)
+
+
+
+CALLBACKS = {
+    ('active', 'airing'): [open_window],
+    ('active', 'working'): [close_window],
+    ('active', 'preparing'): [close_window],
+    ('airing', 'active'): [close_window],
+    ('airing', 'preparing'): [close_window],
+    ('airing', 'working'): [close_window],
+    ('sleeping', 'active'): [clb_wake_up, clb_wanted_temp_callback],
+    ('preparing', 'sleeping'): [clb_sleep, clb_wanted_temp_callback],
+    None: [clb_env_temp, clb_get_rates, clb_wanted_temp_callback, clb_room_temp, clb_radiator_temp]
+}
+
 
 

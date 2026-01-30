@@ -1,3 +1,7 @@
+# ------------------------------------------------------------
+# This module defines time units in seconds for use in the model
+# ------------------------------------------------------------
+
 class TimeUnits:
     second: float = 1.0
     minute: float = 60 * second

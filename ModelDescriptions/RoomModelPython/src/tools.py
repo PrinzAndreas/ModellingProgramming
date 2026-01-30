@@ -1,3 +1,7 @@
+# ------------------------------------------------------------
+# This module contains tools for ODE integration using PyDSTool
+# ------------------------------------------------------------
+
 from contextlib import contextmanager
 
 from PyDSTool import *
@@ -114,12 +118,14 @@ class Integrator:
     def parse_events(self, current_step, event_times, ics, variables, debug=False):
         for event in self.events:
             if event_times.get(event.event_args['name']):
-                temp = current_step.results.getEvents()
-                t = event_times.get(event.event_args['name'])
+                values = current_step.results.getEvents()
+                timestep = event_times.get(event.event_args['name'])
                 feed_dict = {
-                    **{'event': event, 't': t, 'vars': {v: temp.get(v) for v in variables}},
+                    **{'event': event, 't': timestep, 'vars': {variable: values.get(variable) for variable in variables}},
                     **{'c_step': current_step, 'ics': ics, 'var_names': variables, 'params': self.solver.pars}
                 }
+
+                # Call the callbacks associated with the event
                 for callback in event.callbacks:
                     if debug:
                         print(f'calling: {callback.__name__}')
@@ -161,3 +167,4 @@ class Event:
     @property
     def expr(self):
         return f'sin((t - {self.time}) * pi/{self.repeat})'
+

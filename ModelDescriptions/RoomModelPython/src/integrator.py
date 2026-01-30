@@ -1,30 +1,64 @@
+# ------------------------------------------------------------
+# This module initializes and configures the ODE integrator
+# ------------------------------------------------------------
+
+
 from src.odes import *
 from src.experiment import *
 from src.callback import *
 from src.tools import  *
+from src.state_machine import FSM
+
+fsm = FSM()
+
+def fsm_callback(**kwargs):
+    # Request next state
+    current_time = kwargs['c_step']['points']['t'][-1]
+    fsm.next_state(current_time)
+    
+    # Get last transition
+    transition = fsm.last
+    
+    # Call default callbacks
+    for f in CALLBACKS[None]:
+        f(**kwargs)
+
+    # Call transition specific callbacks
+    if transition is not None and transition in CALLBACKS:
+        for f in CALLBACKS[transition]:
+            f(**kwargs)
+
 
 def init_integrator():
-        
-    main_event = Event(name='main_event', time=0 * TimeUnits.second, repeat=Experiment.Variables.INTEGRATOR_PRECISION * TimeUnits.minute, term=True, active=True)
-    wake_up_event = Event(name='wake_up_event', time=7 * TimeUnits.hour, repeat=24*TimeUnits.hour)
-    go_to_sleep_event = Event(name='go_to_sleep_event', time=22 * TimeUnits.hour, repeat=24*TimeUnits.hour)
 
-    main_event.attach_callback(func=clb_env_temp)
-    main_event.attach_callback(func=clb_get_rates)
-    main_event.attach_callback(func=clb_wanted_temp_callback)
-    main_event.attach_callback(func=clb_room_temp)
-    main_event.attach_callback(func=clb_radiator_temp)
+    # An event stops the integrator at specified intervals to perform some actions
+    main_event = Event(
+        name='main_event',                  
+        time=0 * TimeUnits.second,                                              # Starts immediately
+        repeat=Experiment.Variables.INTEGRATOR_PRECISION * TimeUnits.minute,    # Repeats at specified intervals
+        term=True,                                                              # Terminates the integrator when triggered
+        active=True                                                             # Is active                          
+    )
+    
+    # Attach the FSM callback to the main event
+    # This callback will be called every time the event is triggered
+    # Updates the FSM state and performs associated actions
+    main_event.attach_callback(func=fsm_callback)
 
-    wake_up_event.attach_callback(func=clb_wake_up)
 
-    go_to_sleep_event.attach_callback(func=clb_sleep)
-
-
+    # Set up the integrator
     Experiment.integrator = Integrator(
+
+        # Duration and step sizes
         tdata=[0, Experiment.Variables.EXPERIMENT_DURATION],
         max_step=10 * TimeUnits.minute,
         min_step=0.0001 * TimeUnits.minute,
         init_step=10*TimeUnits.second,
+
+        # Events
+        events=[main_event],
+
+        # Expressions (ODEs), initial conditions and parameters
         expressions={
             **System.room.expr, 
             **System.radiator.expr, 
@@ -43,21 +77,6 @@ def init_integrator():
             **System.wanted_temperature.ics, 
             **System.opening_rate.ics
         },
-        events=[
-            main_event,
-            wake_up_event,
-            go_to_sleep_event,
-            *open_close_window_event(start=7.35*TimeUnits.hour, duration=0.35*TimeUnits.hour),
-            *open_close_window_event(start=15.7*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=17*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=18.2*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=20.9*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=22*TimeUnits.hour, duration=0.25*TimeUnits.hour),
-            *open_close_window_event(start=(24 + 17)*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=(24 + 18.2)*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=(24 + 20.9)*TimeUnits.hour, duration=0.3*TimeUnits.hour),
-            *open_close_window_event(start=(24 + 22)*TimeUnits.hour, duration=0.25*TimeUnits.hour),
-        ],
         params={
             'env_rate': System.env.dy_dt(t=0),
             'room_rate': System.room.dy_dt(t=0),
@@ -69,6 +88,8 @@ def init_integrator():
         }
     )
     
+    # Reset environements and logs
     System.env.refresh_value_table()
     Experiment.integrator.verbose = 1
+    fsm.logs = []
     

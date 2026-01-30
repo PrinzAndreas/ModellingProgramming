@@ -1,20 +1,19 @@
+# ------------------------------------------------------------------
+# This module defines the ODE classes for the room heating model
+# ------------------------------------------------------------------
+
 import numpy as np
 from src.heating_constants import *
 from src.experiment import Experiment
 from src.value_table import ValueTable, autofill_and_initiate_value_table, VALUE_TABLE_PATH, INDEX_COL
 
 
-class System:
-    env = None
-    boiler = None
-    room = None
-    water_radiator = None
-    electric_radiator = None
-    radiator = None
-    window_rate = None
-    opening_rate = None
-    wanted_temperature = None
-
+# Base ODE class
+# expression are essentially:
+#  notation = rate
+# rate is computed in dy_dt
+# and states are updated using callbacks
+# see callback.py
 
 class ODE:
     def __init__(self, notation):
@@ -24,10 +23,7 @@ class ODE:
         self.state = 0
 
         self.dq = 0
-
-    def update_state(self, state_value):
-        self.state = state_value
-
+        
     def dy_dt(self, t):
         pass
 
@@ -156,15 +152,33 @@ class ElectricalRadiator(Radiator):
         self.rate = inpPower + outPower
         return self.rate
 
+# Single variable to hold all ODE instances
+class System:
+    env: Environment = None
+    boiler: Boiler = None
+    room: Room = None
+    water_radiator: WaterRadiator = None
+    electric_radiator: ElectricalRadiator = None
+    radiator: Radiator = None
+    window_rate: Rate = None
+    opening_rate: Rate = None
+    wanted_temperature: Rate = None
+
+
 
 # Instantiate the ODE's
-def init_odes(water_radiator_or_electric_radiator: bool = False):
+def init_odes():
+    radiator_type = {
+        'water': 0,
+        'electric': 1
+    }.get(Experiment.Variables.RADIATOR_TYPE, 0)
+
     System.env = Environment(notation='env')
     System.boiler = Boiler(notation='boiler')
     System.room = Room(notation='room')
     System.water_radiator = WaterRadiator(notation='radiator', init_temp=Experiment.Variables.TEMP_NIGHT_NOMINAL, init_hyst=1)
     System.electric_radiator = ElectricalRadiator(notation='radiator', init_temp=Experiment.Variables.TEMP_NIGHT_NOMINAL, init_hyst=0.2)
-    System.radiator = [System.water_radiator, System.electric_radiator][int(water_radiator_or_electric_radiator)]
+    System.radiator = [System.water_radiator, System.electric_radiator][radiator_type]
     System.window_rate = Rate(notation='window')
     System.opening_rate = Rate(notation='opening')
     System.wanted_temperature = Rate(notation='wanted')

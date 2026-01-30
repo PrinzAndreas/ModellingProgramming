@@ -1,3 +1,7 @@
+# ------------------------------------------------------------
+# This module contains constants for the room heating model
+# ------------------------------------------------------------
+
 import math
 from src.time_base_seconds import TimeUnits
 

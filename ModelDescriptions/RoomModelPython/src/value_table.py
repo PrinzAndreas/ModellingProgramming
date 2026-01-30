@@ -1,3 +1,8 @@
+# ------------------------------------------------------------
+# This module defines a ValueTable class for managing time-value pairs
+# It includes methods for adding points, initializing, refreshing, and linear interpolation 
+# ------------------------------------------------------------
+
 from abc import ABC
 from typing import Set
 from src.time_base_seconds import TimeUnits
