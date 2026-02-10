@@ -276,8 +276,14 @@ What are the reasons for these uncertainties? How could a change of perspective 
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+We consider a situation where a player aims the dart arrow at some area or point of the dart board. Depending on the player's proficiency, the aroow will end up somewhere near the intended location.
+This depends on the stability of the aim, the alignment of the hand movements to the intented aim, which finally determines the direction and velocity of the arrow when it leaves the hand.
+From there, physics takes over and the result could be computed, unless there is wind involved.
+The randomness of the results can be captured with an uncertainty distance between the aim and the result.
+<br>
+For a pro player, this uncertainty distance is small, such that the randomness is also small, and maybe not measurable depending on the perspective for the dart board positions.
+<br>
+When we are able to measure the direction and velocity of the dart arrow when it leaves the hand, most of the randomness disappears.
 </details>
 
 ### 5.1 Synchronised Traffic Lights
