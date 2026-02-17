@@ -13,7 +13,6 @@ The purpose is to read the time.
 Which perspective of the clock helps you determine the time? 
 Which aspects of reality do you consider, and which do you ignore?
 Which precision of the relevant attributes is meaningful?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -22,6 +21,7 @@ It has a very simple design with numbers 1 .. 12 and two hands - a short hour ha
 * For determining time, I need to look at where the hands of the clock point.<br/>
 * I only consider the angle of the hands (two numbers). The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape the numbers, the existence of the numbers, the mechanism that makes the clock work (eletronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
 * For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.
+</details>
 </details>
 
 ### 2.2 Alarm Clock System
@@ -32,7 +32,6 @@ Consider an alarm clock somewhere in your household with the purpose of reading 
 What is the system for this clock? 
 What are the parts and attributes of the system? 
 Describe at least one system snapshot using these parts and attributes. 
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -47,6 +46,7 @@ There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button a
 * The relevant attributes are the hour and minute on the display, and the charging status of the battery. It is possible to also consider the connection status to the controlling atomic clock.<br/>
 * A system snapshot is clock.display.hour=11, clock.display.minute=27, clock.battery.status=64%.
 </details>
+</details>
 
 ### 2.3 Alternative Clock Perspective
 <details>
@@ -54,7 +54,6 @@ There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button a
 Consider a clock on a public building. Choose a purpose which is not reading the time.
 
 Which perspective supports your chosen purpose? What is the system in this new perspective, including parts and attributes? Describe at least one snapshot of this alternative system.
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -70,6 +69,7 @@ However, the bell of the clock is a good means of navigation, in particular in t
 * Possible attributes are its location, the direction from where the signal came, the frequency of the signal, and the delay until the next signal.<br/>
 * A possible system state is location: 58.34314231863526, 8.59555405017648, direction: 320&deg;, frequency: 15', delay: 6'
 </details>
+</details>
 
 ### 2.4 Clock Descriptions
 <details>
@@ -77,7 +77,6 @@ However, the bell of the clock is a good means of navigation, in particular in t
 Consider a clock on a public building with the purpose of reading the time.
 
 Create three different snapshot descriptions of such a clock. Then describe possible system executions.
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -93,6 +92,7 @@ We can translate these states into digital time readings as follows: 12:00, 5:20
 When we consider a discrete execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
 A continuous execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
 </details>
+</details>
 
 ### 3.1 Paper plane
 <details>
@@ -101,7 +101,6 @@ Consider a paper plane, folded out of regular A4 paper.
 
 How is the paper plane a model of a Boeing 737? 
 What is the perspective used and what are the behaviours?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -113,6 +112,7 @@ Now we can map between 3D paper plane and Boeing 747 movements. With some scalin
 Obviously, we can only consider scenarios where the plane descends, as the paper plane does not any thrust.
 We can look at gliding ond maybe landing.
 </details>
+</details>
 
 ### 3.2 Music
 <details>
@@ -120,7 +120,6 @@ We can look at gliding ond maybe landing.
 Consider descriptions of music in the form of sheet music.
 
 Do the symbols describe the music correctly? Which perspective is applied? How does changing the playing instrument change the correctness of the model?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -135,6 +134,7 @@ For loudness, expressivity is even less.
 That means not all musical ideas can be expressed with musical notes.<br>
 Different instruments are similar under our perspective. We might need an extended perspective to distinguish them.<br>
 </details>
+</details>
 
 ### 3.3 Geocentric Worldview
 <details>
@@ -143,7 +143,6 @@ The geocentric worldview posits that Earth is at the center of the universe and 
 
 Is the geocentric worldview a correct model of the movements of the stars and planets?
 Which perspective is needed to make it a correct model?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -155,6 +154,7 @@ Due to the placement of the Earth in the center, various corrections have to be 
 With those, the model can predict the planet movements with reasonable precision.<br/>
 However, the model gets much simpler when using a heliocentric perspective.
 </details>
+</details>
 
 ### 3.4 Heating Model
 <details>
@@ -162,13 +162,13 @@ However, the model gets much simpler when using a heliocentric perspective.
 Recheck Episode 11.
 
 Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model to take care of the invalid assumptions?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.<br/>
 Validity of the assumptions is related to the purpose of the model and the implied data accuracy. Although Charlies movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature accuracy of 1 degree is not fine enough to register Charlies influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlies room is also heated and has almost the same temperature as Charlies room.<br/>
 When we want to consider the distribution of temperature in the room, we need more temperature measurement spots and a model for the heat diffusion in the room.
+</details>
 </details>
 
 ### 4.1 Time
@@ -177,7 +177,6 @@ When we want to consider the distribution of temperature in the room, we need mo
 Consider a clock as a model of time.
 
 When is a clock a correct model and when is the model incorrect? How is this influenced by the perspective chosen?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -187,6 +186,7 @@ However, care is needed, because equality depends on the perspective, in particu
 The precision of the clock introduces an extra challenge, because any precision means that clock readings are discrete instead of continuous.
 In this sense, it is impossible to have a real continuous clock. Again, the perspective decides whether this is acceptable or not.
 </details>
+</details>
 
 ### 4.2 Architecture
 <details>
@@ -194,13 +194,13 @@ In this sense, it is impossible to have a real continuous clock. Again, the pers
 Architectural drawings describe some aspects of buildings.
 
 Sometimes, the drawing is prepared after the building is finished. Can we say that the building prescribed by the drawing is a model of the real building? Or is it the other way around?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Obviously, the answer to the question depends on the perspective chosen. Let us assume that the perspective for the drawing and for the building coincide.
 Then the measurements in the building should match the data available in the drawing, and hence model-of can go in both ways.<br/>
 On this basis, we should check what was the original. If the original was the drawing, and the building is based later, then the building can be considered the model. Otherwise, the prescribed building by the drawing can be considered the model.
+</details>
 </details>
 
 ### 4.3 Discretization
@@ -209,7 +209,6 @@ On this basis, we should check what was the original. If the original was the dr
 Figure 4.4 shows how discrete data can be interpolated to form continuous data.
 
 If we start with continuous data given by the cosine function, how can we extract discrete data at every full minute? How does the perspective influence the result?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -265,6 +264,7 @@ From here, we just create a table of values as follows. Of course, you choose on
 </table>
 The perspective influences at which place we read the sine function. It also determines the precision and accuracy of the result.
 </details>
+</details>
 
 ### 4.4 Darts
 <details>
@@ -272,7 +272,6 @@ The perspective influences at which place we read the sine function. It also det
 Dart throwing often has a considerable element of luck involved.
 
 What are the reasons for these uncertainties? How could a change of perspective remove some of the randomness? How does the situation change if the player is a world champion?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -285,6 +284,7 @@ For a pro player, this uncertainty distance is small, such that the randomness i
 <br>
 When we are able to measure the direction and velocity of the dart arrow when it leaves the hand, most of the randomness disappears.
 </details>
+</details>
 
 ### 5.1 Synchronised Traffic Lights
 <details>
@@ -293,7 +293,6 @@ A city wants to reprogram the traffic lights to avoid traffic jams. The new prog
 
 What perspective do you propose for the model to capture all relevant elements? 
 What are the RTS elements, and how do they relate to the three categories of RTS elements?
-</details>
 
 <details>
 <summary> Solution hints </summary>
@@ -311,6 +310,7 @@ Relevant RTS elements could be:
   <li> <em>Language-dependent RTS elements</em> could be the current time, the currently active object, or the current state of each active object. </li>
   <li> <em>Specification-dependent RTS elements</em> could include traffic light status values, traffic condition status values, and traffic light control values. </li>
 </ul>
+</details>
 </details>
 
 ### 5.2 Compilers and Interpreters
@@ -333,12 +333,12 @@ Work in progress<br>
 Testing is a way to validate a new system. A number of tests are run in the mental original and in the new system and the results are compared.
 
 Which methods would you propose to test a new chair? Which tests should be selected?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
 
 ### 5.4 Random Numbers
@@ -347,12 +347,12 @@ Work in progress<br>
 Pseudo-random numbers are a realization of real random numbers.
 
 How could you verify or validate that they are correct?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
 
 ### 6.1 Flight Simulator
@@ -361,12 +361,12 @@ Work in progress<br>
 A flight simulator is software that allows one to experience flying a plane. Simple versions work like games, while advanced versions use real cockpits to recreate the flight feeling as exactly as possible. After extended training in a flight simulator, a real flight is manageable.
 
 Discuss flight simulators in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
 
 ### 6.2 Maps
@@ -375,12 +375,12 @@ Work in progress<br>
 Assume you use a map to plan a hiking trip.
 
 Discuss your plan and the map as a model of the trip in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
 
 ### 6.3 Human Models
@@ -389,12 +389,12 @@ Work in progress<br>
 When you search the Internet for the term \quoted{models}, your first hits will relate to the profession or role to be a model.
 
 Discuss these human models in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
 
 ### 6.4 Weather forecast
@@ -403,10 +403,10 @@ Work in progress<br>
 Consider your favourite weather forecast site. It provides a description of the weather to come and maybe also of the weather that has been.
 
 Discuss weather forecasts in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
