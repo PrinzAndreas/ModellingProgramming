@@ -297,8 +297,20 @@ What are the RTS elements, and how do they relate to the three categories of RTS
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+For this problem, essential elements are the status of the traffic lights and the traffic situation.
+The traffic lights can open or close a direction by their green, yellow, and red lights.
+The traffic can be given by the number of cars per street section and the speed of their movement.
+In addition, it is important where and when cars enter or leave the system.
+Of course, more information about weather, daylight, or driver behaviour could be added.
+<br>
+Some of the data might be available for the traffic light control, for example, the number of cars in front of a traffic light.
+<br>
+Relevant RTS elements could be:
+<ul>
+  <li> The <em>model specification</em> itself is part of the RTS. </li>
+  <li> <em>Language-dependent RTS elements</em> could be the current time, the currently active object, or the current state of each active object. </li>
+  <li> <em>Specification-dependent RTS elements</em> could include traffic light status values, traffic condition status values, and traffic light control values. </li>
+</ul>
 </details>
 
 ### 5.2 Compilers and Interpreters
@@ -307,12 +319,12 @@ Work in progress<br>
 Suppose we have a machine understanding ML, and a compiler written in ML translating SLX to ML.
 
 Can we use the SLX compiler and the ML machine to create a (virtual) SLX machine, thereby making SLX executable?
-</details>
 
 <details>
 <summary> Solution hints </summary>
 Work in progress<br>
 <img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
 </details>
 
 ### 5.3 Testing
