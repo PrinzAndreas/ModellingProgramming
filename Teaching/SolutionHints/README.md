@@ -322,8 +322,10 @@ Can we use the SLX compiler and the ML machine to create a (virtual) SLX machine
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+A virtual SLX machine should read an SLX specification, and then execute it. Unfortunately, our ML machine can only read and execute ML specifications.<br>
+Fortunately, we have an ML specification to execute, namely the compiler. When we execute the compiler with the ML machine, it will read our SLX system specification, and produce a matching ML specification of the same system.<br>
+Now we have an ML specification of our system, and with the ML machine, we can easily execute it.<br>
+In summary, yes, we can create a virtual SLX machine, by using a two-step procedure: (1) compile the SLX specification to a matching ML specification, and (2) execute the produced ML specification.
 </details>
 </details>
 
