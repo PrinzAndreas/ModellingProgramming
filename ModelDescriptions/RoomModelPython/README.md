@@ -21,3 +21,4 @@ Moreover, the following Python modules are used.
 
 The Python descriptions can be executed using Python 3.6 with the required packages installed (see [requirements.txt](cs/requirements.txt)).
 
+The code can also be [executed in code spaces](https://github.com/PrinzAndreas/ModellingProgramming/blob/main/ModelDescriptions/RoomModelPython/HowToRun.md).
