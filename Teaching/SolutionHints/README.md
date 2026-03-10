@@ -338,8 +338,15 @@ Which methods would you propose to test a new chair? Which tests should be selec
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+Let's assume we want to test a new office chair. As the purpose is sitting in an office, we will check the physical properties of the chair and the human interface, i.e. the ergonomics.
+<br/>
+For the <em>physical properties</em>, the chair needs stability, and quality of the moving parts.<br/>
+Proposed test procedure: Rock the chair, Apply pressure to armrests and backrest, Move the moving parts (wheels, swivel, height adjustments), Check the solidity of the materials. <br/>
+Expected result: The chair stays stable, does not make sounds, movements are smooth, and the materials are durable.
+<br/><br/>
+For the <em>ergonomics</em>, we test the comfort of the cushions, the body support, and the comfort.<br/>
+Proposed test procedure: Sit in the chair for 10-15 minutes, Try to adjust the backrest, armrests, height, and depth to your body, Make some movements in the chair (turn, tilt, swivel). <br/>
+Expected result: The chair is comfortable in all situations, supports the lower back, and has a 2–4 finger gap between the seat edge and the back of the knees.
 </details>
 </details>
 
