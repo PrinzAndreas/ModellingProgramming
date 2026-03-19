@@ -359,8 +359,12 @@ How could you verify or validate that they are correct?
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+The trouble with random numbers is that finite sequences have no decisive power for correctness. 
+Therefore, the only way to check correctness is to look at the infinite sequences, which is obviously only possible in mathematics.
+Here we need to check the statistical properties of the infinite sequences and compare with the wanted results.<br>
+In practice, we can compare the statistical properties of the random numbers against our wanted result already for finite sequences.
+If they do not match close enough, we can consider the sequence to be flawed. There are also some test sets which do such comparisons.
+The basic idea is that we reject a sequence if we feel we can prove that it is not random.
 </details>
 </details>
 
