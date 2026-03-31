@@ -377,8 +377,21 @@ Discuss flight simulators in terms of the concepts of this book. What is the ass
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+The <em>perspective</em> of a flight simulator is determined by what a pilot needs to observe and control during flight. Engineers have invested considerable effort in identifying the relevant parameters that characterise the state of an aircraft — these are precisely the quantities displayed in the cockpit instruments: altitude, airspeed, heading, vertical speed, engine thrust, fuel level, and so on. Together, these parameters define what the pilot sees of the system state.
+<br/>
+Equally, the controls — throttle, yoke or sidestick, rudder pedals, flap levers — define what the pilot can change. The perspective is therefore bidirectional: it covers both the observable state and the actionable inputs. This perspective is deliberately narrow compared to the full physics of flight; it abstracts away everything that is not directly relevant to the pilot's task.
+<br/><br/>
+The flight simulator must capture a <em>model</em> of the external forces and environmental conditions acting on the aircraft. These include
+meteorological factors (wind speed and direction, turbulence, precipitation, icing conditions, and visibility),
+exceptional events (bird strikes, volcanic ash clouds, wind shear, and microburst conditions), and
+atmospheric properties (air density as a function of altitude, temperature gradients).
+<br/>
+Depending on the purpose of the simulation — routine training, emergency procedure rehearsal, or certification testing — these external forces can be configured with varying degrees of randomness, different rates of change, and across safe or critical parameter ranges. A training session for a novice pilot might limit disturbances to mild crosswinds, while an advanced session might inject sudden engine failure combined with low visibility.
+The description language for the model is naturally that of time series, capturing how environmental parameters evolve over time, together with probabilistic or stochastic specifications that describe their randomness and variability.
+<br/><br/>
+The program of the flight simulator connects the two sides: it takes the pilot's control inputs together with the current model state (external forces and conditions) and computes the resulting change in perspective parameters — that is, how the aircraft responds. This is essentially the implementation of the flight dynamics.
+<br/>
+The natural description language here is differential equations, which express how the aircraft's state variables (position, velocity, attitude) evolve continuously in response to forces and control inputs. For well-defined procedural sequences — such as a standard landing procedure, an engine-failure checklist, or an automatic go-around — state machines are the appropriate formalism, capturing the discrete, step-by-step nature of these processes.
 </details>
 </details>
 
