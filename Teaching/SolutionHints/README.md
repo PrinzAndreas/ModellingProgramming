@@ -387,11 +387,11 @@ exceptional events (bird strikes, volcanic ash clouds, wind shear, and microburs
 atmospheric properties (air density as a function of altitude, temperature gradients).
 <br/>
 Depending on the purpose of the simulation — routine training, emergency procedure rehearsal, or certification testing — these external forces can be configured with varying degrees of randomness, different rates of change, and across safe or critical parameter ranges. A training session for a novice pilot might limit disturbances to mild crosswinds, while an advanced session might inject sudden engine failure combined with low visibility.
-The description language for the model is naturally that of time series, capturing how environmental parameters evolve over time, together with probabilistic or stochastic specifications that describe their randomness and variability.
+The <em>description</em> language for the model is naturally that of time series, capturing how environmental parameters evolve over time, together with probabilistic or stochastic specifications that describe their randomness and variability.
 <br/><br/>
-The program of the flight simulator connects the two sides: it takes the pilot's control inputs together with the current model state (external forces and conditions) and computes the resulting change in perspective parameters — that is, how the aircraft responds. This is essentially the implementation of the flight dynamics.
+The <em>program</em> of the flight simulator connects the two sides: it takes the pilot's control inputs together with the current model state (external forces and conditions) and computes the resulting change in perspective parameters — that is, how the aircraft responds. This is essentially the implementation of the flight dynamics.
 <br/>
-The natural description language here is differential equations, which express how the aircraft's state variables (position, velocity, attitude) evolve continuously in response to forces and control inputs. For well-defined procedural sequences — such as a standard landing procedure, an engine-failure checklist, or an automatic go-around — state machines are the appropriate formalism, capturing the discrete, step-by-step nature of these processes.
+The natural <em>description</em> language here is differential equations, which express how the aircraft's state variables (position, velocity, attitude) evolve continuously in response to forces and control inputs. For well-defined procedural sequences — such as a standard landing procedure, an engine-failure checklist, or an automatic go-around — state machines are the appropriate formalism, capturing the discrete, step-by-step nature of these processes.
 </details>
 </details>
 
