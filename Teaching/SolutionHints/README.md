@@ -395,6 +395,18 @@ The natural <em>description</em> language here is differential equations, which 
 </details>
 </details>
 
+<br/><br/>
+The map is a <em>description</em> of some geographical points, allowing to detect distances between points and the shape of the underground.
+We asssume that all relevant geographical points are covered in the map. Then the plan could simply be a list of subgoals with numbers marked on the map, together with a planned time for each of them.
+<br/>
+The plan is a <em>model</em> of the trip, with the ...
+
+<br/><br/>
+Work in progress<br>
+<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+</details>
+</details>
+
 ### 6.2 Maps
 <details>
 <summary> Task description </summary>
@@ -404,8 +416,35 @@ Discuss your plan and the map as a model of the trip in terms of the concepts of
 
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+There are several meaningful <em>perspectives</em> to choose in this case. We focus on the track and the landmarks to be visited. 
+For the trip itself, the current position, current time, next subgoal, and landmarks already visited are relevant. 
+The track can be represented as a series of geographical points; landmarks and subgoals are geographical points as well. 
+A geographical point can be characterised by latitude and longitude as well as height and surface characteristics. 
+For landmarks, we may add a photo and descriptive information. 
+We are also interested in distances between points — line-of-sight, walking distance, and height difference — and in walking speed.
+<br/><br/>
+The map is a <em>description</em> of a model of the terrain. 
+Its meaning — the model itself — is our understanding of the real landscape within the chosen perspective: the navigable geography, the paths, the heights. 
+The map is more focused than reality; it ignores vegetation, weather, and social context, attending only to what is relevant for navigation.
+<br/>
+We can attach a sequence of numbered locations and planned times to points on the map. 
+This gives us a <em>description</em> of the planned trip — the plan itself is then the <em>model</em> of the trip, with the planned trip as the referent system.
+<br/><br/>
+When the trip is executed, the real trip becomes a <em>model</em> of the planned trip, with the plan as the referent system. 
+Both share the same perspective — positions, times, subgoals — so the model-of relationship is symmetric, and we could equally treat the real trip as the original and the plan as the model. 
+The choice of which is referent depends on our purpose: planning ahead takes the plan as referent; evaluating what happened takes the real trip as referent.
+<br/><br/>
+<em>Correctness</em> of the real trip relative to the plan is assessed by <em>validation</em>: comparing the executions of the model (real trip) with those of the referent (plan). 
+The perspective determines what counts as a match — how much deviation in position, time, or sequence is acceptable. 
+A ten-minute delay at one subgoal may be within tolerance; missing a landmark entirely may not be. These thresholds are part of the perspective, not the model itself.
+<br/>
+<em>Verification</em> compares descriptions rather than executions. A description of minimal walking speed per terrain type prescribes an infinite set of possible executions. 
+We can check whether all executions consistent with that description are also consistent with the plan — for example, whether the planned times are achievable for any hiker satisfying the speed constraints. 
+This kind of check can be performed without ever walking the trip.
+<br/><br/>
+The plan is also a simple <em>program</em>: a description of the steps to follow, prescribing a system — the walk — for the purpose of reaching all subgoals in sequence. 
+Walking the trip is then the execution of that program. 
+Alternatively, we can run the program virtually — as Google Maps does when it simulates the route — treating the map model as the execution environment rather than the real terrain.
 </details>
 </details>
 
