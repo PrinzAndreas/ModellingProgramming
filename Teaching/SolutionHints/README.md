@@ -395,18 +395,6 @@ The natural <em>description</em> language here is differential equations, which 
 </details>
 </details>
 
-<br/><br/>
-The map is a <em>description</em> of some geographical points, allowing to detect distances between points and the shape of the underground.
-We asssume that all relevant geographical points are covered in the map. Then the plan could simply be a list of subgoals with numbers marked on the map, together with a planned time for each of them.
-<br/>
-The plan is a <em>model</em> of the trip, with the ...
-
-<br/><br/>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
-</details>
-</details>
-
 ### 6.2 Maps
 <details>
 <summary> Task description </summary>
