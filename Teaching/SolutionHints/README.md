@@ -13,7 +13,6 @@ The purpose is to read the time.
 Which perspective of the clock helps you determine the time? 
 Which aspects of reality do you consider, and which do you ignore?
 Which precision of the relevant attributes is meaningful?
-
 <details>
 <summary> Solution hints </summary>
 There is an analog wall clock in my office.
@@ -32,7 +31,6 @@ Consider an alarm clock somewhere in your household with the purpose of reading 
 What is the system for this clock? 
 What are the parts and attributes of the system? 
 Describe at least one system snapshot using these parts and attributes. 
-
 <details>
 <summary> Solution hints </summary>
 I have a digital radio controlled alarm clock in my office which I take with me to meetings such that I can read the time without looking at my wrist.
@@ -54,7 +52,6 @@ There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button a
 Consider a clock on a public building. Choose a purpose which is not reading the time.
 
 Which perspective supports your chosen purpose? What is the system in this new perspective, including parts and attributes? Describe at least one snapshot of this alternative system.
-
 <details>
 <summary> Solution hints </summary>
 In Grimstad, there is a church with a clock on its tower. It is widely visible and shows the time. It also has a bell and in former times it would ring regularly to announce the time.
@@ -77,7 +74,6 @@ However, the bell of the clock is a good means of navigation, in particular in t
 Consider a clock on a public building with the purpose of reading the time.
 
 Create three different snapshot descriptions of such a clock. Then describe possible system executions.
-
 <details>
 <summary> Solution hints </summary>
 We consider the clock of Big Ben, which is the Great Clock of Westminster at the north end of the Palace of Westminster in London, England.
@@ -101,7 +97,6 @@ Consider a paper plane, folded out of regular A4 paper.
 
 How is the paper plane a model of a Boeing 737? 
 What is the perspective used and what are the behaviours?
-
 <details>
 <summary> Solution hints </summary>
 For a model, we need a shared perspective. As the Boeing 737 is more complex, we adapt the perspective to the paper plane.
@@ -120,7 +115,6 @@ We can look at gliding ond maybe landing.
 Consider descriptions of music in the form of sheet music.
 
 Do the symbols describe the music correctly? Which perspective is applied? How does changing the playing instrument change the correctness of the model?
-
 <details>
 <summary> Solution hints </summary>
 Music is a very complex phenomenon involving arrangements of sound, see <a href="https://en.wikipedia.org/wiki/Music">Wikipedia</a>. To make it tangible, we can look at some of its elements: pitch, melody, harmony, rhythm, texture, timbre, expression, and form.<br>
@@ -143,7 +137,6 @@ The geocentric worldview posits that Earth is at the center of the universe and 
 
 Is the geocentric worldview a correct model of the movements of the stars and planets?
 Which perspective is needed to make it a correct model?
-
 <details>
 <summary> Solution hints </summary>
 As with all models, the question is about the purpose of the model. We want to account for the movements of the stars and the planets.
@@ -162,7 +155,6 @@ However, the model gets much simpler when using a heliocentric perspective.
 Recheck Episode 11.
 
 Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model to take care of the invalid assumptions?
-
 <details>
 <summary> Solution hints </summary>
 Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.<br/>
@@ -177,7 +169,6 @@ When we want to consider the distribution of temperature in the room, we need mo
 Consider a clock as a model of time.
 
 When is a clock a correct model and when is the model incorrect? How is this influenced by the perspective chosen?
-
 <details>
 <summary> Solution hints </summary>
 In our understanding, time is the inherent ordering of snapshots. This means we can understand time as IDs for snapshots.
@@ -194,7 +185,6 @@ In this sense, it is impossible to have a real continuous clock. Again, the pers
 Architectural drawings describe some aspects of buildings.
 
 Sometimes, the drawing is prepared after the building is finished. Can we say that the building prescribed by the drawing is a model of the real building? Or is it the other way around?
-
 <details>
 <summary> Solution hints </summary>
 Obviously, the answer to the question depends on the perspective chosen. Let us assume that the perspective for the drawing and for the building coincide.
@@ -209,7 +199,6 @@ On this basis, we should check what was the original. If the original was the dr
 Figure 4.4 shows how discrete data can be interpolated to form continuous data.
 
 If we start with continuous data given by the cosine function, how can we extract discrete data at every full minute? How does the perspective influence the result?
-
 <details>
 <summary> Solution hints </summary>
 The cosine function is a real-valued function from reals. If we want to extract a value for every full minute, we first need to agree on what real number constitutes a minute. For simplicity, we assume a time base of minutes, such that the first minute has the real value 1.0. Alternatively, we could have chosen a time base of seconds, where the first minute would be at the real value 60.0. Another alternative would be to choose a time base of &#x3C0;/2. In this case, the values of sine would switch between 0, 1, and -1.<br/>
@@ -272,7 +261,6 @@ The perspective influences at which place we read the sine function. It also det
 Dart throwing often has a considerable element of luck involved.
 
 What are the reasons for these uncertainties? How could a change of perspective remove some of the randomness? How does the situation change if the player is a world champion?
-
 <details>
 <summary> Solution hints </summary>
 We consider a situation where a player aims the dart arrow at some area or point of the dart board. Depending on the player's proficiency, the aroow will end up somewhere near the intended location.
@@ -293,7 +281,6 @@ A city wants to reprogram the traffic lights to avoid traffic jams. The new prog
 
 What perspective do you propose for the model to capture all relevant elements? 
 What are the RTS elements, and how do they relate to the three categories of RTS elements?
-
 <details>
 <summary> Solution hints </summary>
 For this problem, essential elements are the status of the traffic lights and the traffic situation.
@@ -319,7 +306,6 @@ Relevant RTS elements could be:
 Suppose we have a machine understanding ML, and a compiler written in ML translating SLX to ML.
 
 Can we use the SLX compiler and the ML machine to create a (virtual) SLX machine, thereby making SLX executable?
-
 <details>
 <summary> Solution hints </summary>
 A virtual SLX machine should read an SLX specification, and then execute it. Unfortunately, our ML machine can only read and execute ML specifications.<br>
@@ -335,7 +321,6 @@ In summary, yes, we can create a virtual SLX machine, by using a two-step proced
 Testing is a way to validate a new system. A number of tests are run in the mental original and in the new system and the results are compared.
 
 Which methods would you propose to test a new chair? Which tests should be selected?
-
 <details>
 <summary> Solution hints </summary>
 Let's assume we want to test a new office chair. As the purpose is sitting in an office, we will check the physical properties of the chair and the human interface, i.e. the ergonomics.
@@ -356,7 +341,6 @@ Expected result: The chair is comfortable in all situations, supports the lower 
 Pseudo-random numbers are a realization of real random numbers.
 
 How could you verify or validate that they are correct?
-
 <details>
 <summary> Solution hints </summary>
 The trouble with random numbers is that finite sequences have no decisive power for correctness. 
@@ -374,7 +358,6 @@ The basic idea is that we reject a sequence if we feel we can prove that it is n
 A flight simulator is software that allows one to experience flying a plane. Simple versions work like games, while advanced versions use real cockpits to recreate the flight feeling as exactly as possible. After extended training in a flight simulator, a real flight is manageable.
 
 Discuss flight simulators in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-
 <details>
 <summary> Solution hints </summary>
 The <em>perspective</em> of a flight simulator is determined by what a pilot needs to observe and control during flight. Engineers have invested considerable effort in identifying the relevant parameters that characterise the state of an aircraft — these are precisely the quantities displayed in the cockpit instruments: altitude, airspeed, heading, vertical speed, engine thrust, fuel level, and so on. Together, these parameters define what the pilot sees of the system state.
@@ -401,7 +384,6 @@ The natural <em>description</em> language here is differential equations, which 
 Assume you use a map to plan a hiking trip.
 
 Discuss your plan and the map as a model of the trip in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-
 <details>
 <summary> Solution hints </summary>
 There are several meaningful <em>perspectives</em> to choose in this case. We focus on the track and the landmarks to be visited. 
@@ -439,14 +421,16 @@ Alternatively, we can run the program virtually — as Google Maps does when it 
 ### 6.3 Human Models
 <details>
 <summary> Task description </summary>
-When you search the Internet for the term \quoted{models}, your first hits will relate to the profession or role to be a model.
+When you search the Internet for the term 'models', your first hits will relate to the profession or role to be a model.
 
 Discuss these human models in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+The <em>perspective</em> of a human model focuses on the physical appearance of a person — body shape, proportions, posture, and movement — as far as relevant to how clothing sits and drapes on a body. The perspective is deliberately narrow: personality, voice, and biography are irrelevant. A body can be understood as a 3D shape moving through space, characterised by a set of surface points. The <em>precision</em> of the perspective — how densely the shape is sampled — determines how much detail it captures.
+<br/><br/>
+The human model is a <em>model</em> of the target customer, with the customer as the referent system. Both are physical entities — there is no description involved, and consequently no <em>programming</em> in the sense of the book. The human model exists independently of any particular customer, yet functions as a stand-in for the customer, chosen to approximate that referent within the chosen perspective.
+<br/><br/>
+<em>Correctness</em> is assessed by <em>validation</em>: does the clothing look similar on the customer as on the model? Accuracy here has a concrete meaning: how well do the model's body points match those of the customer? In practice, accuracy is difficult to judge — distance, quick movement, and dim or dramatic lighting all reduce the effective granularity at which the model's shape can be sampled. A viewer perceives a rough silhouette rather than precise measurements. This low precision is not incidental: it is often deliberate, since higher precision would reveal better how far the model's proportions deviate from the customer's.
 </details>
 </details>
 
