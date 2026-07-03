@@ -434,16 +434,20 @@ The human model is a <em>model</em> of the target customer, with the customer as
 </details>
 </details>
 
-### 6.4 Weather forecast
+### 6.4 Weather Forecast
 <details>
 <summary> Task description </summary>
 Consider your favourite weather forecast site. It provides a description of the weather to come and maybe also of the weather that has been.
 
 Discuss weather forecasts in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
-
 <details>
 <summary> Solution hints </summary>
-Work in progress<br>
-<img src="https://raw.githubusercontent.com/PrinzAndreas/ModellingProgramming/main/images/comingSoon.png" alt="work in progress" title="work in progress" style="max-width: 100%;">
+The <em>perspective</em> of the weather is determined by what people need to know to plan their activities: temperature, precipitation, and wind (speed and direction). Each of these has an explicit <em>precision</em> in both time and space. On yr.no, for instance, the time granularity is one hour, temperature is given to the nearest degree, wind speed to the nearest m/s, and precipitation to the nearest mm. Since wind varies considerably within an hour, both average and maximum speed are provided — acknowledging the limitation of a coarse time granularity. There is also an implicit spatial granularity: the forecast is valid for a region and represents an average over that area rather than any specific point within it.
+<br/><br/>
+The weather forecast is a <em>description</em> — a sequence of snapshot descriptions, one per time step, each specifying the expected values of the perspective variables. In this sense it is also a <em>program</em>: executing it mentally produces <em>virtual weather</em> — a model of how we understand the weather to develop over time. This virtual weather is not the real weather to come; it is our interpretation of what the numbers and diagrams mean for reality.
+<br/><br/>
+The <em>referent system</em> is the real weather — a continuous physical system that simply unfolds, with no description of its own. When instruments measure it, they produce a series of snapshots aligned with the same perspective variables: temperature, precipitation, wind. This sequence of measured snapshots is the <em>backcast</em> — a description of what actually happened, in the same form as the forecast.
+<br/><br/>
+<em>Correctness</em> is assessed by <em>validation</em>: comparing corresponding snapshots from the forecast against those from the backcast. Where the numbers match within the <em>accuracy</em> of the perspective — the acceptable deviation defined by the precision of our measurements — the model is correct. The elegance of this framing is that forecast and backcast share the same structure — both are sequences of snapshot descriptions — making the comparison direct and unambiguous.
 </details>
 </details>
