@@ -15,11 +15,10 @@ Which aspects of reality do you consider, and which do you ignore?
 Which precision of the relevant attributes is meaningful?
 <details>
 <summary> Solution hints </summary>
-There is an analog wall clock in my office.
-It has a very simple design with numbers 1 .. 12 and two hands - a short hour hand and a long minute hand.<br/>
-* For determining time, I need to look at where the hands of the clock point.<br/>
-* I only consider the angle of the hands (two numbers). The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape the numbers, the existence of the numbers, the mechanism that makes the clock work (eletronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
-* For reading the time it is sufficient to have the angle of the hands with a precision of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a precision of 30 degrees helps us to distinguish 12 different directions for the hour hand.
+Consider an analog wall clock with a simple design: numbers 1 to 12 and two hands — a short hour hand and a long minute hand.<br/>
+* For determining the time, the relevant information is where the hands point.<br/>
+* Only the angle of the hands (two numbers) is considered. The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape of the numbers, the existence of the numbers, the mechanism that makes the clock work (electronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
+* For reading the time it is sufficient to have the angle of the hands with a <em>precision</em> of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a <em>precision</em> of 30 degrees helps us to distinguish 12 different directions for the hour hand.
 </details>
 </details>
 
@@ -33,16 +32,15 @@ What are the parts and attributes of the system?
 Describe at least one system snapshot using these parts and attributes. 
 <details>
 <summary> Solution hints </summary>
-I have a digital radio controlled alarm clock in my office which I take with me to meetings such that I can read the time without looking at my wrist.
-The alarm clock display shows the current temperature, second, hours, minutes, the day and month, and the weekday. The digits are shown with a seven segment display each.
+Consider a digital radio-controlled alarm clock. The display shows the current temperature, seconds, hours, minutes, the day and month, and the weekday. The digits are shown with a seven-segment display each.
 There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button and at the back there is a compartment for the battery.<br/>
-* For determining the time, I read the hour digits as the hour and the minute digits as the minute.<br/>
-* All other information on the display is irrelevant as is the colour of the display or its lighting. All the electronics behind is not relevant as is the clock casing or placement.<br/>
-* As the clock is radio controlled and adjusts austomatically, I do not care for any of the buttons.<br/>
+* For determining the time, the hour digits are read as the hour and the minute digits as the minute.<br/>
+* All other information on the display is irrelevant, as is the colour of the display or its lighting. All the electronics behind are not relevant, as is the clock casing or placement.<br/>
+* As the clock is radio controlled and adjusts automatically, none of the buttons are relevant.<br/>
 * It is important that the battery has enough power.<br/>
 * This boils down to the alarm clock system having three parts: the clock casing including a display, the battery cover, and the battery. It would be possible to consider the display as a separate element.<br/>
 * The relevant attributes are the hour and minute on the display, and the charging status of the battery. It is possible to also consider the connection status to the controlling atomic clock.<br/>
-* A system snapshot is clock.display.hour=11, clock.display.minute=27, clock.battery.status=64%.
+* A <em>system snapshot</em> is clock.display.hour=11, clock.display.minute=27, clock.battery.status=64%.
 </details>
 </details>
 
@@ -55,14 +53,14 @@ Which perspective supports your chosen purpose? What is the system in this new p
 <details>
 <summary> Solution hints </summary>
 In Grimstad, there is a church with a clock on its tower. It is widely visible and shows the time. It also has a bell and in former times it would ring regularly to announce the time.
-We will look at the clock as a means of navigation for the boats that are sailing around Grimstad. The visual clock is obviously to small to aid in navigation - the clock tower is better suited for that purpose.
+We will look at the clock as a means of navigation for the boats that are sailing around Grimstad. The visual clock is obviously too small to aid in navigation - the clock tower is better suited for that purpose.
 However, the bell of the clock is a good means of navigation, in particular in the case of fog. It provides an approximate direction for the harbour, which can be improved with visual clues when one approaches the shore.<br/>
 * For navigation, the frequency of the bell signal is essential as well as its pattern.<br/>
 * The placement of the clock is important in order to know the direction.<br/>
 * Differences in sound to other bells in the vicinity are also important to know such that the clock is identifiable.<br/>
 * When hearing the bell, the direction from where it comes is important and maybe the strength of the sound.<br/>
-* We do not care for the hands or the colour of the clock or even the time it shows.<br/>
-* In this perspectivem, the clock is a defined point in space which has a regular acoustic signal.<br/>
+* The hands, the colour of the clock, and the time it shows are all irrelevant.<br/>
+* In this <em>perspective</em>, the clock is a defined point in space which has a regular acoustic signal.<br/>
 * Possible attributes are its location, the direction from where the signal came, the frequency of the signal, and the delay until the next signal.<br/>
 * A possible system state is location: 58.34314231863526, 8.59555405017648, direction: 320&deg;, frequency: 15', delay: 6'
 </details>
@@ -78,15 +76,15 @@ Create three different snapshot descriptions of such a clock. Then describe poss
 <summary> Solution hints </summary>
 We consider the clock of Big Ben, which is the Great Clock of Westminster at the north end of the Palace of Westminster in London, England.
 The clock is an analogue clock and is shown in four directions. This means a system status contains four clock readings, which all should be the same at all times.
-This is normally ensured by the mechanics inside the tower. Each clock reading can be represented by the angle of its hour and minute hands with the precision of integers.
+This is normally ensured by the mechanics inside the tower. Each clock reading can be represented by the angle of its hour and minute hands with the <em>precision</em> of integers.
 We only look at the north clock now.
 If we use degrees for the angle starting from the hands pointing up, then we can identify three situations as follows.<br><br>
 bigben.clock.north.hour=0, bigben.clock.north.minute=0 <br>
 bigben.clock.north.hour=160, bigben.clock.north.minute=120 <br>
 bigben.clock.north.hour=81, bigben.clock.north.minute=253<br><br>
 We can translate these states into digital time readings as follows: 12:00, 5:20, 2:42.<br>
-When we consider a discrete execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
-A continuous execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
+When we consider a <em>discrete</em> execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
+A <em>continuous</em> execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
 </details>
 </details>
 
@@ -99,13 +97,13 @@ How is the paper plane a model of a Boeing 737?
 What is the perspective used and what are the behaviours?
 <details>
 <summary> Solution hints </summary>
-For a model, we need a shared perspective. As the Boeing 737 is more complex, we adapt the perspective to the paper plane.
+For a <em>model</em>, we need a shared <em>perspective</em>. As the Boeing 737 is more complex, we adapt the <em>perspective</em> to the paper plane.
 We consider one body, two wings, and the possibility to be airborne. For this, we consider the 3D position of the plane, its speed and the direction it is facing.
 We ignore the material, the inside of the body, and the wheels. If we want, we can consider flaps.<br>
 
-Now we can map between 3D paper plane and Boeing 747 movements. With some scaling, we can get the movements to match. 
+Now we can map between 3D paper plane and Boeing 737 movements. With some scaling, we can get the movements to match. 
 Obviously, we can only consider scenarios where the plane descends, as the paper plane does not any thrust.
-We can look at gliding ond maybe landing.
+We can look at gliding and maybe landing.
 </details>
 </details>
 
@@ -119,14 +117,14 @@ Do the symbols describe the music correctly? Which perspective is applied? How d
 <summary> Solution hints </summary>
 Music is a very complex phenomenon involving arrangements of sound, see <a href="https://en.wikipedia.org/wiki/Music">Wikipedia</a>. To make it tangible, we can look at some of its elements: pitch, melody, harmony, rhythm, texture, timbre, expression, and form.<br>
 Even though the underlying phenomenon is sound, we do not look at the physics of sound waves, but consider the perception of sound, see <a href="https://en.wikipedia.org/wiki/Sound">Wikipedia</a>. Again, there are several possible elements to consider: pitch, duration, loudness, timbre, texture, and spatial location.<br>
-We select a restricted perspective and consider pitch, duration, and loudness. We measure the pitch as the frequency of the sound wave, duration as the time it takes from start to end and the loudness by the pressure level in decibel.<br>
-Notes in sheet music can express pitch, duration, and loudness. This way, notes can describe music on our perspective. As we often create music in terms on notes, these notes describe the music correctly.<br>
+We select a restricted <em>perspective</em> and consider pitch, duration, and loudness. We measure the pitch as the frequency of the sound wave, duration as the time it takes from start to end and the loudness by the pressure level in decibel.<br>
+Notes in sheet music can express pitch, duration, and loudness. This way, notes can describe music on our <em>perspective</em>. As we often create music in terms on notes, these notes describe the music correctly.<br>
 However, we know that musical notes are not able to describe all possible changes in pitch, duration, and loudness. 
 The expressible pitches are limited, related to a reference frequency (concert pitch).
 Also the expressible durations are limited, given in fractions of the musical meter.
 For loudness, expressivity is even less.
 That means not all musical ideas can be expressed with musical notes.<br>
-Different instruments are similar under our perspective. We might need an extended perspective to distinguish them.<br>
+Different instruments are similar under our <em>perspective</em>. We might need an extended <em>perspective</em> to distinguish them.<br>
 </details>
 </details>
 
@@ -143,9 +141,9 @@ As with all models, the question is about the purpose of the model. We want to a
 First, it must be noted that for the movements of the stars there is basically no difference between a geocentric and a heliocentric worldview, because all stars are very far apart from our solar system.
 When it comes to the planets, there are very early methods to predict the movements of the planets, the sun and the moon.
 There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
-Due to the placement of the Earth in the center, various corrections have to be applied to ensure correctness.
-With those, the model can predict the planet movements with reasonable precision.<br/>
-However, the model gets much simpler when using a heliocentric perspective.
+Due to the placement of the Earth in the center, various corrections have to be applied to ensure <em>correctness</em>.
+With those, the model can predict the planet movements with reasonable <em>precision</em>.<br/>
+However, the model gets much simpler when using a heliocentric <em>perspective</em>.
 </details>
 </details>
 
@@ -157,8 +155,8 @@ Recheck Episode 11.
 Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model to take care of the invalid assumptions?
 <details>
 <summary> Solution hints </summary>
-Obviously, there are many more implicit assumption to add. We consider just three of them: Charlies movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.<br/>
-Validity of the assumptions is related to the purpose of the model and the implied data accuracy. Although Charlies movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature accuracy of 1 degree is not fine enough to register Charlies influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlies room is also heated and has almost the same temperature as Charlies room.<br/>
+Obviously, there are many more implicit assumption to add. We consider just three of them: Charlie's movements in the room are irrelevant. The furniture can be ignored. The floor isolation is ideal.<br/>
+Validity of the assumptions is related to the purpose of the model and the implied data <em>accuracy</em>. Although Charlie's movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature <em>accuracy</em> of 1 degree is not fine enough to register Charlie's influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlie's room is also heated and has almost the same temperature as Charlie's room.<br/>
 When we want to consider the distribution of temperature in the room, we need more temperature measurement spots and a model for the heat diffusion in the room.
 </details>
 </details>
@@ -171,11 +169,11 @@ Consider a clock as a model of time.
 When is a clock a correct model and when is the model incorrect? How is this influenced by the perspective chosen?
 <details>
 <summary> Solution hints </summary>
-In our understanding, time is the inherent ordering of snapshots. This means we can understand time as IDs for snapshots.
-A clock is a way to provide these IDs inside of snapshots. A simple correctness understanding would say that the clock should equal the time, which implies that the clock is incorrect when it does not equal the time.<br/>
-However, care is needed, because equality depends on the perspective, in particular the accuracy and precision of the clock.
-The precision of the clock introduces an extra challenge, because any precision means that clock readings are discrete instead of continuous.
-In this sense, it is impossible to have a real continuous clock. Again, the perspective decides whether this is acceptable or not.
+In our understanding, time is the inherent ordering of <em>snapshots</em>. This means we can understand time as IDs for <em>snapshots</em>.
+A clock is a way to provide these IDs inside of <em>snapshots</em>. A simple <em>correctness</em> understanding would say that the clock should equal the time, which implies that the clock is incorrect when it does not equal the time.<br/>
+However, care is needed, because equality depends on the <em>perspective</em>, in particular the <em>accuracy</em> and <em>precision</em> of the clock.
+The <em>precision</em> of the clock introduces an extra challenge, because any <em>precision</em> means that clock readings are discrete instead of continuous.
+In this sense, it is impossible to have a real continuous clock. Again, the <em>perspective</em> decides whether this is acceptable or not.
 </details>
 </details>
 
@@ -187,9 +185,9 @@ Architectural drawings describe some aspects of buildings.
 Sometimes, the drawing is prepared after the building is finished. Can we say that the building prescribed by the drawing is a model of the real building? Or is it the other way around?
 <details>
 <summary> Solution hints </summary>
-Obviously, the answer to the question depends on the perspective chosen. Let us assume that the perspective for the drawing and for the building coincide.
+Obviously, the answer to the question depends on the <em>perspective</em> chosen. Let us assume that the <em>perspective</em> for the drawing and for the building coincide.
 Then the measurements in the building should match the data available in the drawing, and hence model-of can go in both ways.<br/>
-On this basis, we should check what was the original. If the original was the drawing, and the building is based later, then the building can be considered the model. Otherwise, the prescribed building by the drawing can be considered the model.
+On this basis, we should check what was the original. If the original was the drawing, and the building is based later, then the building can be considered the <em>model</em>. Otherwise, the prescribed building by the drawing can be considered the <em>model</em>.
 </details>
 </details>
 
@@ -251,7 +249,7 @@ From here, we just create a table of values as follows. Of course, you choose on
     </tr>
   </tbody>
 </table>
-The perspective influences at which place we read the sine function. It also determines the precision and accuracy of the result.
+The <em>perspective</em> influences at which place we read the cosine function. It also determines the <em>precision</em> and <em>accuracy</em> of the result.
 </details>
 </details>
 
@@ -263,12 +261,12 @@ Dart throwing often has a considerable element of luck involved.
 What are the reasons for these uncertainties? How could a change of perspective remove some of the randomness? How does the situation change if the player is a world champion?
 <details>
 <summary> Solution hints </summary>
-We consider a situation where a player aims the dart arrow at some area or point of the dart board. Depending on the player's proficiency, the aroow will end up somewhere near the intended location.
+We consider a situation where a player aims the dart arrow at some area or point of the dart board. Depending on the player's proficiency, the arrow will end up somewhere near the intended location.
 This depends on the stability of the aim, the alignment of the hand movements to the intented aim, which finally determines the direction and velocity of the arrow when it leaves the hand.
 From there, physics takes over and the result could be computed, unless there is wind involved.
 The randomness of the results can be captured with an uncertainty distance between the aim and the result.
 <br>
-For a pro player, this uncertainty distance is small, such that the randomness is also small, and maybe not measurable depending on the perspective for the dart board positions.
+For a pro player, this uncertainty distance is small, such that the randomness is also small, and maybe not measurable depending on the <em>perspective</em> for the dart board positions.
 <br>
 When we are able to measure the direction and velocity of the dart arrow when it leaves the hand, most of the randomness disappears.
 </details>
@@ -277,7 +275,7 @@ When we are able to measure the direction and velocity of the dart arrow when it
 ### 5.1 Synchronised Traffic Lights
 <details>
 <summary> Task description </summary>
-A city wants to reprogram the traffic lights to avoid traffic jams. The new programs should be tested in a model before deployment.
+A city wants to reprogram the traffic lights to avoid traffic jams. The new programs should be tested in a <em>model</em> before deployment.
 
 What perspective do you propose for the model to capture all relevant elements? 
 What are the RTS elements, and how do they relate to the three categories of RTS elements?
@@ -323,7 +321,7 @@ Testing is a way to validate a new system. A number of tests are run in the ment
 Which methods would you propose to test a new chair? Which tests should be selected?
 <details>
 <summary> Solution hints </summary>
-Let's assume we want to test a new office chair. As the purpose is sitting in an office, we will check the physical properties of the chair and the human interface, i.e. the ergonomics.
+Let us assume we want to test a new office chair. As the purpose is sitting in an office, we will check the physical properties of the chair and the human interface, i.e. the ergonomics.
 <br/>
 For the <em>physical properties</em>, the chair needs stability, and quality of the moving parts.<br/>
 Proposed test procedure: Rock the chair, Apply pressure to armrests and backrest, Move the moving parts (wheels, swivel, height adjustments), Check the solidity of the materials. <br/>
@@ -343,7 +341,7 @@ Pseudo-random numbers are a realization of real random numbers.
 How could you verify or validate that they are correct?
 <details>
 <summary> Solution hints </summary>
-The trouble with random numbers is that finite sequences have no decisive power for correctness. 
+The difficulty with random numbers is that finite sequences have no decisive power for correctness. 
 Therefore, the only way to check correctness is to look at the infinite sequences, which is obviously only possible in mathematics.
 Here we need to check the statistical properties of the infinite sequences and compare with the wanted results.<br>
 In practice, we can compare the statistical properties of the random numbers against our wanted result already for finite sequences.
@@ -398,7 +396,7 @@ Its meaning — the model itself — is our understanding of the real landscape 
 The map is more focused than reality; it ignores vegetation, weather, and social context, attending only to what is relevant for navigation.
 <br/>
 We can attach a sequence of numbered locations and planned times to points on the map. 
-This gives us a <em>description</em> of the planned trip — the plan itself is then the <em>model</em> of the trip, with the planned trip as the referent system.
+This gives us a <em>description</em> of the planned trip — the plan itself is then the <em>model</em> of the trip, with the plan as the referent system.
 <br/><br/>
 When the trip is executed, the real trip becomes a <em>model</em> of the planned trip, with the plan as the referent system. 
 Both share the same perspective — positions, times, subgoals — so the model-of relationship is symmetric, and we could equally treat the real trip as the original and the plan as the model. 
@@ -430,7 +428,7 @@ The <em>perspective</em> of a human model focuses on the physical appearance of 
 <br/><br/>
 The human model is a <em>model</em> of the target customer, with the customer as the referent system. Both are physical entities — there is no description involved, and consequently no <em>programming</em> in the sense of the book. The human model exists independently of any particular customer, yet functions as a stand-in for the customer, chosen to approximate that referent within the chosen perspective.
 <br/><br/>
-<em>Correctness</em> is assessed by <em>validation</em>: does the clothing look similar on the customer as on the model? Accuracy here has a concrete meaning: how well do the model's body points match those of the customer? In practice, accuracy is difficult to judge — distance, quick movement, and dim or dramatic lighting all reduce the effective granularity at which the model's shape can be sampled. A viewer perceives a rough silhouette rather than precise measurements. This low precision is not incidental: it is often deliberate, since higher precision would reveal better how far the model's proportions deviate from the customer's.
+<em>Correctness</em> is assessed by <em>validation</em>: does the clothing look similar on the customer as on the model? <em>Accuracy</em> here has a concrete meaning: how well do the model's body points match those of the customer? In practice, accuracy is difficult to judge — distance, quick movement, and dim or dramatic lighting all reduce the effective granularity at which the model's shape can be sampled. A viewer perceives a rough silhouette rather than precise measurements. This low precision is not incidental: it is often deliberate, since higher precision would reveal better how far the model's proportions deviate from the customer's.
 </details>
 </details>
 
