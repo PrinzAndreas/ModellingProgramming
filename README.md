@@ -13,6 +13,7 @@ Welcome to the online resources for the book [*Understanding Modelling and Progr
 ### [Data](Data)
 * [Temperature Data](Data/TemperatureData)
 * [Simulation Data](Data/SimulationData)
+* [Simulation Diagrams](Illustrations/Diagrams)
 
 ### [Illustrations](Illustrations)
 * [Figures](Illustrations/Figures)

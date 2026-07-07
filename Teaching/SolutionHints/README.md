@@ -15,7 +15,7 @@ Which aspects of reality do you consider, and which do you ignore?
 Which precision of the relevant attributes is meaningful?
 <details>
 <summary> Solution hints </summary>
-Consider an analog wall clock with a simple design: numbers 1 to 12 and two hands — a short hour hand and a long minute hand.<br/>
+Consider an analog wall clock with a simple design: numbers 1 to 12 and two hands - a short hour hand and a long minute hand.<br/>
 * For determining the time, the relevant information is where the hands point.<br/>
 * Only the angle of the hands (two numbers) is considered. The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape of the numbers, the existence of the numbers, the mechanism that makes the clock work (electronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
 * For reading the time it is sufficient to have the angle of the hands with a <em>precision</em> of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a <em>precision</em> of 30 degrees helps us to distinguish 12 different directions for the hour hand.

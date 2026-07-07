@@ -2,9 +2,6 @@
 
 We provide a few relevant references to material that can be used in teaching in addition to or as an alternative to the book.
 
-* Work in progress
-![work in progress](../../images/comingSoon.png "work in progress")
-
 ### Other publications of the authors
 You can find the authors on dblp, Google Scholar, CRISTIN, and ResearchGate as follows.
 * Andreas Prinz:          [dblp](https://dblp.uni-trier.de/pid/59/807.html), [Google Scholar](https://scholar.google.com/citations?user=IwpfSKUAAAAJ), [CRISTIN](https://wo.cristin.no/as/WebObjects/cristin.woa/wa/fres?sort=ar&pnr=1690&action=sok), [ResearchGate](https://www.researchgate.net/profile/Andreas-Prinz)
