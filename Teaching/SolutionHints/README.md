@@ -5,8 +5,6 @@ As the tasks are formulated very openly, there is not just one solution to each 
 Rather, they are starting points to discover different models and perspectives.
 
 ### 2.1 Clock Perspective
-<details>
-<summary> Task description </summary>
 Consider a clock somewhere in your household or school.
 The purpose is to read the time.
 
@@ -19,12 +17,10 @@ Consider an analog wall clock with a simple design: numbers 1 to 12 and two hand
 * For determining the time, the relevant information is where the hands point.<br/>
 * Only the angle of the hands (two numbers) is considered. The following are examples of irrelevant aspects: the colour of the hands and the clock, the shape of the numbers, the existence of the numbers, the mechanism that makes the clock work (electronic versus mechanical), and the position of the clock. There are many more irrelevant aspects.<br/>
 * For reading the time it is sufficient to have the angle of the hands with a <em>precision</em> of 6 degrees, such that we can distinguish 60 different directions for the minute hand. For the hour hand, a <em>precision</em> of 30 degrees helps us to distinguish 12 different directions for the hour hand.
-</details>
+<img src="figures/fig_2_1_clock_angles.svg" alt="Clock face at 6:15 with the hour and minute hand angles annotated, and tick marks at 6 and 30 degree spacing" width="400">
 </details>
 
 ### 2.2 Alarm Clock System
-<details>
-<summary> Task description </summary>
 Consider an alarm clock somewhere in your household with the purpose of reading the time.
 
 What is the system for this clock? 
@@ -42,11 +38,8 @@ There are four buttons: MODE, UP, DOWN, ALARM. On top there is a SNOOZE button a
 * The relevant attributes are the hour and minute on the display, and the charging status of the battery. It is possible to also consider the connection status to the controlling atomic clock.<br/>
 * A <em>system snapshot</em> is clock.display.hour=11, clock.display.minute=27, clock.battery.status=64%.
 </details>
-</details>
 
 ### 2.3 Alternative Clock Perspective
-<details>
-<summary> Task description </summary>
 Consider a clock on a public building. Choose a purpose which is not reading the time.
 
 Which perspective supports your chosen purpose? What is the system in this new perspective, including parts and attributes? Describe at least one snapshot of this alternative system.
@@ -64,11 +57,8 @@ However, the bell of the clock is a good means of navigation, in particular in t
 * Possible attributes are its location, the direction from where the signal came, the frequency of the signal, and the delay until the next signal.<br/>
 * A possible system state is location: 58.34314231863526, 8.59555405017648, direction: 320&deg;, frequency: 15', delay: 6'
 </details>
-</details>
 
 ### 2.4 Clock Descriptions
-<details>
-<summary> Task description </summary>
 Consider a clock on a public building with the purpose of reading the time.
 
 Create three different snapshot descriptions of such a clock. Then describe possible system executions.
@@ -86,11 +76,8 @@ We can translate these states into digital time readings as follows: 12:00, 5:20
 When we consider a <em>discrete</em> execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
 A <em>continuous</em> execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
 </details>
-</details>
 
 ### 3.1 Paper plane
-<details>
-<summary> Task description </summary>
 Consider a paper plane, folded out of regular A4 paper.
 
 How is the paper plane a model of a Boeing 737? 
@@ -105,11 +92,8 @@ Now we can map between 3D paper plane and Boeing 737 movements. With some scalin
 Obviously, we can only consider scenarios where the plane descends, as the paper plane does not any thrust.
 We can look at gliding and maybe landing.
 </details>
-</details>
 
 ### 3.2 Music
-<details>
-<summary> Task description </summary>
 Consider descriptions of music in the form of sheet music.
 
 Do the symbols describe the music correctly? Which perspective is applied? How does changing the playing instrument change the correctness of the model?
@@ -126,11 +110,8 @@ For loudness, expressivity is even less.
 That means not all musical ideas can be expressed with musical notes.<br>
 Different instruments are similar under our <em>perspective</em>. We might need an extended <em>perspective</em> to distinguish them.<br>
 </details>
-</details>
 
 ### 3.3 Geocentric Worldview
-<details>
-<summary> Task description </summary>
 The geocentric worldview posits that Earth is at the center of the universe and stars, planets, and the sun, revolve around it.
 
 Is the geocentric worldview a correct model of the movements of the stars and planets?
@@ -145,11 +126,8 @@ Due to the placement of the Earth in the center, various corrections have to be 
 With those, the model can predict the planet movements with reasonable <em>precision</em>.<br/>
 However, the model gets much simpler when using a heliocentric <em>perspective</em>.
 </details>
-</details>
 
 ### 3.4 Heating Model
-<details>
-<summary> Task description </summary>
 Recheck Episode 11.
 
 Add more implicit assumptions for that case. Determine which of the given and the added assumptions are valid. How could we extend the model to take care of the invalid assumptions?
@@ -159,11 +137,8 @@ Obviously, there are many more implicit assumption to add. We consider just thre
 Validity of the assumptions is related to the purpose of the model and the implied data <em>accuracy</em>. Although Charlie's movements influence the temperature distribution in the room, the effect is not visible because we only have one data item for the room temperature and our temperature <em>accuracy</em> of 1 degree is not fine enough to register Charlie's influence. The furniture could make a difference, but this is not visible as we only have one data item for the room temperature. The floor isolation is not relevant as the room below Charlie's room is also heated and has almost the same temperature as Charlie's room.<br/>
 When we want to consider the distribution of temperature in the room, we need more temperature measurement spots and a model for the heat diffusion in the room.
 </details>
-</details>
 
 ### 4.1 Time
-<details>
-<summary> Task description </summary>
 Consider a clock as a model of time.
 
 When is a clock a correct model and when is the model incorrect? How is this influenced by the perspective chosen?
@@ -175,11 +150,8 @@ However, care is needed, because equality depends on the <em>perspective</em>, i
 The <em>precision</em> of the clock introduces an extra challenge, because any <em>precision</em> means that clock readings are discrete instead of continuous.
 In this sense, it is impossible to have a real continuous clock. Again, the <em>perspective</em> decides whether this is acceptable or not.
 </details>
-</details>
 
 ### 4.2 Architecture
-<details>
-<summary> Task description </summary>
 Architectural drawings describe some aspects of buildings.
 
 Sometimes, the drawing is prepared after the building is finished. Can we say that the building prescribed by the drawing is a model of the real building? Or is it the other way around?
@@ -189,17 +161,14 @@ Obviously, the answer to the question depends on the <em>perspective</em> chosen
 Then the measurements in the building should match the data available in the drawing, and hence model-of can go in both ways.<br/>
 On this basis, we should check what was the original. If the original was the drawing, and the building is based later, then the building can be considered the <em>model</em>. Otherwise, the prescribed building by the drawing can be considered the <em>model</em>.
 </details>
-</details>
 
 ### 4.3 Discretization
-<details>
-<summary> Task description </summary>
-Figure 4.4 shows how discrete data can be interpolated to form continuous data.
+<a href="../../Illustrations/Diagrams/#diagrams-from-book">Figure 4.4</a> shows how discrete data can be interpolated to form continuous data.
 
 If we start with continuous data given by the cosine function, how can we extract discrete data at every full minute? How does the perspective influence the result?
 <details>
 <summary> Solution hints </summary>
-The cosine function is a real-valued function from reals. If we want to extract a value for every full minute, we first need to agree on what real number constitutes a minute. For simplicity, we assume a time base of minutes, such that the first minute has the real value 1.0. Alternatively, we could have chosen a time base of seconds, where the first minute would be at the real value 60.0. Another alternative would be to choose a time base of &#x3C0;/2. In this case, the values of sine would switch between 0, 1, and -1.<br/>
+The cosine function is a real-valued function from reals. If we want to extract a value for every full minute, we first need to agree on what real number constitutes a minute. For simplicity, we assume a time base of minutes, such that the first minute has the real value 1.0. Alternatively, we could have chosen a time base of seconds, where the first minute would be at the real value 60.0. Another alternative would be to choose a time base of &#x3C0;/2. In this case, the values of cosine would switch between 1, 0, -1, and 0.<br/>
 From here, we just create a table of values as follows. Of course, you choose only one column with the appropriate time base.
 <table>
   <thead>
@@ -209,37 +178,43 @@ From here, we just create a table of values as follows. Of course, you choose on
       <th scope="col">time base second</th>
       <th scope="col">time base minute&times;&#x3C0;/2</th>
     </tr>
+    <tr>
+      <th scope="col"><em>t</em></th>
+      <th scope="col">cos(<em>t</em> &middot; 1)</th>
+      <th scope="col">cos(<em>t</em> &middot; 60)</th>
+      <th scope="col">cos(<em>t</em> &middot; &pi;/2)</th>
+    </tr>
   </thead>
   <tbody>
     <tr>
       <th scope="row">0</th>
-      <td style="text-align: center;">0.0</td>
-      <td style="text-align: center;">0.0</td>
-      <td style="text-align: center;">0.0</td>
-    </tr>
-    <tr>
-      <th scope="row">1</th>
-      <td style="text-align: center;">0.84</td>
-      <td style="text-align: center;">-0.30</td>
+      <td style="text-align: center;">1.0</td>
+      <td style="text-align: center;">1.0</td>
       <td style="text-align: center;">1.0</td>
     </tr>
     <tr>
-      <th scope="row">2</th>
-      <td style="text-align: center;">0.91</td>
-      <td style="text-align: center;">0.58</td>
+      <th scope="row">1</th>
+      <td style="text-align: center;">0.54</td>
+      <td style="text-align: center;">-0.95</td>
       <td style="text-align: center;">0.0</td>
     </tr>
     <tr>
-      <th scope="row">3</th>
-      <td style="text-align: center;">0.14</td>
-      <td style="text-align: center;">-0.80</td>
+      <th scope="row">2</th>
+      <td style="text-align: center;">-0.42</td>
+      <td style="text-align: center;">0.81</td>
       <td style="text-align: center;">-1.0</td>
     </tr>
     <tr>
-      <th scope="row">4</th>
-      <td style="text-align: center;">-0.76</td>
-      <td style="text-align: center;">0.95</td>
+      <th scope="row">3</th>
+      <td style="text-align: center;">-0.99</td>
+      <td style="text-align: center;">-0.60</td>
       <td style="text-align: center;">0.0</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td style="text-align: center;">-0.65</td>
+      <td style="text-align: center;">0.33</td>
+      <td style="text-align: center;">1.0</td>
     </tr>
     <tr>
       <th scope="row">...</th>
@@ -249,13 +224,11 @@ From here, we just create a table of values as follows. Of course, you choose on
     </tr>
   </tbody>
 </table>
+<img src="figures/fig_4_3_single.png" alt="Discrete sampling of cos(t) under three different time bases: minute, second, and minute&times;&#960;/2" width="700"><br/>
 The <em>perspective</em> influences at which place we read the cosine function. It also determines the <em>precision</em> and <em>accuracy</em> of the result.
-</details>
 </details>
 
 ### 4.4 Darts
-<details>
-<summary> Task description </summary>
 Dart throwing often has a considerable element of luck involved.
 
 What are the reasons for these uncertainties? How could a change of perspective remove some of the randomness? How does the situation change if the player is a world champion?
@@ -270,11 +243,8 @@ For a pro player, this uncertainty distance is small, such that the randomness i
 <br>
 When we are able to measure the direction and velocity of the dart arrow when it leaves the hand, most of the randomness disappears.
 </details>
-</details>
 
 ### 5.1 Synchronised Traffic Lights
-<details>
-<summary> Task description </summary>
 A city wants to reprogram the traffic lights to avoid traffic jams. The new programs should be tested in a <em>model</em> before deployment.
 
 What perspective do you propose for the model to capture all relevant elements? 
@@ -296,11 +266,8 @@ Relevant RTS elements could be:
   <li> <em>Specification-dependent RTS elements</em> could include traffic light status values, traffic condition status values, and traffic light control values. </li>
 </ul>
 </details>
-</details>
 
 ### 5.2 Compilers and Interpreters
-<details>
-<summary> Task description </summary>
 Suppose we have a machine understanding ML, and a compiler written in ML translating SLX to ML.
 
 Can we use the SLX compiler and the ML machine to create a (virtual) SLX machine, thereby making SLX executable?
@@ -311,11 +278,8 @@ Fortunately, we have an ML specification to execute, namely the compiler. When w
 Now we have an ML specification of our system, and with the ML machine, we can easily execute it.<br>
 In summary, yes, we can create a virtual SLX machine, by using a two-step procedure: (1) compile the SLX specification to a matching ML specification, and (2) execute the produced ML specification.
 </details>
-</details>
 
 ### 5.3 Testing
-<details>
-<summary> Task description </summary>
 Testing is a way to validate a new system. A number of tests are run in the mental original and in the new system and the results are compared.
 
 Which methods would you propose to test a new chair? Which tests should be selected?
@@ -331,11 +295,8 @@ For the <em>ergonomics</em>, we test the comfort of the cushions, the body suppo
 Proposed test procedure: Sit in the chair for 10-15 minutes, Try to adjust the backrest, armrests, height, and depth to your body, Make some movements in the chair (turn, tilt, swivel). <br/>
 Expected result: The chair is comfortable in all situations, supports the lower back, and has a 2–4 finger gap between the seat edge and the back of the knees.
 </details>
-</details>
 
 ### 5.4 Random Numbers
-<details>
-<summary> Task description </summary>
 Pseudo-random numbers are a realization of real random numbers.
 
 How could you verify or validate that they are correct?
@@ -348,11 +309,8 @@ In practice, we can compare the statistical properties of the random numbers aga
 If they do not match close enough, we can consider the sequence to be flawed. There are also some test sets which do such comparisons.
 The basic idea is that we reject a sequence if we feel we can prove that it is not random.
 </details>
-</details>
 
 ### 6.1 Flight Simulator
-<details>
-<summary> Task description </summary>
 A flight simulator is software that allows one to experience flying a plane. Simple versions work like games, while advanced versions use real cockpits to recreate the flight feeling as exactly as possible. After extended training in a flight simulator, a real flight is manageable.
 
 Discuss flight simulators in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
@@ -374,11 +332,8 @@ The <em>program</em> of the flight simulator connects the two sides: it takes th
 <br/>
 The natural <em>description</em> language here is differential equations, which express how the aircraft's state variables (position, velocity, attitude) evolve continuously in response to forces and control inputs. For well-defined procedural sequences — such as a standard landing procedure, an engine-failure checklist, or an automatic go-around — state machines are the appropriate formalism, capturing the discrete, step-by-step nature of these processes.
 </details>
-</details>
 
 ### 6.2 Maps
-<details>
-<summary> Task description </summary>
 Assume you use a map to plan a hiking trip.
 
 Discuss your plan and the map as a model of the trip in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
@@ -414,11 +369,8 @@ The plan is also a simple <em>program</em>: a description of the steps to follow
 Walking the trip is then the execution of that program. 
 Alternatively, we can run the program virtually — as Google Maps does when it simulates the route — treating the map model as the execution environment rather than the real terrain.
 </details>
-</details>
 
 ### 6.3 Human Models
-<details>
-<summary> Task description </summary>
 When you search the Internet for the term 'models', your first hits will relate to the profession or role to be a model.
 
 Discuss these human models in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
@@ -430,11 +382,8 @@ The human model is a <em>model</em> of the target customer, with the customer as
 <br/><br/>
 <em>Correctness</em> is assessed by <em>validation</em>: does the clothing look similar on the customer as on the model? <em>Accuracy</em> here has a concrete meaning: how well do the model's body points match those of the customer? In practice, accuracy is difficult to judge — distance, quick movement, and dim or dramatic lighting all reduce the effective granularity at which the model's shape can be sampled. A viewer perceives a rough silhouette rather than precise measurements. This low precision is not incidental: it is often deliberate, since higher precision would reveal better how far the model's proportions deviate from the customer's.
 </details>
-</details>
 
 ### 6.4 Weather Forecast
-<details>
-<summary> Task description </summary>
 Consider your favourite weather forecast site. It provides a description of the weather to come and maybe also of the weather that has been.
 
 Discuss weather forecasts in terms of the concepts of this book. What is the associated perspective, what is the modelling involved and where are the programming and descriptions?
@@ -447,5 +396,4 @@ The weather forecast is a <em>description</em> — a sequence of snapshot descri
 The <em>referent system</em> is the real weather — a continuous physical system that simply unfolds, with no description of its own. When instruments measure it, they produce a series of snapshots aligned with the same perspective variables: temperature, precipitation, wind. This sequence of measured snapshots is the <em>backcast</em> — a description of what actually happened, in the same form as the forecast.
 <br/><br/>
 <em>Correctness</em> is assessed by <em>validation</em>: comparing corresponding snapshots from the forecast against those from the backcast. Where the numbers match within the <em>accuracy</em> of the perspective — the acceptable deviation defined by the precision of our measurements — the model is correct. The elegance of this framing is that forecast and backcast share the same structure — both are sequences of snapshot descriptions — making the comparison direct and unambiguous.
-</details>
 </details>
