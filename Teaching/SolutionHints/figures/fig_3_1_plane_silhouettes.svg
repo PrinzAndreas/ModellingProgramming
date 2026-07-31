@@ -1,0 +1,14 @@
+<svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="500" fill="#ffffff"/>
+
+<g transform="translate(-50,20) scale(0.9)">
+<path d="M 200.0,40.0 L 206.0,95.0 L 350.0,235.0 L 358.0,245.0 L 240.0,258.0 L 210.0,400.0 L 200.0,415.0 L 190.0,400.0 L 160.0,258.0 L 42.0,245.0 L 50.0,235.0 L 194.0,95.0 L 200.0,40.0 Z" fill="#1f2328"/>
+<line x1="200" y1="40" x2="200" y2="415" stroke="#ffffff" stroke-width="2"/>
+</g>
+<text x="150" y="480" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">paper plane</text>
+
+<g transform="translate(430,20) scale(0.9)">
+<path d="M 200.0,20.0 L 208.0,55.0 L 212.0,100.0 L 214.0,150.0 L 218.0,175.0 L 295.0,205.0 L 300.0,213.0 L 230.0,228.0 L 217.0,255.0 L 216.0,320.0 L 216.0,335.0 L 258.0,350.0 L 260.0,358.0 L 220.0,372.0 L 207.0,388.0 L 200.0,398.0 L 193.0,388.0 L 180.0,372.0 L 140.0,358.0 L 142.0,350.0 L 184.0,335.0 L 184.0,320.0 L 183.0,255.0 L 170.0,228.0 L 100.0,213.0 L 105.0,205.0 L 182.0,175.0 L 186.0,150.0 L 188.0,100.0 L 192.0,55.0 L 200.0,20.0 Z" fill="#1f2328"/>
+</g>
+<text x="630" y="480" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">Boeing 737</text>
+</svg>

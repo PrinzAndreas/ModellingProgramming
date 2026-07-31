@@ -3,7 +3,6 @@
 <desc id="clockDesc">A clock face showing the hour hand and minute hand at 6:15, with tick marks every 6 degrees (minute precision) and every 30 degrees (hour precision), and arcs labeling the angle of each hand measured from the 12 o'clock position.</desc>
 <rect x="0" y="0" width="500" height="500" fill="#ffffff"/>
 <circle cx="250" cy="250" r="200" fill="none" stroke="#1f2328" stroke-width="3"/>
-
 <g stroke="#59636e" stroke-width="1.5">
 <line x1="269.9" y1="61.0" x2="270.9" y2="51.1" />
 <line x1="289.5" y1="64.2" x2="291.6" y2="54.4" />
@@ -54,7 +53,6 @@
 <line x1="210.5" y1="64.2" x2="208.4" y2="54.4" />
 <line x1="230.1" y1="61.0" x2="229.1" y2="51.1" />
 </g>
-
 <g stroke="#1f2328" stroke-width="3">
 <line x1="250.0" y1="75.0" x2="250.0" y2="50.0" />
 <line x1="337.5" y1="98.4" x2="350.0" y2="76.8" />
@@ -69,7 +67,6 @@
 <line x1="98.4" y1="162.5" x2="76.8" y2="150.0" />
 <line x1="162.5" y1="98.4" x2="150.0" y2="76.8" />
 </g>
-
 <g font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#1f2328" text-anchor="middle" dominant-baseline="middle">
 <text x="250.0" y="102.0">12</text>
 <text x="324.0" y="121.8">1</text>
@@ -84,14 +81,11 @@
 <text x="121.8" y="176.0">10</text>
 <text x="176.0" y="121.8">11</text>
 </g>
-
 <path d="M 250.0 160.0 A 90 90 0 1 1 238.3 339.2" fill="none" stroke="#0550ae" stroke-width="2" stroke-dasharray="4 3"/>
-<text x="300.0" y="300.0" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#0550ae" text-anchor="middle">hour hand: 187.5&#176;</text>
-
+<text x="266.5" y="155.2" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#0550ae" text-anchor="start">hour hand: 187.5&#176;</text>
 <path d="M 250.0 185.0 A 65 65 0 0 1 315.0 250.0" fill="none" stroke="#953800" stroke-width="2" stroke-dasharray="4 3"/>
 <text x="296.0" y="204.0" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#953800" text-anchor="start">minute hand: 90&#176;</text>
-
 <line x1="250" y1="250" x2="238.3" y2="339.2" stroke="#1f2328" stroke-width="8" stroke-linecap="round"/>
-<line x1="250" y1="250" x2="435.0" y2="250.0" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<line x1="250" y1="250" x2="370.0" y2="250.0" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
 <circle cx="250" cy="250" r="8" fill="#1f2328"/>
 </svg>

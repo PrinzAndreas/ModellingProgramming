@@ -65,14 +65,17 @@ Create three different snapshot descriptions of such a clock. Then describe poss
 <details>
 <summary> Solution hints </summary>
 We consider the clock of Big Ben, which is the Great Clock of Westminster at the north end of the Palace of Westminster in London, England.
+<img src="https://commons.wikimedia.org/wiki/Special:FilePath/Big%20Ben%20Clock%20Face.jpg" alt="The Big Ben clock face" width="350"><br/>
+<span style="font-size: smaller; color: #59636e;">Photo: Wikimedia Commons, CC BY-SA 4.0 (<a href="https://commons.wikimedia.org/wiki/File:Big_Ben_Clock_Face.jpg">file page</a>)</span><br/>
 The clock is an analogue clock and is shown in four directions. This means a system status contains four clock readings, which all should be the same at all times.
 This is normally ensured by the mechanics inside the tower. Each clock reading can be represented by the angle of its hour and minute hands with the <em>precision</em> of integers.
 We only look at the north clock now.
 If we use degrees for the angle starting from the hands pointing up, then we can identify three situations as follows.<br><br>
 bigben.clock.north.hour=0, bigben.clock.north.minute=0 <br>
 bigben.clock.north.hour=160, bigben.clock.north.minute=120 <br>
-bigben.clock.north.hour=81, bigben.clock.north.minute=253<br><br>
+bigben.clock.north.hour=81, bigben.clock.north.minute=252<br><br>
 We can translate these states into digital time readings as follows: 12:00, 5:20, 2:42.<br>
+<img src="figures/fig_2_4_clock_snapshots.svg" alt="Three clock faces showing the system snapshots 12:00, 5:20, and 2:42 with their hour and minute hand angles" width="600"><br/>
 When we consider a <em>discrete</em> execution, then the minute hand would advance by 6 degrees every minute, while the hour hand would advance by 1 degree every other minute. We consider all angles modulo 360 degrees.<br>
 A <em>continuous</em> execution will advance the minute hand continuously and constantly such that one minute yields 6 degrees. The hour hand is increased similarly to increase by 1 degree every other minute.
 </details>
@@ -121,7 +124,12 @@ Which perspective is needed to make it a correct model?
 As with all models, the question is about the purpose of the model. We want to account for the movements of the stars and the planets.
 First, it must be noted that for the movements of the stars there is basically no difference between a geocentric and a heliocentric worldview, because all stars are very far apart from our solar system.
 When it comes to the planets, there are very early methods to predict the movements of the planets, the sun and the moon.
-There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that.
+There are even <a href="https://en.wikipedia.org/wiki/Antikythera_mechanism">physical models</a> for that, such as the Antikythera mechanism, an ancient Greek geared device for predicting astronomical positions.<br/>
+<video controls width="500">
+  <source src="https://commons.wikimedia.org/wiki/Special:FilePath/Lego%20Antikythera%20Mechanism.webm" type="video/webm">
+  Your browser does not support inline video. <a href="https://commons.wikimedia.org/wiki/File:Lego_Antikythera_Mechanism.webm">Watch it on Wikimedia Commons</a> instead.
+</video><br/>
+<span style="font-size: smaller; color: #59636e;">Video: Jacopo Werther, <a href="https://commons.wikimedia.org/wiki/File:Lego_Antikythera_Mechanism.webm">Wikimedia Commons</a>, CC BY-SA 3.0 &mdash; a LEGO reconstruction showing the mechanism's gear train in motion.</span><br/>
 Due to the placement of the Earth in the center, various corrections have to be applied to ensure <em>correctness</em>.
 With those, the model can predict the planet movements with reasonable <em>precision</em>.<br/>
 However, the model gets much simpler when using a heliocentric <em>perspective</em>.
@@ -163,7 +171,7 @@ On this basis, we should check what was the original. If the original was the dr
 </details>
 
 ### 4.3 Discretization
-<a href="../../Illustrations/Diagrams/#diagrams-from-book">Figure 4.4</a> shows how discrete data can be interpolated to form continuous data.
+<a href="../../Illustrations/Diagrams/Figure_4_4.png">Figure 4.4</a> shows how discrete data can be interpolated to form continuous data.
 
 If we start with continuous data given by the cosine function, how can we extract discrete data at every full minute? How does the perspective influence the result?
 <details>
