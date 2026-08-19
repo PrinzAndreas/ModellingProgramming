@@ -65,6 +65,7 @@ Create three different snapshot descriptions of such a clock. Then describe poss
 <details>
 <summary> Solution hints </summary>
 We consider the clock of Big Ben, which is the Great Clock of Westminster at the north end of the Palace of Westminster in London, England.
+
 <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Big%20Ben%20Clock%20Face.jpg" alt="The Big Ben clock face" width="350"><br/>
 <span style="font-size: smaller; color: #59636e;">Photo: Wikimedia Commons, CC BY-SA 4.0 (<a href="https://commons.wikimedia.org/wiki/File:Big_Ben_Clock_Face.jpg">file page</a>)</span><br/>
 The clock is an analogue clock and is shown in four directions. This means a system status contains four clock readings, which all should be the same at all times.
