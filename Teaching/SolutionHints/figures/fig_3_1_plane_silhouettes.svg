@@ -1,14 +1,58 @@
-<svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
-<rect width="900" height="500" fill="#ffffff"/>
-
-<g transform="translate(-50,20) scale(0.9)">
-<path d="M 200.0,40.0 L 206.0,95.0 L 350.0,235.0 L 358.0,245.0 L 240.0,258.0 L 210.0,400.0 L 200.0,415.0 L 190.0,400.0 L 160.0,258.0 L 42.0,245.0 L 50.0,235.0 L 194.0,95.0 L 200.0,40.0 Z" fill="#1f2328"/>
-<line x1="200" y1="40" x2="200" y2="415" stroke="#ffffff" stroke-width="2"/>
+<svg viewBox="0 0 1164 422" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three top-view silhouettes for comparison: paper planes Fast Glider and Lock-Bottom, and a Boeing 737, each with body, wings, and other surfaces filled in distinct colours">
+<rect width="1164" height="422" fill="#ffffff"/>
+<a href="https://www.foldnfly.com/48.html#Fast-Glider" target="_blank" rel="noopener">
+<g transform="translate(-300,-5)">
+<!-- wings fast glider -->
+<path d="M 477,85 L 497,105 L620,105 L 620,205 L 477,205 Z" fill="#953800" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M 463,85 L 443,105 L320,105 L 320,205 L 463,205 Z" fill="#953800" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<!-- tail fast glider -->
+<path d="M 477,205 L 497,205 L 497,235 L 530,268 L 537,288 L 537,335 L 530,335 L 530,268 L 530,335 L 477,335 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1.2"/>
+<path d="M 463,205 L 443,205 L 443,235 L 410,268 L 403,288 L 403,335 L 410,335 L 410,268 L 410,335 L 463,335 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1.2"/>
+<!-- body fast glider -->
+<path d="M 470,25 L 477,85 L 477,335 L 463,335 L 463,85 L 470,25 Z" fill="#0550ae" stroke="#1f2328" stroke-width="1.2"/>
+<line x1="470" y1="25" x2="470" y2="335" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
 </g>
-<text x="150" y="480" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">paper plane</text>
-
-<g transform="translate(430,20) scale(0.9)">
-<path d="M 200.0,20.0 L 208.0,55.0 L 212.0,100.0 L 214.0,150.0 L 218.0,175.0 L 295.0,205.0 L 300.0,213.0 L 230.0,228.0 L 217.0,255.0 L 216.0,320.0 L 216.0,335.0 L 258.0,350.0 L 260.0,358.0 L 220.0,372.0 L 207.0,388.0 L 200.0,398.0 L 193.0,388.0 L 180.0,372.0 L 140.0,358.0 L 142.0,350.0 L 184.0,335.0 L 184.0,320.0 L 183.0,255.0 L 170.0,228.0 L 100.0,213.0 L 105.0,205.0 L 182.0,175.0 L 186.0,150.0 L 188.0,100.0 L 192.0,55.0 L 200.0,20.0 Z" fill="#1f2328"/>
+<text x="170" y="397" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#1f2328" text-anchor="middle">Fast Glider (top view)</text>
+</a>
+<g transform="translate(522,20) scale(0.888) translate(-522,-20)">
+<g transform="translate(-263,-2)">
+<!-- engines boeing -->
+<path d="M 821,179 C 818,170 818,149 821,150 C 822,148 834,148 835,150 C 838,153 838,173 835,179 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1" stroke-linejoin="round"/>
+<path d="M 749,179 C 752,170 752,149 749,150 C 748,148 736,148 735,150 C 732,153 732,173 735,179 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1" stroke-linejoin="round"/>
+<!-- wings boeing -->
+<path d="M 800,155 L 817,170 L 937,228 C 945,232 947,246 947,246 L 839,218 L 800,220 Z" fill="#953800" stroke="#1f2328" stroke-width="1" stroke-linejoin="round"/>
+<path d="M 770,155 L 753,170 L 633,228 C 625,232 623,246 623,246 L 731,218 L 770,220 Z" fill="#953800" stroke="#1f2328" stroke-width="1" stroke-linejoin="round"/>
+<!-- tail boeing -->
+<path d="M 794,331 L 850,365 L 850,371 L 788,355 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1" stroke-linejoin="round"/>
+<path d="M 776,331 L 720,365 L 720,371 L 782,355 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1" stroke-linejoin="round"/>
+<!-- body boeing -->
+<path d="M 785,25 C 795,22 800,60 800,75 L 800,285 C 800,300 790,361 785,359 C 780,361 770,300 770,285 L 770,75 C 770,60 775,22 785,25 Z" fill="#0550ae" stroke="#1f2328" stroke-width="1"/>
 </g>
-<text x="630" y="480" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">Boeing 737</text>
+</g>
+<text x="522" y="397" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#1f2328" text-anchor="middle">Boeing 737 (top view)</text>
+<a href="https://www.foldnfly.com/29.html#Lock-Bottom" target="_blank" rel="noopener">
+<g transform="translate(698,-2)">
+<g transform="scale(0.86) translate(30,0)">
+<!-- wings lock bottom -->
+<path d="M 162,85 L 302,225 L 309,245 L 309,385 L 302,385 L 302,225 L 302,385 L 269,385 L 269,365 L 249,365 L 249,385 L 162,385 L 162,85 Z" fill="#953800" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M 147,85 L 7,225   L 0,245   L 0,385   L 7,385   L 7,225   L 7,385   L 40,385  L 40,365  L 60,365  L 60,385  L 147,385 L 147,85 Z" fill="#953800" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<!-- flaps lock bottom -->
+<path d="M 269,365 L 249,365 L 249,372 L 269,372 Z" fill="#8a8f98" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M 40,365  L 60,365  L 60,372  L 40,372 Z"  fill="#8a8f98" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<!-- body lock bottom -->
+<path d="M 155,25 L 162,85 L 162,385 L 147,385 L 147,85 L 155,25 Z" fill="#0550ae" stroke="#1f2328" stroke-width="1.2" stroke-linejoin="round"/>
+<line x1="155" y1="25" x2="155" y2="385" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+</g>
+</g>
+<text x="857" y="397" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#1f2328" text-anchor="middle">Lock-Bottom (top view)</text>
+</a>
+<g transform="translate(1020,20)">
+<rect x="-8" y="-16" width="132" height="74" fill="#ffffff" opacity="0.92" stroke="#c9cdd1"/>
+<rect x="0" y="-8" width="18" height="14" fill="#0550ae"/>
+<text x="26" y="3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">body</text>
+<rect x="0" y="14" width="18" height="14" fill="#953800"/>
+<text x="26" y="25" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">wings</text>
+<rect x="0" y="36" width="18" height="14" fill="#8a8f98"/>
+<text x="26" y="47" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">other (tail)</text>
+</g>
 </svg>

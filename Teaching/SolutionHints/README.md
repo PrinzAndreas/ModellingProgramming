@@ -92,6 +92,8 @@ For a <em>model</em>, we need a shared <em>perspective</em>. As the Boeing 737 i
 We consider one body, two wings, and the possibility to be airborne. For this, we consider the 3D position of the plane, its speed and the direction it is facing.
 We ignore the material, the inside of the body, and the wheels. If we want, we can consider flaps.<br>
 
+<img src="figures/fig_3_1_plane_silhouettes.svg" alt="Top-view silhouettes of the Fast Glider and Lock-Bottom paper planes and a Boeing 737, with body, wings, and other surfaces highlighted in matching colours" width="700"><br/>
+
 Now we can map between 3D paper plane and Boeing 737 movements. With some scaling, we can get the movements to match. 
 Obviously, we can only consider scenarios where the plane descends, as the paper plane does not any thrust.
 We can look at gliding and maybe landing.
@@ -329,6 +331,8 @@ The <em>perspective</em> of a flight simulator is determined by what a pilot nee
 <br/>
 Equally, the controls — throttle, yoke or sidestick, rudder pedals, flap levers — define what the pilot can change. The perspective is therefore bidirectional: it covers both the observable state and the actionable inputs. This perspective is deliberately narrow compared to the full physics of flight; it abstracts away everything that is not directly relevant to the pilot's task.
 <br/><br/>
+<img src="figures/fig_6_1_cockpit_regions.svg" alt="Photo of an FAA flight simulator cockpit with the instrument panel outlined and labelled 'instruments', and the sidestick and throttle console outlined and labelled 'controls'" width="700"><br/>
+<span style="font-size: smaller; color: #59636e;">Photo: U.S. Federal Aviation Administration, public domain (<a href="https://commons.wikimedia.org/wiki/File:FAA_flight_simulator_-_display.jpg">file page</a>)</span><br/><br/>
 The flight simulator must capture a <em>model</em> of the external forces and environmental conditions acting on the aircraft. These include
 meteorological factors (wind speed and direction, turbulence, precipitation, icing conditions, and visibility),
 exceptional events (bird strikes, volcanic ash clouds, wind shear, and microburst conditions), and
